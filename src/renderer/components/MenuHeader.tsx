@@ -40,8 +40,7 @@ const NumberLinearProgress = (props) =>{
 
 export default function MenuHeader({ username, progress, showCourseImage }) {
   return (
-    <Box>
-      <AppBar position="fixed">
+      <AppBar position="absolute">
         <Toolbar disableGutters>
           <Avatar
             variant="square"
@@ -70,6 +69,5 @@ export default function MenuHeader({ username, progress, showCourseImage }) {
           </Box>
         </Toolbar>
       </AppBar>
-    </Box>
   );
 }

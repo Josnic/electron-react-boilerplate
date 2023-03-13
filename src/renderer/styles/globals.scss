@@ -1,7 +1,46 @@
-.generic-container {
-    padding-right: 0 !important;
-    padding-left: 0 !important;
-}
+html,
 body{
-    padding-left: 0 !important;
+  margin: 0;
+  padding: 0;
+}
+.f-container{
+  height: 100vh; /* for shorter content */
+  display: flex !important;
+  flex-direction: column;
+    
+  /*ie10*/
+  display: -ms-flexbox;
+  -ms-flex-direction: column;
+}
+
+.main{
+  flex: 1 !important;
+  /*ie10*/
+  -ms-flex: 1 1 auto; /*needs both shrink and grow*/
+}
+
+.header,
+.footer{
+  flex-basis: 80px;
+  
+  /*ie10*/
+  -ms-flex-preferred-size: 50px;
+  
+  /*center align of links*/
+  display: flex;
+  justify-content: space-around; /*or space-between*/
+  /*ie10*/
+  display: -ms-flexbox;
+  -ms-flex-align: center; /*vertical*/
+  -ms-flex-line-pack: distribute; /*or justify*/
+}
+
+.footer {
+  /*ie10 short content*/
+  margin-top: auto; 
+}
+
+/* fixed header and footer with scrollable main section */
+.fixed-hf .main{
+  overflow-y: auto;
 }
