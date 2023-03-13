@@ -3,7 +3,6 @@ import Grid from '@mui/material/Grid';
 import DOMPurify from 'dompurify';
 import Artplayer from '../../ArtPlayer';
 import ButtomCustom from '../../ButtonRound';
-import './styles.scss';
 
 const PracticalStep = ({ data }) => {
 
@@ -13,7 +12,7 @@ const PracticalStep = ({ data }) => {
                 
             </Grid>
 
-            <Grid item xs={12} className='button-container'>
+            <Grid item xs={12} className='lessons-button-container-center'>
                 <ButtomCustom variant="contained" rounded>
                     Continuar
                 </ButtomCustom>

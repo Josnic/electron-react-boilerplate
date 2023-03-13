@@ -55,7 +55,7 @@ const NewConcept = ({ data }) => {
                 />
             </Grid>
 
-            <Grid item xs={12} className='button-container'>
+            <Grid item xs={12} className='lessons-button-container-center'>
                 <ButtomCustom variant="contained" rounded>
                     Continuar
                 </ButtomCustom>
