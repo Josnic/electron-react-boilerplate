@@ -9,14 +9,6 @@ import ListCard from './components/ListCard';
 import Typography from '@mui/material/Typography';
 import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
-
-const Item = styled(Paper)(({ theme }) => ({
-  backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
-  ...theme.typography.body2,
-  padding: theme.spacing(1),
-  textAlign: 'center',
-  color: theme.palette.text.secondary,
-}));
 import './styles.scss';
 
 const Home = () => {
@@ -37,17 +29,17 @@ const Home = () => {
                         </Typography>
                         </div>
                         <div className='list-container'>
-                        <Grid container columns={{ xs: 4, md: 12 }} spacing={2}>
-                            <Grid item xs={4}>
-                                <ListCard />
+                            <Grid container columns={{ xs: 4, md: 12 }} spacing={2}>
+                                <Grid item xs={4}>
+                                    <ListCard />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <ListCard />
+                                </Grid>
+                                <Grid item xs={4}>
+                                    <ListCard />
+                                </Grid>
                             </Grid>
-                            <Grid item xs={4}>
-                                <ListCard />
-                            </Grid>
-                            <Grid item xs={4}>
-                                <ListCard />
-                            </Grid>
-                        </Grid>
                         </div>
                     </div>
 
