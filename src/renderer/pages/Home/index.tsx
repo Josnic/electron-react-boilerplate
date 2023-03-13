@@ -5,9 +5,8 @@ import Container from '@mui/material/Container';
 import MenuHeader from '../../components/Layout/MenuHeader';
 import MenuFooter from '../../components/Layout/MenuFooter';
 import Box from '@mui/material/Box';
-import ListCard from './components/ListCard';
+import ListCard from '../../components/ListCard';
 import Typography from '@mui/material/Typography';
-import Paper from '@mui/material/Paper';
 import Grid from '@mui/material/Grid';
 import './styles.scss';
 
