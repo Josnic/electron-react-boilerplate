@@ -1,0 +1,33 @@
+.tests-container {
+    width: 100%;
+    .question-container {
+        width: 100%;
+        display: flex;
+        padding: 10px 10px 10px 10px;
+        justify-content: space-between;
+        .question {
+           &.self-appraisal {
+            width: 60%;
+           }
+           &.situacional-analysis {
+            width: 80%;
+           }
+           &.root-off-bitterness {
+            width: 75%;
+           }
+        }
+        .radio-container {
+            width: 40%;
+            float: right;
+            text-align: right;
+        }
+        .input-number-container {
+            width: 20%;
+            text-align: right;
+        }
+        .select-container {
+            width: 20%;
+            justify-content: right;
+        }
+    }
+}
