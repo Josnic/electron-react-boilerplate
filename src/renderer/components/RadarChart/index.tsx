@@ -56,6 +56,12 @@ const RadarChart = ({title, series, categories}) =>{
         }
       }, [chartInstance.current])
 
+      const exportToBase64 = async () => {
+        await chartInstance.current.chart.dataURI().then(data =>{
+          console.log(data)
+        })
+      }
+
     return (
         <>
         <ReactApexChart
