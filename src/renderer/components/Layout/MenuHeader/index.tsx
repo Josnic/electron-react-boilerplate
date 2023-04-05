@@ -8,6 +8,7 @@ import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import CardHeader from '@mui/material/CardHeader';
+import MenuIcon from '@mui/icons-material/Menu';
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 12,
@@ -38,10 +39,19 @@ const NumberLinearProgress = (props) =>{
 }
 
 
-export default function MenuHeader({ username, progress, showCourseImage }) {
+export default function MenuHeader({ username, progress, showCourseImage, handleDrawerOpen, open }) {
   return (
       <AppBar position="absolute">
         <Toolbar disableGutters>
+        <IconButton
+            color="inherit"
+            aria-label="open drawer"
+            onClick={handleDrawerOpen}
+            edge="start"
+            sx={{ marginLeft:'5px', mr: 2, ...(open && { display: 'none' }) }}
+          >
+            <MenuIcon />
+          </IconButton>
           <Avatar
             variant="square"
             src="https://mui.com/static/images/avatar/1.jpg"
