@@ -16,7 +16,7 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
 import { ipcMainUtils } from './app/ipcMainUtils';
-import { sqliteModule } from './app/sqlite3';
+import { sqlite3Module } from './app/sqlite3Module';
 
 class AppUpdater {
   constructor() {
@@ -27,7 +27,7 @@ class AppUpdater {
 }
 
 ipcMainUtils(ipcMain, shell);
-sqliteModule(ipcMain);
+sqlite3Module(ipcMain);
 
 let mainWindow: BrowserWindow | null = null;
 
