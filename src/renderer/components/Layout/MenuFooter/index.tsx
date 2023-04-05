@@ -116,7 +116,7 @@ export default function MenuFooter({ progress, open }) {
 
 
   return (
-      <AppBar open={open} position="absolute" color="primary" sx={{ top: 'auto', bottom: 0 }}>
+      <AppBar open={open} position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
         <Toolbar disableGutters>
         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
