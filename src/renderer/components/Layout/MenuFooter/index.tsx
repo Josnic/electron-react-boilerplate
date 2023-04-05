@@ -1,6 +1,5 @@
 import * as React from 'react';
 import { styled } from '@mui/material/styles';
-import AppBar from '@mui/material/AppBar';
 import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
@@ -13,7 +12,6 @@ import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuItem from '@mui/material/MenuItem';
 import ListItemIcon from '@mui/material/ListItemIcon';
-import Typography from '@mui/material/Typography';
 import CloudSyncIcon from '@mui/icons-material/CloudSync';
 import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
@@ -21,7 +19,33 @@ import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import LanguageIcon from '@mui/icons-material/Language';
 import { useNavigate } from 'react-router-dom';
 
-export default function MenuFooter({ progress }) {
+import { styled, useTheme } from '@mui/material/styles';
+import Drawer from '@mui/material/Drawer';
+import CssBaseline from '@mui/material/CssBaseline';
+import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
+
+import { openSystemBrowser } from '../../../utils/electronFunctions';
+
+const AppBar = styled(MuiAppBar, {
+  shouldForwardProp: (prop) => prop !== 'open',
+})<AppBarProps>(({ theme, open }) => ({
+  transition: theme.transitions.create(['margin', 'width'], {
+    easing: theme.transitions.easing.sharp,
+    duration: theme.transitions.duration.leavingScreen,
+  }),
+  ...(open && {
+    width: `calc(100% - ${drawerWidth}px)`,
+    marginLeft: `${drawerWidth}px`,
+    transition: theme.transitions.create(['margin', 'width'], {
+      easing: theme.transitions.easing.easeOut,
+      duration: theme.transitions.duration.enteringScreen,
+    }),
+  }),
+}));
+
+const drawerWidth = 240;
+
+export default function MenuFooter({ progress, open }) {
 
     const navigate = useNavigate();
 
@@ -84,7 +108,7 @@ export default function MenuFooter({ progress }) {
 
 
   return (
-      <AppBar position="absolute" color="primary" sx={{ top: 'auto', bottom: 0 }}>
+      <AppBar open={open} position="absolute" color="primary" sx={{ top: 'auto', bottom: 0 }}>
         <Toolbar disableGutters>
         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
             <IconButton
@@ -132,16 +156,18 @@ export default function MenuFooter({ progress }) {
                         {page.icon("white")}
                     </ListItemIcon>
                     <Typography textAlign="center">{page.text}</Typography>
-                </MenuItem>
+              </MenuItem>
             ))}
           </Box>
           <Box sx={{ flexGrow: 0 }}>
-          <MenuItem onClick={handleCloseNavMenu}>
-                    <ListItemIcon>
-                        <LanguageIcon sx={{ color: "white" }} />
-                    </ListItemIcon>
-                  <Typography textAlign="center">{"Sitio Web"}</Typography>
-                </MenuItem>
+            <MenuItem onClick={()=>{
+              openSystemBrowser("https://www.google.com")
+            }}>
+                <ListItemIcon>
+                    <LanguageIcon sx={{ color: "white" }} />
+                </ListItemIcon>
+                <Typography textAlign="center">{"Sitio Web"}</Typography>
+              </MenuItem>
           </Box>
         </Toolbar>
       </AppBar>
