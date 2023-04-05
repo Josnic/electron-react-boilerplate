@@ -2,6 +2,7 @@ import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
 import { ThemeProvider } from '@mui/material/styles';
 
 import MyTheme from '../MyTheme';
+import Welcome from "../pages/Welcome"; 
 import Login from "../pages/Login"; 
 import Register from "../pages/Register"; 
 import Home from "../pages/Home";
@@ -23,7 +24,8 @@ const RouteApp = () =>{
     <ThemeProvider theme={MyTheme}>
         <Router>
             <Routes>
-                <Route path="/" element={<Home />} />
+                <Route path="/" element={<Welcome />} />
+                <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route
                     path="/home"
