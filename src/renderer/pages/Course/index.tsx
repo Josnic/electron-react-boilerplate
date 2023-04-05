@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import './styles.scss';
 
-import NewConcept from '../../components/Lessons/NewConcept';
+import NewConcept from '../../components/BarChart';
 
 const Course = () => {
 

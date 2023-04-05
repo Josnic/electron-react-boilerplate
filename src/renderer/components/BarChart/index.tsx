@@ -31,6 +31,20 @@ const BarChart = ({title, series, categories}) =>{
             locales: [SpanishLocale],
             defaultLocale: "es"
           },
+          title: {
+            text: "Su nivel DISC",
+            align: 'center',
+            margin: 10,
+            offsetX: 0,
+            offsetY: 0,
+            floating: false,
+            style: {
+              fontSize:  '20px',
+              fontWeight:  'bold',
+              fontFamily:  undefined,
+              color:  '#263238'
+            },
+        },
           colors: colors,
           plotOptions: {
             bar: {
@@ -66,6 +80,7 @@ const BarChart = ({title, series, categories}) =>{
       useEffect(()=>{
         if (chartInstance.current){
          //chartInstance.current.chart.setLocale('es')
+         exportToBase64();
         }
       }, [chartInstance.current])
 
