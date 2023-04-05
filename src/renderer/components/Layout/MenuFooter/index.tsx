@@ -17,14 +17,17 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import LanguageIcon from '@mui/icons-material/Language';
-import { useNavigate } from 'react-router-dom';
-
 import { styled, useTheme } from '@mui/material/styles';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+
+import AuthTypes from '../../../redux/constants';
 import { openSystemBrowser } from '../../../utils/electronFunctions';
+const drawerWidth = 240;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -43,11 +46,17 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-const drawerWidth = 240;
-
 export default function MenuFooter({ progress, open }) {
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const closeSession = () =>{
+    dispatch({
+      type: AuthTypes.LOGOUT
+    });
+    navigate("/");
+  }
 
     const pages = [
         {
@@ -79,13 +88,12 @@ export default function MenuFooter({ progress, open }) {
         setAnchorElNav(event.currentTarget);
     };
 
-    const handleCloseNavMenu = (id) => {
+    const handleClickNavMenu = (id) => {
         setAnchorElNav(null);
         let path = "/";
         switch(id){
             case "close-session":
-
-
+              closeSession();
             break;
 
             case "sync":
@@ -134,13 +142,13 @@ export default function MenuFooter({ progress, open }) {
                 horizontal: 'left',
               }}
               open={Boolean(anchorElNav)}
-              onClose={handleCloseNavMenu}
+              onClose={handleClickNavMenu}
               sx={{
                 display: { xs: 'block', md: 'none' },
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={"menu1-" + page.id} onClick={handleCloseNavMenu}>
+                <MenuItem key={"menu1-" + page.id} onClick={()=>{handleClickNavMenu(page.id)}}>
                     <ListItemIcon>
                         {page.icon("gray")}
                     </ListItemIcon>
@@ -151,7 +159,7 @@ export default function MenuFooter({ progress, open }) {
           </Box>
           <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
             {pages.map((page) => (
-              <MenuItem key={"menu2-" + page.id} onClick={handleCloseNavMenu}>
+              <MenuItem key={"menu2-" + page.id} onClick={()=>{handleClickNavMenu(page.id)}}>
                     <ListItemIcon>
                         {page.icon("white")}
                     </ListItemIcon>
