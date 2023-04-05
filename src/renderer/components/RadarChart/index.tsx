@@ -24,8 +24,19 @@ const RadarChart = ({title, series, categories}) =>{
             defaultLocale: "es"
           },
           title: {
-            text: 'Basic'
-          },
+            text: "Mapa situacional",
+            align: 'center',
+            margin: 10,
+            offsetX: 0,
+            offsetY: 0,
+            floating: false,
+            style: {
+              fontSize:  '20px',
+              fontWeight:  'bold',
+              fontFamily:  undefined,
+              color:  '#263238'
+            },
+        },
           xaxis: {
             categories: ['January', 'February', 'March', 'April', 'May', 'June']
           }
