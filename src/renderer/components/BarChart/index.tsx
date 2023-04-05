@@ -88,6 +88,9 @@ const BarChart = ({title, series, categories}) =>{
         await chartInstance.current.chart.dataURI().then(data =>{
           console.log(data)
         })
+        const paper = chartInstance.current.chart.w.globals.dom.Paper;
+        const svg = paper.svg()
+        console.log(svg)
       }
 
     return (
