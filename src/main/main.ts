@@ -15,6 +15,9 @@ import log from 'electron-log';
 import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
+import { ipcMainUtils } from './app/ipcMainUtils';
+import { sqliteModule } from './app/sqlite3';
+
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
@@ -22,6 +25,9 @@ class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
+
+ipcMainUtils(ipcMain, shell);
+sqliteModule(ipcMain);
 
 let mainWindow: BrowserWindow | null = null;
 
