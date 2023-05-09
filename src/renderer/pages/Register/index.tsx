@@ -7,37 +7,74 @@ import FormControlLabel from '@mui/material/FormControlLabel';
 import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
+import Chip from '@mui/material/Chip';
 import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
+import Copyright from '../Components/Copyright';
+import OverlayLoader from '../Components/OverlayLoader';
 
-function Copyright(props: any) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import { showToast } from '../../utils/toast';
+import { validateEmail } from '../../utils/generals';
+import { sqlite3Run } from '../../helpers/Sqlite3Operations'; 
 
 export default function SignUp() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [open, setOpen] = React.useState(false);
+  const [ready, setReady] = React.useState(false);
+  const navigate = useNavigate();
+
+  const handleSubmit = async(event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+
+    const email = data.get('email').trim();
+    const firstName = data.get('firstName').trim();
+    const lastName = data.get('lastName').trim();
+    const password = data.get('password').trim();
+    if (email == "" || password == "" || firstName == "" || lastName == "") {
+      showToast("Completa los datos");
+    }else if (!validateEmail(email)) {
+      showToast("El correo electrónico no es correcto");
+    }else{
+      setOpen(true);
+      const result = await sqlite3Run("INSERT INTO user VALUES (?,?,?,?)", [firstName, lastName, email, password]);
+      setReady(true);
+      showToast("Usuario creado exitosamente", "success", undefined, ()=>{
+        setOpen(false);
+        navigate("/login");
+      })
+      if (result.OK) {
+        setReady(true);
+        showToast("Usuario creado exitosamente. De click en el botón o cierre el mensaje para ir al ", "success", undefined, ()=>{
+          setOpen(false);
+          navigate("/login");
+        })
+      }else{
+        //setOpen(false);
+        console.log(result)
+        //showToast("Ocurrió un error. Intenta nuevamente.", "error");
+      }
+    }
   };
+
+  const CloseButton = ({ closeToast }) => (
+    <Chip label="Iniciar sesión" variant="outlined" onClick={()=>{
+      closeToast();
+      setOpen(false);
+      navigate("/login");
+    }} />
+  );
 
   return (
       <Container component="main" maxWidth="xs">
+        <OverlayLoader open={open} ready={ready} buttonClick={()=>{
+          setOpen(false);
+          navigate("/login");
+        }}/>
         <CssBaseline />
         <Box
           sx={{
@@ -51,7 +88,7 @@ export default function SignUp() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign up
+            Registro de usuario
           </Typography>
           <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 3 }}>
             <Grid container spacing={2}>
@@ -62,7 +99,7 @@ export default function SignUp() {
                   required
                   fullWidth
                   id="firstName"
-                  label="First Name"
+                  label="Nombres"
                   autoFocus
                 />
               </Grid>
@@ -71,7 +108,7 @@ export default function SignUp() {
                   required
                   fullWidth
                   id="lastName"
-                  label="Last Name"
+                  label="Apellidos"
                   name="lastName"
                   autoComplete="family-name"
                 />
@@ -81,7 +118,7 @@ export default function SignUp() {
                   required
                   fullWidth
                   id="email"
-                  label="Email Address"
+                  label="Correo electrónico"
                   name="email"
                   autoComplete="email"
                 />
@@ -91,7 +128,7 @@ export default function SignUp() {
                   required
                   fullWidth
                   name="password"
-                  label="Password"
+                  label="Contraseña"
                   type="password"
                   id="password"
                   autoComplete="new-password"
@@ -100,7 +137,7 @@ export default function SignUp() {
               <Grid item xs={12}>
                 <FormControlLabel
                   control={<Checkbox value="allowExtraEmails" color="primary" />}
-                  label="I want to receive inspiration, marketing promotions and updates via email."
+                  label="Acepto los terminos y condiciones."
                 />
               </Grid>
             </Grid>
@@ -110,18 +147,25 @@ export default function SignUp() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign Up
+              Registrar
             </Button>
             <Grid container justifyContent="flex-end">
               <Grid item>
-                <Link href="#" variant="body2">
-                  Already have an account? Sign in
-                </Link>
+              <Link
+                component="button"
+                variant="body2"
+                onClick={() => {
+                  navigate("/login")
+                }}
+              >
+                Iniciar sesión
+              </Link>
               </Grid>
             </Grid>
           </Box>
         </Box>
         <Copyright sx={{ mt: 5 }} />
+        <ToastContainer limit={3} autoClose={3000} closeButton={CloseButton}/>
       </Container>
   );
 }
