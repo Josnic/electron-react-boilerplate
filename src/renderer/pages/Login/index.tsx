@@ -11,33 +11,54 @@ import Box from '@mui/material/Box';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
+import { ToastContainer } from 'react-toastify';
+import OverlayLoader from '../Components/OverlayLoader';
+import { useDispatch } from 'react-redux';
+import { useNavigate, NavLink } from 'react-router-dom';
 
-function Copyright(props: any) {
-  return (
-    <Typography variant="body2" color="text.secondary" align="center" {...props}>
-      {'Copyright © '}
-      <Link color="inherit" href="https://mui.com/">
-        Your Website
-      </Link>{' '}
-      {new Date().getFullYear()}
-      {'.'}
-    </Typography>
-  );
-}
+import AuthTypes from './../../redux/constants';
+import { sqlite3All } from '../../helpers/Sqlite3Operations'; 
 
+import Copyright from '../Components/Copyright';
+import { showToast } from '../../utils/toast';
 
 export default function SignIn() {
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const [open, setOpen] = React.useState(false);
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
+    const email = data.get('email').trim();
+    const password = data.get('password').trim()
+    if (email == "" || password == "") {
+      showToast("Completa los datos");
+    }else{
+      setOpen(true);
+      const result = await sqlite3All(`SELECT * FROM user WHERE email = '${email}' AND password = '${password}' LIMIT 1`);
+      if (result.OK) {
+        setOpen(false);
+        if (result.OK.length && result.OK.length == 1) {
+          dispatch({
+            type: AuthTypes.LOGIN,
+            token: ""
+          });
+          navigate("/home");
+        }else{
+          showToast("Datos de acceso no existentes");
+        }
+      }else{
+        setOpen(false);
+        console.log(result)
+        showToast("Ocurrió un error. Intenta nuevamente.", "error");
+      }
+    } 
   };
 
   return (
       <Container component="main" maxWidth="xs">
+        <OverlayLoader open={open} />
         <CssBaseline />
         <Box
           sx={{
@@ -51,7 +72,7 @@ export default function SignIn() {
             <LockOutlinedIcon />
           </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Iniciar sesión
           </Typography>
           <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
             <TextField
@@ -59,7 +80,7 @@ export default function SignIn() {
               required
               fullWidth
               id="email"
-              label="Email Address"
+              label="Correo electrónico"
               name="email"
               autoComplete="email"
               autoFocus
@@ -69,14 +90,14 @@ export default function SignIn() {
               required
               fullWidth
               name="password"
-              label="Password"
+              label="Contraseña"
               type="password"
               id="password"
               autoComplete="current-password"
             />
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
+              label="Recordarme"
             />
             <Button
               type="submit"
@@ -84,23 +105,36 @@ export default function SignIn() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
             >
-              Sign In
+              Ingresar
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link href="#" variant="body2">
-                  Forgot password?
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={() => {
+                    navigate("/register")
+                  }}
+                >
+                  Olvidaste tu contraseña?
                 </Link>
               </Grid>
               <Grid item>
-                <Link href="#" variant="body2">
-                  {"Don't have an account? Sign Up"}
+                <Link
+                  component="button"
+                  variant="body2"
+                  onClick={() => {
+                    navigate("/register")
+                  }}
+                >
+                  Registrate
                 </Link>
               </Grid>
             </Grid>
           </Box>
         </Box>
         <Copyright sx={{ mt: 8, mb: 4 }} />
+        <ToastContainer />
       </Container>
   );
 }
