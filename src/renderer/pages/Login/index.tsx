@@ -12,14 +12,14 @@ import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import Container from '@mui/material/Container';
 import { ToastContainer } from 'react-toastify';
-import OverlayLoader from '../Components/OverlayLoader';
+import OverlayLoader from '../../components/OverlayLoader';
 import { useDispatch } from 'react-redux';
 import { useNavigate, NavLink } from 'react-router-dom';
 
 import AuthTypes from './../../redux/constants';
 import { sqlite3All } from '../../helpers/Sqlite3Operations'; 
 
-import Copyright from '../Components/Copyright';
+import Copyright from '../../components/Copyright';
 import { showToast } from '../../utils/toast';
 
 export default function SignIn() {

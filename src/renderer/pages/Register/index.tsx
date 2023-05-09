@@ -15,8 +15,8 @@ import Container from '@mui/material/Container';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { ToastContainer } from 'react-toastify';
 import { useNavigate } from 'react-router-dom';
-import Copyright from '../Components/Copyright';
-import OverlayLoader from '../Components/OverlayLoader';
+import Copyright from '../../components/Copyright';
+import OverlayLoader from '../../components/OverlayLoader';
 
 import { showToast } from '../../utils/toast';
 import { validateEmail } from '../../utils/generals';
