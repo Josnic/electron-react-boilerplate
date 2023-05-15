@@ -1,4 +1,6 @@
 import { createTheme, Theme, ThemeProvider } from '@mui/material/styles';
+import type {} from '@mui/lab/themeAugmentation';
+import '@mui/lab/themeAugmentation';
 
 export const themeOptions: ThemeOptions = {
   palette: {
@@ -9,6 +11,15 @@ export const themeOptions: ThemeOptions = {
     secondary: {
       main: '#f50057',
     }
+  },
+  components: {
+    MuiTimeline: {
+      styleOverrides: {
+        root: {
+          backgroundColor: 'red',
+        },
+      },
+    },
   },
 };
 
