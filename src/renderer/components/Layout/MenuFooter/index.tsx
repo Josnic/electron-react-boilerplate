@@ -46,7 +46,7 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-export default function MenuFooter({ progress, open }) {
+export default function MenuFooter({ isCourse, open }) {
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -62,21 +62,25 @@ export default function MenuFooter({ progress, open }) {
         {
             id: "close-session",
             text: "Cerrar sesión",
+            hidden: false,
             icon: (color) => { return (<ExitToAppIcon sx={{ color: color }} />)}
         },
         {
             id: "sync",
             text: "Sincronizar",
+            hidden: false,
             icon: (color) => { return (<CloudSyncIcon sx={{ color: color }} />)}
         },
         {
             id: "certificate",
             text: "Constancia",
+            hidden: isCourse ? false : true,
             icon: (color) => { return (<CardMembershipIcon sx={{ color: color }} />)}
         },
         {
             id: "downloads",
             text: "Centro de descargas",
+            hidden: isCourse ? false : true,
             icon: (color) => { return (<CloudDownloadIcon sx={{ color: color }} />)}
         }
     ]
@@ -118,18 +122,16 @@ export default function MenuFooter({ progress, open }) {
   return (
       <AppBar open={open} position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
         <Toolbar disableGutters>
-        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }} key={1}>
             <IconButton
               size="large"
-              aria-label="account of current user"
-              aria-controls="menu-appbar"
-              aria-haspopup="true"
               onClick={handleOpenNavMenu}
               color="inherit"
             >
               <MenuIcon />
             </IconButton>
             <Menu
+              key={"menu-appbar"}
               id="menu-appbar"
               anchorEl={anchorElNav}
               anchorOrigin={{
@@ -148,34 +150,50 @@ export default function MenuFooter({ progress, open }) {
               }}
             >
               {pages.map((page) => (
-                <MenuItem key={"menu1-" + page.id} onClick={()=>{handleClickNavMenu(page.id)}}>
-                    <ListItemIcon>
+                <div>
+                {
+                  !page.hidden ? (
+                    <MenuItem key={"menu1-" + page.id} onClick={()=>{handleClickNavMenu(page.id)}}>
+                      <ListItemIcon key={"list1-" + page.id}>
                         {page.icon("gray")}
-                    </ListItemIcon>
-                  <Typography textAlign="center">{page.text}</Typography>
-                </MenuItem>
+                      </ListItemIcon>
+                      <Typography textAlign="center">{page.text}</Typography>
+                    </MenuItem>
+                  ):(
+                    null
+                  )
+                }
+                </div>
               ))}
             </Menu>
           </Box>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} key={2}>
             {pages.map((page) => (
-              <MenuItem key={"menu2-" + page.id} onClick={()=>{handleClickNavMenu(page.id)}}>
-                    <ListItemIcon>
-                        {page.icon("white")}
-                    </ListItemIcon>
-                    <Typography textAlign="center">{page.text}</Typography>
-              </MenuItem>
+              <>
+                {
+                  !page.hidden ? (
+                    <MenuItem key={"menu2-" + page.id} onClick={()=>{handleClickNavMenu(page.id)}}>
+                        <ListItemIcon key={"list2-" + page.id}>
+                          {page.icon("white")}
+                        </ListItemIcon>
+                        <Typography textAlign="center">{page.text}</Typography>
+                    </MenuItem>
+                  ):(
+                    null
+                  )
+                }
+              </>
             ))}
           </Box>
-          <Box sx={{ flexGrow: 0 }}>
-            <MenuItem onClick={()=>{
+          <Box sx={{ flexGrow: 0 }} key={3}>
+            <MenuItem key={"menu-browser"} onClick={()=>{
               openSystemBrowser("https://www.google.com")
             }}>
-                <ListItemIcon>
-                    <LanguageIcon sx={{ color: "white" }} />
-                </ListItemIcon>
-                <Typography textAlign="center">{"Sitio Web"}</Typography>
-              </MenuItem>
+              <ListItemIcon key="unique-open">
+                <LanguageIcon sx={{ color: "white" }} />
+              </ListItemIcon>
+              <Typography textAlign="center">{"Sitio Web"}</Typography>
+            </MenuItem>
           </Box>
         </Toolbar>
       </AppBar>

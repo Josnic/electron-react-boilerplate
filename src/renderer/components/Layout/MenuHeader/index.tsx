@@ -39,19 +39,25 @@ const NumberLinearProgress = (props) =>{
 }
 
 
-export default function MenuHeader({ username, progress, showCourseImage, handleDrawerOpen, open }) {
+export default function MenuHeader({ username, progress, isCourse, handleDrawerOpen, open }) {
   return (
       <AppBar position="absolute">
         <Toolbar disableGutters>
-        <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            onClick={handleDrawerOpen}
-            edge="start"
-            sx={{ marginLeft:'5px', mr: 2, ...(open && { display: 'none' }) }}
-          >
-            <MenuIcon />
-          </IconButton>
+          {
+            isCourse ? (
+              <IconButton
+                color="inherit"
+                aria-label="open drawer"
+                onClick={handleDrawerOpen}
+                edge="start"
+                sx={{ marginLeft:'5px', mr: 2, ...(open && { display: 'none' }) }}
+              >
+                <MenuIcon />
+              </IconButton>
+            ):(
+              null
+            )
+          }
           <Avatar
             variant="square"
             src="https://mui.com/static/images/avatar/1.jpg"
@@ -59,11 +65,17 @@ export default function MenuHeader({ username, progress, showCourseImage, handle
           />
           <Box sx={{ flexGrow: 0.5 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
-            <Avatar
-            variant="square"
-              src="https://mui.com/static/images/avatar/1.jpg"
-              sx={{ display: { xs: 'none', md: 'flex' }, width: 56, height: 56 }}
-            />
+            {
+               isCourse ? (
+                <Avatar
+                  variant="square"
+                  src="https://mui.com/static/images/avatar/1.jpg"
+                  sx={{ display: { xs: 'none', md: 'flex' }, width: 56, height: 56 }}
+                />
+               ):(
+                null
+               )
+            }
           </Box>
           <Box sx={{ flexGrow: 0.5 }} />
           <Box sx={{ flexGrow: 0 }}>
