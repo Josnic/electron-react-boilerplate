@@ -15,12 +15,16 @@ import Button from '@mui/material/Button';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 
 import RadioQuestion from '../components/RadioQuestion';
+import AlertModal from '../components/AlertModal';
 import TestTitle from '../TestTitle';
 import '../styles.scss';
 
 const SelfAppraisal = ({ data }) => {
+  
   const [answers, setAnswers] = useState(Array(10).fill(null));
   const [questions, setQuestions] = useState(Array(10).fill('Pregunta'));
+  const [openModalWelcome, setOpenModalWelcome] = useState(true);
+  const [openModalEnd, setOpenModalEnd] = useState(false);
 
   const handleAnswerChange = (index, value) => {
     console.log(index, value);
@@ -57,6 +61,24 @@ const SelfAppraisal = ({ data }) => {
           Continuar
         </ButtomCustom>
       </Grid>
+      <AlertModal 
+        open={openModalWelcome} 
+        title={"Título"} 
+        content="Esta es una cosa rara. Esta es una cosa rara Esta es una cosa rara Esta es una cosa rara Esta es una cosa rara" 
+        buttonText={"Autoevaluación"}
+        onButtonClick={()=>{
+          setOpenModalWelcome(false);
+        }}
+      />
+      <AlertModal 
+        open={openModalEnd} 
+        title={"Título"} 
+        content="Esta es una cosa rara. Esta es una cosa rara Esta es una cosa rara Esta es una cosa rara Esta es una cosa rara" 
+        buttonText={"Aceptar"}
+        onButtonClick={()=>{
+          setOpenModalEnd(false);
+        }}
+      />
     </Grid>
   );
 };
