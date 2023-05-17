@@ -4,10 +4,10 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import Typography from '@mui/material/Typography';
 
-const TestTitle = ({ title, component, color }) => {
+const TestTitle = ({ title, component, color, barColor }) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
+      <AppBar position="static" color={barColor ? barColor : 'primary'}>
         <Toolbar>
           <Typography
             variant="h6"
