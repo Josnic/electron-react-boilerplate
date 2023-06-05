@@ -5,7 +5,9 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
-import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
+import LinearProgress, {
+  linearProgressClasses,
+} from '@mui/material/LinearProgress';
 import CardHeader from '@mui/material/CardHeader';
 import Button from '@mui/material/Button';
 import Menu from '@mui/material/Menu';
@@ -47,155 +49,165 @@ const AppBar = styled(MuiAppBar, {
 }));
 
 export default function MenuFooter({ isCourse, open }) {
-
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
-  const closeSession = () =>{
+  const closeSession = () => {
     dispatch({
-      type: AuthTypes.LOGOUT
+      type: AuthTypes.LOGOUT,
     });
-    navigate("/");
-  }
+    navigate('/');
+  };
 
-    const pages = [
-        {
-            id: "close-session",
-            text: "Cerrar sesión",
-            hidden: false,
-            icon: (color) => { return (<ExitToAppIcon sx={{ color: color }} />)}
-        },
-        {
-            id: "sync",
-            text: "Sincronizar",
-            hidden: false,
-            icon: (color) => { return (<CloudSyncIcon sx={{ color: color }} />)}
-        },
-        {
-            id: "certificate",
-            text: "Constancia",
-            hidden: isCourse ? false : true,
-            icon: (color) => { return (<CardMembershipIcon sx={{ color: color }} />)}
-        },
-        {
-            id: "downloads",
-            text: "Centro de descargas",
-            hidden: isCourse ? false : true,
-            icon: (color) => { return (<CloudDownloadIcon sx={{ color: color }} />)}
-        }
-    ]
+  const pages = [
+    {
+      id: 'close-session',
+      text: 'Cerrar sesión',
+      hidden: false,
+      icon: (color) => {
+        return <ExitToAppIcon sx={{ color: color }} />;
+      },
+    },
+    {
+      id: 'sync',
+      text: 'Sincronizar',
+      hidden: false,
+      icon: (color) => {
+        return <CloudSyncIcon sx={{ color: color }} />;
+      },
+    },
+    {
+      id: 'certificate',
+      text: 'Constancia',
+      hidden: isCourse ? false : true,
+      icon: (color) => {
+        return <CardMembershipIcon sx={{ color: color }} />;
+      },
+    },
+    {
+      id: 'downloads',
+      text: 'Centro de descargas',
+      hidden: isCourse ? false : true,
+      icon: (color) => {
+        return <CloudDownloadIcon sx={{ color: color }} />;
+      },
+    },
+  ];
 
-    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(null);
-    const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(null);
+  const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
+    null
+  );
+  const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
+    null
+  );
 
-    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
-        setAnchorElNav(event.currentTarget);
-    };
+  const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorElNav(event.currentTarget);
+  };
 
-    const handleClickNavMenu = (id) => {
-        setAnchorElNav(null);
-        let path = "/";
-        switch(id){
-            case "close-session":
-              closeSession();
-            break;
+  const handleClickNavMenu = (id) => {
+    setAnchorElNav(null);
+    let path = '/';
+    switch (id) {
+      case 'close-session':
+        closeSession();
+        break;
 
-            case "sync":
+      case 'sync':
+        break;
 
+      case 'certificate':
+        break;
 
-            break;
-
-            case "certificate":
-
-
-            break;
-
-            case "downloads":
-
-
-            break;
-        }
-        navigate(path);
-    };
-
+      case 'downloads':
+        break;
+    }
+    navigate(path);
+  };
 
   return (
-      <AppBar open={open} position="fixed" color="primary" sx={{ top: 'auto', bottom: 0 }}>
-        <Toolbar disableGutters>
-        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }} key={1}>
-            <IconButton
-              size="large"
-              onClick={handleOpenNavMenu}
-              color="inherit"
-            >
-              <MenuIcon />
-            </IconButton>
-            <Menu
-              key={"menu-appbar"}
-              id="menu-appbar"
-              anchorEl={anchorElNav}
-              anchorOrigin={{
-                vertical: 'bottom',
-                horizontal: 'left',
-              }}
-              keepMounted
-              transformOrigin={{
-                vertical: 'top',
-                horizontal: 'left',
-              }}
-              open={Boolean(anchorElNav)}
-              onClose={handleClickNavMenu}
-              sx={{
-                display: { xs: 'block', md: 'none' },
-              }}
-            >
-              {pages.map((page) => (
-                <div>
-                {
-                  !page.hidden ? (
-                    <MenuItem key={"menu1-" + page.id} onClick={()=>{handleClickNavMenu(page.id)}}>
-                      <ListItemIcon key={"list1-" + page.id}>
-                        {page.icon("gray")}
-                      </ListItemIcon>
-                      <Typography textAlign="center">{page.text}</Typography>
-                    </MenuItem>
-                  ):(
-                    null
-                  )
-                }
-                </div>
-              ))}
-            </Menu>
-          </Box>
-          <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }} key={2}>
+    <AppBar
+      open={open}
+      position="fixed"
+      color="primary"
+      sx={{ top: 'auto', bottom: 0 }}
+    >
+      <Toolbar disableGutters>
+        <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
+          <IconButton size="large" onClick={handleOpenNavMenu} color="inherit">
+            <MenuIcon />
+          </IconButton>
+          <Menu
+            key={'menu-appbar'}
+            id="menu-appbar"
+            anchorEl={anchorElNav}
+            anchorOrigin={{
+              vertical: 'bottom',
+              horizontal: 'left',
+            }}
+            keepMounted
+            transformOrigin={{
+              vertical: 'top',
+              horizontal: 'left',
+            }}
+            open={Boolean(anchorElNav)}
+            onClose={handleClickNavMenu}
+            sx={{
+              display: { xs: 'block', md: 'none' },
+            }}
+          >
             {pages.map((page) => (
-              <>
-                {
-                  !page.hidden ? (
-                    <MenuItem key={"menu2-" + page.id} onClick={()=>{handleClickNavMenu(page.id)}}>
-                        <ListItemIcon key={"list2-" + page.id}>
-                          {page.icon("white")}
-                        </ListItemIcon>
-                        <Typography textAlign="center">{page.text}</Typography>
-                    </MenuItem>
-                  ):(
-                    null
-                  )
-                }
-              </>
+              <div key={page.id}>
+                {!page.hidden ? (
+                  <MenuItem
+                    key={'menu1-' + page.id}
+                    onClick={() => {
+                      handleClickNavMenu(page.id);
+                    }}
+                  >
+                    <ListItemIcon key={'list1-' + page.id}>
+                      {page.icon('gray')}
+                    </ListItemIcon>
+                    <Typography textAlign="center">{page.text}</Typography>
+                  </MenuItem>
+                ) : null}
+              </div>
             ))}
-          </Box>
-          <Box sx={{ flexGrow: 0 }} key={3}>
-            <MenuItem key={"menu-browser"} onClick={()=>{
-              openSystemBrowser("https://www.google.com")
-            }}>
-              <ListItemIcon key="unique-open">
-                <LanguageIcon sx={{ color: "white" }} />
-              </ListItemIcon>
-              <Typography textAlign="center">{"Sitio Web"}</Typography>
-            </MenuItem>
-          </Box>
-        </Toolbar>
-      </AppBar>
+          </Menu>
+        </Box>
+        <Box sx={{ flexGrow: 1, display: { xs: 'none', md: 'flex' } }}>
+          {pages.map((page) => (
+            <div key={page.id}>
+              {!page.hidden ? (
+                <MenuItem
+                  key={'menu2-' + page.id}
+                  onClick={() => {
+                    handleClickNavMenu(page.id);
+                  }}
+                >
+                  <ListItemIcon key={'list2-' + page.id}>
+                    {page.icon('white')}
+                  </ListItemIcon>
+                  <Typography textAlign="center">{page.text}</Typography>
+                </MenuItem>
+              ) : null}
+            </div>
+          ))}
+        </Box>
+        <Box sx={{ flexGrow: 0 }}>
+          <MenuItem
+            key={'menu-browser'}
+            onClick={() => {
+              openSystemBrowser('https://www.google.com');
+            }}
+          >
+            <ListItemIcon key="unique-open">
+              <LanguageIcon sx={{ color: 'white' }} />
+            </ListItemIcon>
+            <Typography textAlign="center">{'Sitio Web'}</Typography>
+          </MenuItem>
+        </Box>
+      </Toolbar>
+    </AppBar>
   );
 }
