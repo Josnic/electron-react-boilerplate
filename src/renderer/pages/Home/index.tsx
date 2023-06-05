@@ -10,6 +10,7 @@ import Typography from '@mui/material/Typography';
 import Grid from '@mui/material/Grid';
 import './styles.scss';
 import { ToastContainer } from 'react-toastify';
+import { useNavigate } from 'react-router-dom';
 
 import OverlayLoader from '../../components/OverlayLoader';
 import { showToast } from '../../utils/toast';
@@ -19,20 +20,21 @@ import { sqlite3All } from '../../helpers/Sqlite3Operations';
 const Home = () => {
   const [openLoader, setOpenLoader] = React.useState(false);
   const [courses, setCourses] = useState([]);
-    const getCourses = async() => {
-      const result = await sqlite3All("SELECT * FROM courses ORDWER BY id DESC");
-      if (result.OK) {
-        if (result.OK.length && result.OK.length > 0) {
-            setCourses(result.OK);
-        }else{
-          showToast("No se encontraron cursos disponibles");
-        }
+  const navigate = useNavigate();
+  const getCourses = async() => {
+    const result = await sqlite3All("SELECT * FROM cursos ORDER BY cod_curso DESC");
+    if (result.OK) {
+      if (result.OK.length && result.OK.length > 0) {
+          setCourses(result.OK);
       }else{
-        console.log(result)
-        showToast("Ocurrió un error. Intenta nuevamente.", "error");
+        showToast("No se encontraron cursos disponibles");
       }
-      setOpenLoader(false);
+    }else{
+      console.log(result)
+      showToast("Ocurrió un error. Intenta nuevamente.", "error");
     }
+    setOpenLoader(false);
+  }
 
   useEffect(()=>{
     setOpenLoader(true);
@@ -58,15 +60,15 @@ const Home = () => {
                         <div className='list-container'>
                             <Grid container columns={{ xs: 4, md: 12 }} spacing={2}>
                               {courses.map((card, index) => (
-                                <Grid item xs={4}>
-                                  <ListCard course={card} />
+                                <Grid item xs={4} key={index}>
+                                  <ListCard cardData={card} onCardClick={()=>{
+                                    navigate("/course/" + card.cod_curso);
+                                  }}/>
                                 </Grid>
                               ))}
                             </Grid>
                         </div>
                     </div>
-
-                    
                 </Box>
                 <Box className="footer">
                     <MenuFooter />
