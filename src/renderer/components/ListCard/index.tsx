@@ -10,26 +10,51 @@ import Typography from '@mui/material/Typography';
 import { red } from '@mui/material/colors';
 import './styles.scss';
 
-export default function RecipeReviewCard() {
+import { getPathCourseResource } from '../../utils/electronFunctions';
+
+export default function({ cardData, onCardClick }) {
   const [expanded, setExpanded] = React.useState(false);
+  const [image, setImage] = React.useState("");
 
   const handleExpandClick = () => {
     setExpanded(!expanded);
   };
 
+  const imageUrl = async() => {
+    let path = cardData.cod_curso + ".asar";
+    if (cardData.cod_unidad){
+      path += "/" + cardData.cod_unidad;
+    }
+    path += "/img/" + cardData.imagen;
+    const finalPath = await getPathCourseResource(path);
+    setImage(finalPath)
+  }
+
+  React.useEffect(()=>{
+    imageUrl();
+  }, [])
+
   return (
-    <Card sx={{ maxWidth: 250 }}>
-      <CardMedia
-        component="img"
-        height="194"
-        image="https://mui.com/static/images/cards/paella.jpg"
-        alt="Paella dish"
-      />
-      <CardContent className='list-card-content'>
-      <Typography variant="body2" color="text.secondary">
-        Coaching de vida 
-      </Typography>
-      </CardContent>
-    </Card>
+    <>
+    {
+      image != "" ? (
+        <Card sx={{ maxWidth: 250 }} onClick={onCardClick} className="card-course">
+          <CardMedia
+            component="img"
+            height="194"
+            image={image}
+            alt={cardData.nombre}
+          />
+          <CardContent className='list-card-content'>
+          <Typography variant="body2" color="text.secondary">
+            {cardData.nombre}
+          </Typography>
+          </CardContent>
+        </Card>
+      ):(
+        null
+      )
+    }
+    </>
   );
 }
