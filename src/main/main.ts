@@ -26,7 +26,7 @@ class AppUpdater {
   }
 }
 
-ipcMainUtils(ipcMain, shell);
+ipcMainUtils(ipcMain);
 sqlite3Module(ipcMain);
 
 let mainWindow: BrowserWindow | null = null;
@@ -84,6 +84,7 @@ const createWindow = async () => {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
+        webSecurity: false
     },
   });
 
