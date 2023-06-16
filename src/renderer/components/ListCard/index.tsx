@@ -22,9 +22,6 @@ export default function({ cardData, onCardClick }) {
 
   const imageUrl = async() => {
     let path = cardData.cod_curso + ".asar";
-    if (cardData.cod_unidad){
-      path += "/" + cardData.cod_unidad;
-    }
     path += "/img/" + cardData.imagen;
     const finalPath = await getPathCourseResource(path);
     setImage(finalPath)
