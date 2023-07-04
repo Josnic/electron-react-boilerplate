@@ -3,6 +3,10 @@
     iframe {
         border: 1px solid gray;
     }
+
+    img {
+        object-fit:contain;
+    }
 }
 
 .download-button-container {
