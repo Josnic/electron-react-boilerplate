@@ -18,7 +18,7 @@
         display: flex;
       }
 
-      &.situacional-analysis {
+      &.input-number-cuestion {
         width: 80%;
       }
 
@@ -36,6 +36,9 @@
     .input-number-container {
       width: 20%;
       text-align: right;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
     .select-container {
