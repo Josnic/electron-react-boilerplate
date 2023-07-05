@@ -17,6 +17,7 @@ import './styles.scss';
 import parse from 'html-react-parser';
 import * as download from 'downloadjs/download';
 import { getPathCourseResource } from '../../utils/electronFunctions';
+import { useStateWithCallback } from '../../hooks/useStateWithCallback';
 
 const Audio = ({ playList }) => {
   const [progressType, setProgressType] = useState<ProgressUI>('waveform');
@@ -96,7 +97,7 @@ const Video = ({ source }) => {
 const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
   const [html, setHtml] = useState(null);
   const [filePathDownload, setFilePathDownload] = useState(null);
-  const [rootMultimedia, setRootMultimedia] = useState(null);
+  const [rootMultimedia, setRootMultimedia] = useStateWithCallback([]);
   const prepareHtml = async () => {
     setFilePathDownload(null);
     let path = courseCode + '.asar';
@@ -166,7 +167,17 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
 
     const finalHtml = content ? content : content2;
     if (finalHtml){
-      setHtml(finalHtml);
+      if (rootMultimedia.length > 0){
+        for (let i = 0; i < rootMultimedia.length; i++){
+          rootMultimedia[i].unmount();
+        }
+        setRootMultimedia([], (prevValue, newValue) => {
+          console.log(newValue);
+          setHtml(finalHtml);
+        })
+      }else{
+        setHtml(finalHtml);
+      }
     }
   };
 
@@ -179,7 +190,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
         const finalPath = await getPathCourseResource(
           path + '/videos/' + videos[i]
         );
-        renderMultimedia(videos[i], 'VIDEO', finalPath, data.nombre);
+        await renderMultimedia(videos[i], 'VIDEO', finalPath, data.nombre);
       }
     }
 
@@ -188,18 +199,17 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
         const finalPath = await getPathCourseResource(
           path + '/audios/' + audios[i]
         );
-        renderMultimedia(audios[i], 'AUDIO', finalPath, data.nombre);
+        await renderMultimedia(audios[i], 'AUDIO', finalPath, data.nombre);
       }
     }
   };
 
   const renderMultimedia = (identifier, type, source, name) => {
-    if (rootMultimedia) {
-      rootMultimedia.unmount();
-    }
     const container = document.getElementById(identifier);
     const root = createRoot(container);
-    setRootMultimedia(root);
+    setRootMultimedia(Array.from(rootMultimedia).concat([root]), (prevValue, newValue) => {
+      console.log(newValue);
+    })
     let component = null;
     switch (type) {
       case 'AUDIO':
