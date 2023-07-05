@@ -17,12 +17,7 @@ const FormQuestion = ({ data, courseCode }) => {
   const [header, setHeader] = useState(null);
   const [footer, setFooter] = useState(null);
 
-  const html = `lorem <b onmouseover="alert('mouseover');">ipsum  ioihio pohpioh pohjpoij pojpoj pohiop pohpoi pojhpoi pòjpo pojhpo pohpoi  umi psumv ipsum vv ipsum </b>`;
-  const sanitizedData = () => ({
-    __html: DOMPurify.sanitize(html),
-  });
-
-  const imagePaths = async (html, stringImages) => {
+  const imagePaths = async (html, stringImages, path) => {
     const images = stringImages ? stringImages.split(',') : null;
     let content = html;
     if (Array.isArray(images)) {
@@ -57,7 +52,7 @@ const FormQuestion = ({ data, courseCode }) => {
       if (form.OK[0].encabezado && form.OK[0].encabezado != '') {
         let htmlHeader = form.OK[0].encabezado;
         if (form.OK[0].img_encabezado && form.OK[0].img_encabezado != '') {
-          htmlHeader = await imagePaths(htmlHeader, form.OK[0].img_encabezado);
+          htmlHeader = await imagePaths(htmlHeader, form.OK[0].img_encabezado, path);
         }
         setHeader(htmlHeader);
       }
@@ -65,7 +60,7 @@ const FormQuestion = ({ data, courseCode }) => {
       if (form.OK[0].pie && form.OK[0].pie != '') {
         let htmlFooter = form.OK[0].pie;
         if (form.OK[0].img_pie && form.OK[0].img_pie != '') {
-          htmlFooter = await imagePaths(htmlFooter, form.OK[0].img_pie);
+          htmlFooter = await imagePaths(htmlFooter, form.OK[0].img_pie, path);
         }
         setFooter(htmlFooter);
       }
