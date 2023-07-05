@@ -13,8 +13,9 @@
     justify-content: space-between;
 
     .question {
-      &.self-appraisal {
-        width: 60%;
+      &.radio-question {
+        width: 70%;
+        display: flex;
       }
 
       &.situacional-analysis {

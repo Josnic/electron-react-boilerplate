@@ -10,8 +10,9 @@ import { styled } from '@mui/material/styles';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
 import IconButton from '@mui/material/IconButton';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
+import parse from 'html-react-parser';
 
-const RadioQuestion = (props) => {
+const RadioQuestion = ({ question }) => {
   const [answer, setAnswer] = useState(null);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -39,12 +40,10 @@ const RadioQuestion = (props) => {
 
   return (
     <div className="question-container">
-      <div className="question self-appraisal">
-        Estás desarrollando tu potencial en lo que haces a diario?
-        <LightTooltip title="Add">
-          <IconButton>
-            <LiveHelpIcon />
-          </IconButton>
+      <div className="question radio-question">
+        {parse(question.pregunta)}
+        <LightTooltip title={parse(question.informativo)}>
+            <LiveHelpIcon color="disabled" sx={{ cursor: 'pointer' }} />
         </LightTooltip>
       </div>
       <div className="radio-container">
