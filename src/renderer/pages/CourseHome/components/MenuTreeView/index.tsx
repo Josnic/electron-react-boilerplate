@@ -11,7 +11,6 @@ import LocalOfferIcon from '@mui/icons-material/LocalOffer';
 import ArrowDropDownIcon from '@mui/icons-material/ArrowDropDown';
 import ArrowRightIcon from '@mui/icons-material/ArrowRight';
 import { SvgIconProps } from '@mui/material/SvgIcon';
-
 declare module 'react' {
   interface CSSProperties {
     '--tree-view-color'?: string;
@@ -53,7 +52,7 @@ const StyledTreeItemRoot = styled(TreeItem)(({ theme }) => ({
   [`& .${treeItemClasses.group}`]: {
     marginLeft: 0,
     [`& .${treeItemClasses.content}`]: {
-      paddingLeft: theme.spacing(2),
+      paddingLeft: theme.spacing(3),
     },
   },
 }));
@@ -90,52 +89,102 @@ function StyledTreeItem(props: StyledTreeItemProps) {
   );
 }
 
-export default function MenuTreeView() {
+const MenuTreeView  = React.forwardRef(({ data, onClickItem }, ref) =>{
+  const [dataMenu, setDataMenu] = React.useState([]);
+  const [selectedNode, setSelectedNode] = React.useState(null);
+
+  const setSelectedNodeActive = async(nodeId) => {
+    const nodeIdParts = nodeId.split("-");
+    setSelectedNode(nodeId);
+    let data = {};
+    switch(nodeIdParts[0]){
+      case "UNIT":
+        data = JSON.parse(JSON.stringify(dataMenu[nodeIdParts[1]]));
+        delete data.lessons;
+      break;
+      
+      case "LESSON":
+        data = JSON.parse(JSON.stringify(dataMenu[nodeIdParts[1]][nodeIdParts[2]]));
+      break;
+
+      case "SUBLESSON":
+        data = JSON.parse(JSON.stringify(dataMenu[nodeIdParts[1]][nodeIdParts[2]][nodeIdParts[3]]));
+      break;
+    }
+    onClickItem(nodeIdParts[0], data);
+  }
+
+  const handleSelect = (event, nodeIds) => {
+    console.log(nodeIds)
+  }
+
+  React.useImperativeHandle(ref, () => ({
+    setSelectedNode: setSelectedNodeActive
+  }))
+  
+  React.useEffect(()=>{
+    setDataMenu(data);
+  }, [data])
+
   return (
     <TreeView
-      defaultExpanded={['3']}
+      id={"tree-view-menu"}
       defaultCollapseIcon={<ArrowDropDownIcon />}
       defaultExpandIcon={<ArrowRightIcon />}
       defaultEndIcon={<div style={{ width: 24 }} />}
-      sx={{ height: 264, flexGrow: 1, maxWidth: 400, overflowY: 'auto' }}
+      sx={{ height: 264, flexGrow: 1, maxWidth: 500, overflowY: 'auto' }}
+      onNodeSelect={handleSelect}
+      selected={selectedNode}
     >
-      <StyledTreeItem nodeId="1" labelText="Formando hábitos adecuados" labelIcon={CheckBoxOutlinedIcon} />
-      <StyledTreeItem nodeId="2" labelText="Trash" labelIcon={CheckBoxOutlineBlankOutlinedIcon} />
-      <StyledTreeItem nodeId="3" labelText="Categories" labelIcon={CheckBoxOutlineBlankOutlinedIcon}>
-        <StyledTreeItem
-          nodeId="5"
-          labelText="Social"
-          labelIcon={CheckBoxOutlineBlankOutlinedIcon}
-          labelInfo="90"
-          color="#1a73e8"
-          bgColor="#e8f0fe"
-        />
-        <StyledTreeItem
-          nodeId="6"
-          labelText="Updates"
+      {dataMenu && dataMenu.length > 0 && dataMenu.map((unit, index) => (
+        <StyledTreeItem 
+          nodeId={`UNIT-${index}-${unit.cod_unidad}`}
+          id={`UNIT-${index}-${unit.cod_unidad}`}
+          key={`node-${index}`} 
+          labelText={unit.nombre} 
           labelIcon={CheckBoxOutlinedIcon}
-          labelInfo="2,294"
-          color="#e3742f"
-          bgColor="#fcefe3"
-        />
-        <StyledTreeItem
-          nodeId="7"
-          labelText="Forums"
-          labelIcon={CheckBoxOutlinedIcon}
-          labelInfo="3,566"
-          color="#a250f5"
-          bgColor="#f3e8fd"
-        />
-        <StyledTreeItem
-          nodeId="8"
-          labelText="Promotions"
-          labelIcon={CheckBoxOutlineBlankOutlinedIcon}
-          labelInfo="733"
-          color="#3c8039"
-          bgColor="#e6f4ea"
-        />
-      </StyledTreeItem>
-      <StyledTreeItem nodeId="4" labelText="History" labelIcon={CheckBoxIcon} />
+          onClick={()=>{
+            setSelectedNode(`UNIT-${index}-${unit.cod_unidad}`);
+            onClickItem("UNIT", unit);
+          }}
+        >
+          
+          {unit.lessons.map((lesson, index2) => (
+            <StyledTreeItem
+              nodeId={`LESSON-${index}-${index2}`}
+              key={`LESSON-${index}-${index2}`}
+              labelText={lesson.nombre}
+              labelIcon={CheckBoxOutlineBlankOutlinedIcon}
+              labelInfo=""
+              color="#1a73e8"
+              bgColor="#e8f0fe"
+              onClick={()=>{
+                setSelectedNode(`LESSON-${index}-${index2}`);
+                onClickItem("LESSON", lesson)
+              }}
+            >
+              {lesson.sublessons.map((sublesson, index3) => (
+                <StyledTreeItem
+                  nodeId={`SUBLESSON-${index}-${index2}-${index3}`}
+                  key={`SUBLESSON-${index}-${index2}-${index3}`}
+                  labelText={sublesson.nombre}
+                  labelIcon={CheckBoxOutlinedIcon}
+                  labelInfo=""
+                  color="#e3742f"
+                  bgColor="#fcefe3"
+                  onClick={()=>{
+                    setSelectedNode(`SUBLESSON-${index}-${index2}-${index3}`);
+                    onClickItem("SUBLESSON", sublesson);
+                  }}
+                />
+              ))}
+            </StyledTreeItem>
+          ))}
+
+        </StyledTreeItem>
+      ))}
     </TreeView>
   );
-}
+})
+
+export default MenuTreeView;
