@@ -96,7 +96,7 @@ const Video = ({ source }) => {
 const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
   const [html, setHtml] = useState(null);
   const [filePathDownload, setFilePathDownload] = useState(null);
-
+  const [rootMultimedia, setRootMultimedia] = useState(null);
   const prepareHtml = async () => {
     setFilePathDownload(null);
     let path = courseCode + '.asar';
@@ -194,8 +194,12 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
   };
 
   const renderMultimedia = (identifier, type, source, name) => {
+    if (rootMultimedia) {
+      rootMultimedia.unmount();
+    }
     const container = document.getElementById(identifier);
     const root = createRoot(container);
+    setRootMultimedia(root);
     let component = null;
     switch (type) {
       case 'AUDIO':
