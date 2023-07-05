@@ -36,7 +36,7 @@ export default function AlertModal({ open, title, content, buttonText, onButtonC
           </DialogContentText>
         </DialogContent>
         <DialogActions className='alert-modal-button-container'>
-          <Button onClick={onButtonClick} variant="contained">Agree</Button>
+          <Button onClick={onButtonClick} variant="contained">{buttonText}</Button>
         </DialogActions>
       </Dialog>
     </div>
