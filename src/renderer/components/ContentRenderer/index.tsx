@@ -34,63 +34,70 @@ const Audio = ({ playList }) => {
   const [activeUI, setActiveUI] = useState<ActiveUI>({ all: true });
 
   return (
-    <AudioPlayer
-      playList={playList}
-      activeUI={{
-        ...activeUI,
-        progress: progressType,
-      }}
-      placement={{
-        interface: {
-          templateArea: interfacePlacement,
-        },
+    <>
+      <AudioPlayer
+        playList={playList}
+        activeUI={{
+          ...activeUI,
+          progress: progressType,
+        }}
+        placement={{
+          interface: {
+            templateArea: interfacePlacement,
+          },
 
-        volumeSlider: volumeSliderPlacement,
-      }}
-      rootContainerProps={{
-        colorScheme: theme,
-        width,
-      }}
-    />
+          volumeSlider: volumeSliderPlacement,
+        }}
+        rootContainerProps={{
+          colorScheme: theme,
+          width,
+        }}
+      />
+    </>
   );
 };
 
-const Video = ({ source }) => {
+const Video = ({ source, getInstance }) => {
   return (
-    <Artplayer
-      option={{
-        url: source,
-        setting: true,
-        autoSize: true,
-        autoMini: true,
-        screenshot: true,
-        setting: true,
-        loop: true,
-        flip: true,
-        playbackRate: true,
-        aspectRatio: true,
-        fullscreen: true,
-        fullscreenWeb: true,
-        miniProgressBar: true,
-        mutex: true,
-        backdrop: true,
-        playsInline: true,
-        autoPlayback: true,
-        airplay: true,
-        theme: '#23ade5',
-        lang: 'es',
-        whitelist: ['*'],
-        moreVideoAttr: {
-          crossOrigin: 'anonymous',
-        },
-      }}
-      style={{
-        maxWidth: '600px',
-        height: '400px',
-        margin: 'auto',
-      }}
-      getInstance={(art) => console.info(art)}
-    />
+    <div>
+      <Artplayer
+        option={{
+          url: source,
+          setting: true,
+          autoSize: true,
+          autoMini: true,
+          screenshot: true,
+          setting: true,
+          loop: true,
+          flip: true,
+          playbackRate: true,
+          aspectRatio: true,
+          fullscreen: true,
+          fullscreenWeb: true,
+          miniProgressBar: true,
+          mutex: true,
+          backdrop: true,
+          playsInline: true,
+          autoPlayback: true,
+          airplay: true,
+          theme: '#23ade5',
+          lang: 'es',
+          whitelist: ['*'],
+          moreVideoAttr: {
+            crossOrigin: 'anonymous',
+          },
+        }}
+        style={{
+          maxWidth: '600px',
+          height: '400px',
+          margin: 'auto',
+        }}
+        getInstance={(art) => {
+          getInstance(art)
+          console.info(art)
+        }}
+      />
+    </div>
   );
 };
 
@@ -98,6 +105,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
   const [html, setHtml] = useState(null);
   const [filePathDownload, setFilePathDownload] = useState(null);
   const [rootMultimedia, setRootMultimedia] = useStateWithCallback([]);
+  const [artPlayerInstances, setArtPlayerInstances] = useState([]);
   const prepareHtml = async () => {
     setFilePathDownload(null);
     let path = courseCode + '.asar';
@@ -168,11 +176,22 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
     const finalHtml = content ? content : content2;
     if (finalHtml){
       if (rootMultimedia.length > 0){
+        if(artPlayerInstances.length > 0) {
+          for (let k = 0; k < artPlayerInstances.length; k++){
+            artPlayerInstances[k].destroy();
+          }
+        }
         for (let i = 0; i < rootMultimedia.length; i++){
-          rootMultimedia[i].unmount();
+          try{
+            rootMultimedia[i].unmount();
+          }catch(e){
+            console.log(e)
+          }
+          
         }
         setRootMultimedia([], (prevValue, newValue) => {
           console.log(newValue);
+          setArtPlayerInstances([]);
           setHtml(finalHtml);
         })
       }else{
@@ -226,7 +245,9 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
       break;
 
       case 'VIDEO':
-        component = <Video source={source} />;
+        component = <Video source={source} getInstance={(artInstance)=>{
+          setArtPlayerInstances(artPlayerInstances => [...artPlayerInstances, artInstance])
+        }} />;
       break;
     }
 
