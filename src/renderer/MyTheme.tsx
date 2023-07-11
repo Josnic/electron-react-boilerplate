@@ -9,7 +9,7 @@ export const themeOptions: ThemeOptions = {
       main: '#005375',
     },
     secondary: {
-      main: '#f50057',
+      main: '#1285AB',
     }
   },
   components: {
