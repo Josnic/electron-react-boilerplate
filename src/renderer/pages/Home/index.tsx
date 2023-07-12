@@ -22,7 +22,8 @@ const Home = () => {
   const [courses, setCourses] = useState([]);
   const navigate = useNavigate();
   const getCourses = async() => {
-    const result = await sqlite3All("SELECT * FROM cursos ORDER BY cod_curso DESC");
+    const result = await sqlite3All("SELECT * FROM cursos ORDER BY cod_curso ASC");
+    console.log(result)
     if (result.OK) {
       if (result.OK.length && result.OK.length > 0) {
           setCourses(result.OK);
