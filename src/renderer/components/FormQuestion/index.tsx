@@ -85,17 +85,17 @@ const FormQuestion = ({ data, courseCode }) => {
                     <>
                     {
                         questions.map((question) => (
-                            <div key={question.id} className='question-container'>
+                            <div key={question.id} className='question-container-form'>
                                 <div className="question">
                                     <div>{parse(question.pregunta)}</div>
                                 </div>
                                 <div className="answer-container">
-                                    <FormControl sx={{ minWidth: 120, width: '100%' }}>
+                                    <FormControl sx={{ minWidth: 120, width: '95%' }}>
                                     <TextField
                                         id="outlined-multiline-static"
                                         label=""
                                         multiline
-                                        rows={4}
+                                        rows={3}
                                         defaultValue=""
                                     />
                                     </FormControl>

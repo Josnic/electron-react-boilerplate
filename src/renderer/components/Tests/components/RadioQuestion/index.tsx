@@ -18,7 +18,7 @@ const RadioQuestion = ({ question }) => {
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt((event.target as HTMLInputElement).value);
     setAnswer(value);
-    props.onAnswerChange(parseInt(value));
+    //props.onAnswerChange(parseInt(value));
   };
 
   const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
