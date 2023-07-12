@@ -29,7 +29,7 @@ import { useNavigate } from 'react-router-dom';
 
 import AuthTypes from '../../../redux/constants';
 import { openSystemBrowser } from '../../../utils/electronFunctions';
-const drawerWidth = 240;
+const drawerWidth = 300;
 
 const AppBar = styled(MuiAppBar, {
   shouldForwardProp: (prop) => prop !== 'open',
@@ -90,6 +90,14 @@ export default function MenuFooter({ isCourse, open }) {
       hidden: isCourse ? false : true,
       icon: (color) => {
         return <CloudDownloadIcon sx={{ color: color }} />;
+      },
+    },
+    {
+      id: 'downloads',
+      text: '                   ',
+      hidden: isCourse ? false : true,
+      icon: (color) => {
+        return null;
       },
     },
   ];
@@ -204,7 +212,7 @@ export default function MenuFooter({ isCourse, open }) {
             <ListItemIcon key="unique-open">
               <LanguageIcon sx={{ color: 'white' }} />
             </ListItemIcon>
-            <Typography textAlign="center">{'Sitio Web'}</Typography>
+            <Typography sx={{ flexGrow: 0, display: { xs: 'none', md: 'flex' } }} textAlign="center">{'Sitio Web'}</Typography>
           </MenuItem>
         </Box>
       </Toolbar>
