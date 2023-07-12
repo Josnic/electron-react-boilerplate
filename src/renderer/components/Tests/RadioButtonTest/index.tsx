@@ -83,7 +83,17 @@ const RadioButtonTest = ({ data, courseCode }) => {
           content: htmlContent,
           buttonText: testData.texto_boton && testData.texto_boton != "" ? testData.texto_boton : "Aceptar"
         })
+      }else{
+        setModalInitData({
+          content: "",
+          buttonText: ""
+        });
       }
+    }else{
+      setModalInitData({
+        content: "",
+        buttonText: ""
+      });
     }
 
     const questions = await sqlite3All(
@@ -93,6 +103,9 @@ const RadioButtonTest = ({ data, courseCode }) => {
     if (questions.OK) {
       setQuestions(questions.OK);
       setAnswers(new Array(questions.OK.length).fill(null));
+    }else{
+      setQuestions([]);
+      setAnswers([]);
     }
   }
 

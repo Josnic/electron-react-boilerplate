@@ -12,7 +12,6 @@ import { sqlite3All } from '../../helpers/Sqlite3Operations';
 import "./styles.scss";
 
 const FormQuestion = ({ data, courseCode }) => {
-  const [formData, setFormData] = useState(null);
   const [questions, setQuestions] = useState([]);
   const [header, setHeader] = useState(null);
   const [footer, setFooter] = useState(null);
@@ -46,6 +45,8 @@ const FormQuestion = ({ data, courseCode }) => {
     console.log(questions)
     if (questions.OK) {
         setQuestions(questions.OK);
+    }else{
+      setQuestions([]);
     }
     const path = courseCode + '.asar';
     if (form.OK && form.OK.length && form.OK.length == 1) {
@@ -55,6 +56,8 @@ const FormQuestion = ({ data, courseCode }) => {
           htmlHeader = await imagePaths(htmlHeader, form.OK[0].img_encabezado, path);
         }
         setHeader(htmlHeader);
+      }else{
+        setHeader(null);
       }
 
       if (form.OK[0].pie && form.OK[0].pie != '') {
@@ -63,6 +66,8 @@ const FormQuestion = ({ data, courseCode }) => {
           htmlFooter = await imagePaths(htmlFooter, form.OK[0].img_pie, path);
         }
         setFooter(htmlFooter);
+      }else{
+        setFooter(null);
       }
     }
   };
@@ -72,6 +77,11 @@ const FormQuestion = ({ data, courseCode }) => {
       loadFormDetails();
     }
   }, [data]);
+
+  useEffect(()=>{
+    setHeader(null);
+    setFooter(null);
+  },[])
 
   return (
     <Grid container columns={{ xs: 4, md: 12 }} spacing={2}>
