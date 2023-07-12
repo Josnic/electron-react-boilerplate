@@ -91,15 +91,7 @@ export default function MenuFooter({ isCourse, open }) {
       icon: (color) => {
         return <CloudDownloadIcon sx={{ color: color }} />;
       },
-    },
-    {
-      id: 'downloads',
-      text: '                   ',
-      hidden: isCourse ? false : true,
-      icon: (color) => {
-        return null;
-      },
-    },
+    }
   ];
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
