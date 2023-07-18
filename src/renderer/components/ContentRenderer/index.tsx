@@ -108,7 +108,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
   const [artPlayerInstances, setArtPlayerInstances] = useState([]);
   const prepareHtml = async () => {
     setFilePathDownload(null);
-    let path = courseCode + '.asar';
+    let path = courseCode;
     let content = data.contenido;
     let content2 = "";
     //imagenes
@@ -122,7 +122,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
           );
         }else{
           finalPath = await getPathCourseResource(
-            path + '/img/' + images[i]
+            path + '/img.asar/' + images[i]
           );
         }
         if (content){
@@ -138,7 +138,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
     if (Array.isArray(interactives)) {
       for (let i = 0; i < interactives.length; i++) {
         const finalPath = await getPathCourseResource(
-          path + '/interactivos/' + interactives[i]
+          path + '/interactivos/' + data.cod_unidad + ".asar/" + interactives[i]
         );
         if (content){
           content = content.replace(interactives[i], finalPath + "/index.html");
@@ -152,7 +152,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
     if (!content){
       const videos = data.videos ? data.videos.split(',') : null;
       const audios = data.audios ? data.audios.split(',') : null;
-      let path = courseCode + '.asar';
+      let path = courseCode;
       if (Array.isArray(videos)) {
         for (let i = 0; i < videos.length; i++) {
           content2 += "<div id='"+videos[i]+"'></div>"
@@ -168,7 +168,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
 
     if (data.archivo_descargable) {
       const filePathPdf = await getPathCourseResource(
-        path + '/pdf/' + data.archivo_descargable
+        path + '/pdf.asar/' + data.archivo_descargable
       );
       setFilePathDownload(filePathPdf);
     }
@@ -205,11 +205,11 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
   const renderMultimediaComponents = async () => {
     const videos = data.videos ? data.videos.split(',') : null;
     const audios = data.audios ? data.audios.split(',') : null;
-    let path = courseCode + '.asar';
+    let path = courseCode;
     if (Array.isArray(videos)) {
       for (let i = 0; i < videos.length; i++) {
         const finalPath = await getPathCourseResource(
-          path + '/videos/' + videos[i]
+          path + '/videos/' + data.cod_unidad + ".asar/" + videos[i]
         );
         await renderMultimedia(videos[i], 'VIDEO', finalPath, data.nombre);
       }
@@ -218,7 +218,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
     if (Array.isArray(audios)) {
       for (let i = 0; i < audios.length; i++) {
         const finalPath = await getPathCourseResource(
-          path + '/audios/' + audios[i]
+          path + '/audios.asar/' + audios[i]
         );
         await renderMultimedia(audios[i], 'AUDIO', finalPath, data.nombre);
       }
