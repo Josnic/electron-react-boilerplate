@@ -163,7 +163,7 @@ const MenuTreeView  = React.forwardRef(({ data, onClickItem }, ref) =>{
           }}
         >
           
-          {unit.lessons.map((lesson, index2) => (
+          {unit.lessons && unit.lessons.map((lesson, index2) => (
             <StyledTreeItem
               nodeId={`LESSON-${index}-${index2}`}
               key={`LESSON-${index}-${index2}`}
@@ -177,7 +177,7 @@ const MenuTreeView  = React.forwardRef(({ data, onClickItem }, ref) =>{
                 onClickItem("LESSON", lesson)
               }}
             >
-              {lesson.sublessons.map((sublesson, index3) => (
+              {lesson.sublessons && lesson.sublessons.map((sublesson, index3) => (
                 <StyledTreeItem
                   nodeId={`SUBLESSON-${index}-${index2}-${index3}`}
                   key={`SUBLESSON-${index}-${index2}-${index3}`}
