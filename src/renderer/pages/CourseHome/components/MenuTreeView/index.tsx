@@ -97,21 +97,35 @@ const MenuTreeView  = React.forwardRef(({ data, onClickItem }, ref) =>{
     const nodeIdParts = nodeId.split("-");
     setSelectedNode(nodeId);
     let data = {};
+    let nextNodeId = null;
     switch(nodeIdParts[0]){
       case "UNIT":
-        data = JSON.parse(JSON.stringify(dataMenu[nodeIdParts[1]]));
+        data = JSON.parse(JSON.stringify(dataMenu[parseInt(nodeIdParts[1])]));
         delete data.lessons;
       break;
       
       case "LESSON":
-        data = JSON.parse(JSON.stringify(dataMenu[nodeIdParts[1]][nodeIdParts[2]]));
+        data = JSON.parse(JSON.stringify(dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2])]));
       break;
 
       case "SUBLESSON":
-        data = JSON.parse(JSON.stringify(dataMenu[nodeIdParts[1]][nodeIdParts[2]][nodeIdParts[3]]));
+        data = JSON.parse(JSON.stringify(dataMenu[parseInt(nodeIdParts[1])]["lessons"][parseInt(nodeIdParts[2])]["sublessons"][parseInt(nodeIdParts[3])]));
+        
+        if (dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2])].sublessons.length - 1 == parseInt(nodeIdParts[3])){
+          if (dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2]) + 1]){
+            nextNodeId = `LESSON-${parseInt(nodeIdParts[1])}-${(parseInt(nodeIdParts[2]) + 1)}`
+          }else{
+            if (dataMenu[parseInt(nodeIdParts[1]) + 1]){
+              nextNodeId = `UNIT-${(parseInt(nodeIdParts[1]) + 1)}-${units[parseInt(nodeIdParts[1]) + 1].cod_unidad}`
+            }
+          }
+        }else{
+          nextNodeId = `SUBLESSON-${parseInt(nodeIdParts[1])}-${parseInt(nodeIdParts[2])}-${(parseInt(nodeIdParts[3]) + 1)}`
+        } 
       break;
     }
-    onClickItem(nodeIdParts[0], data);
+    console.log(nextNodeId)
+    onClickItem(nodeIdParts[0], data, nextNodeId);
   }
 
   const handleSelect = (event, nodeIds) => {
@@ -174,7 +188,22 @@ const MenuTreeView  = React.forwardRef(({ data, onClickItem }, ref) =>{
                   bgColor="#fcefe3"
                   onClick={()=>{
                     setSelectedNode(`SUBLESSON-${index}-${index2}-${index3}`);
-                    onClickItem("SUBLESSON", sublesson);
+                    let nextNodeId = null;
+                    if (dataMenu[index].lessons[index2].sublessons.length - 1 == index3){
+
+                      if (dataMenu[index].lessons[index2 + 1]){
+                        nextNodeId = `LESSON-${index}-${(index2 + 1)}`
+                      }else{
+                        if (dataMenu[index + 1]){
+                          nextNodeId = `UNIT-${(index + 1)}-${dataMenu[index + 1].cod_unidad}`
+                        }
+                      }
+                     
+
+                    }else{
+                      nextNodeId = `SUBLESSON-${index}-${index2}-${(index3 + 1)}`
+                    } 
+                    onClickItem("SUBLESSON", sublesson, nextNodeId);
                   }}
                 />
               ))}

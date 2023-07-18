@@ -203,6 +203,11 @@ export default function CourseHome() {
         <MenuTreeView 
           data={dataMenu} 
           onClickItem={(type, data, nextNodeIdData) => {
+            if (nextNodeIdData){
+              setNextNodeId(nextNodeIdData);
+            }else{
+              setNextNodeId(null);
+            }
             renderContent(type, data)
           }}
           ref={menuTreeViewRef} 
@@ -218,7 +223,6 @@ export default function CourseHome() {
                   {units.map((card, index) => (
                     <Grid item xs={4} key={index}>
                       <ListCard cardData={card} onCardClick={()=>{
-                        //navigate("/course/" + card.cod_curso);
                         menuTreeViewRef.current.setSelectedNode(`UNIT-${index}-${card.cod_unidad}`)
                       }}/>
                     </Grid>
@@ -234,7 +238,9 @@ export default function CourseHome() {
                     type={htmlContent.type} 
                     courseCode={courseCode}
                     onContinue={()=> {
-                      
+                      if (nextNodeId){
+                        menuTreeViewRef.current.setSelectedNode(nextNodeId);
+                      }
                     }} 
                   />
                 ):(
