@@ -119,7 +119,7 @@ export default function CourseHome() {
         const lessons = await sqlite3All(`SELECT *, objetivo AS contenido  FROM lecciones WHERE cod_unidad = '${dataMenu[i].cod_unidad}' ORDER BY cod_leccion ASC`);
         if (lessons.OK){
           for (let j = 0; j < lessons.OK.length; j++) {
-            const sublessons = await sqlite3All(`SELECT *, CASE WHEN test_id IS NULL THEN '' ELSE (SELECT test_tipo FROM tests WHERE cod_test = test_id) END AS test_tipo 
+            const sublessons = await sqlite3All(`SELECT *, '${dataMenu[i].cod_unidad}' AS cod_unidad, CASE WHEN test_id IS NULL THEN '' ELSE (SELECT test_tipo FROM tests WHERE cod_test = test_id) END AS test_tipo 
                                                  FROM sublecciones WHERE cod_leccion = '${lessons.OK[j].cod_leccion}' ORDER BY orden ASC`);
             if (sublessons.OK){
               lessons.OK[j]["sublessons"] = sublessons.OK;
