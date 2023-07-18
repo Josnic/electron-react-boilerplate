@@ -197,6 +197,8 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
       }else{
         setHtml(finalHtml);
       }
+    }else{
+      setHtml(null);
     }
   };
 
