@@ -12,9 +12,9 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import parse from 'html-react-parser';
 
-const RadioQuestion = ({ question }) => {
+const RadioQuestion = ({ question, scale }) => {
   const [answer, setAnswer] = useState(null);
-
+  const [numRadios, setNumRadios] = useState(Array(scale.max).fill(0))
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt((event.target as HTMLInputElement).value);
     setAnswer(value);
@@ -38,13 +38,28 @@ const RadioQuestion = ({ question }) => {
     },
   }));
 
+  const radios = () =>{
+    const r = [];
+    for (let i = scale.min; i <= scale.max; i++){
+      r.push(<FormControlLabel value={i} control={<Radio />} label={i} />)
+    }
+    return r;
+  }
+
   return (
     <div className="question-container">
       <div className="question radio-question">
         {parse(question.pregunta)}
-        <LightTooltip title={parse(question.informativo)}>
-            <LiveHelpIcon color="disabled" sx={{ cursor: 'pointer' }} />
-        </LightTooltip>
+        {
+          question.informativo ? (
+          <LightTooltip title={parse(question.informativo)}>
+              <LiveHelpIcon color="disabled" sx={{ cursor: 'pointer' }} />
+          </LightTooltip>
+          ):(
+            null
+          )
+        }
+        
       </div>
       <div className="radio-container">
         <FormControl>
@@ -53,11 +68,7 @@ const RadioQuestion = ({ question }) => {
             name="row-radio-buttons-group"
             onChange={handleChange}
           >
-            <FormControlLabel value="1" control={<Radio />} label="1" />
-            <FormControlLabel value="2" control={<Radio />} label="2" />
-            <FormControlLabel value="3" control={<Radio />} label="3" />
-            <FormControlLabel value="4" control={<Radio />} label="4" />
-            <FormControlLabel value="5" control={<Radio />} label="5" />
+            {radios()}
           </RadioGroup>
         </FormControl>
       </div>

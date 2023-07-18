@@ -61,7 +61,7 @@ const InputNumberTest = ({ data, courseCode }) => {
             images[i].replace('commons', 'commons.asar')
           );
         } else {
-          finalPath = await getPathCourseResource(path + '/img/' + images[i]);
+          finalPath = await getPathCourseResource(path + '/img.asar/' + images[i]);
         }
         content = content.replace(images[i], finalPath);
       }
@@ -78,7 +78,7 @@ const InputNumberTest = ({ data, courseCode }) => {
       const testData = test.OK[0];
       if (testData.encabezado && testData.encabezado != '') {
         let htmlContent = testData.encabezado;
-        const path = courseCode + '.asar';
+        const path = courseCode;
         if (testData.img_encabezado && testData.img_encabezado != '') {
           htmlContent = await imagePaths(
             htmlContent,

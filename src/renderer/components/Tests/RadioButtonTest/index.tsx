@@ -28,7 +28,7 @@ const RadioButtonTest = ({ data, courseCode }) => {
   const [questions, setQuestions] = useState([]);
   const [openModalWelcome, setOpenModalWelcome] = useState(true);
   const [openModalEnd, setOpenModalEnd] = useState(false);
-
+  const [currentTest, setTest] = useState(null);
   const [modalInitData, setModalInitData] = useState({
     content: "",
     buttonText: ""
@@ -58,7 +58,7 @@ const RadioButtonTest = ({ data, courseCode }) => {
             images[i].replace('commons', 'commons.asar')
           );
         } else {
-          finalPath = await getPathCourseResource(path + '/img/' + images[i]);
+          finalPath = await getPathCourseResource(path + '/img.asar/' + images[i]);
         }
         content = content.replace(images[i], finalPath);
       }
@@ -72,10 +72,11 @@ const RadioButtonTest = ({ data, courseCode }) => {
     );
     console.log(test)
     if (test.OK){
+      setTest(test.OK[0])
       const testData = test.OK[0];
       if (testData.encabezado && testData.encabezado != '') {
         let htmlContent = testData.encabezado;
-        const path = courseCode + '.asar';
+        const path = courseCode;
         if (testData.img_encabezado && testData.img_encabezado != '') {
           htmlContent = await imagePaths(htmlContent, testData.img_encabezado, path);
         }
@@ -117,51 +118,64 @@ const RadioButtonTest = ({ data, courseCode }) => {
 
   return (
     <Grid container columns={{ xs: 4, md: 12 }} spacing={2}>
-      <Grid item xs={12}>
-        {
-          data ? (
-            <TestTitle title={data.nombre} color={'white'} />
-          ):(
-            null
-          )
-        }
-      </Grid>
-      <Grid item xs={12}>
-        <div className="tests-container">
-          {questions.map((question, index) => {
-            return (
-              <RadioQuestion
-                question={question}
-                key={index}
-                onAnswerChange={(value) => handleAnswerChange(index, value)}
-              />
-            );
-          })}
-        </div>
-      </Grid>
-      <Grid item xs={12} className="lessons-button-container-center">
-        <ButtomCustom onClick={handleSubmit} variant="contained" rounded>
-          Guardar
-        </ButtomCustom>
-      </Grid>
-      <AlertModal 
-        open={openModalWelcome} 
-        title={""} 
-        content={parse(modalInitData.content)}
-        buttonText={modalInitData.buttonText}
-        onButtonClick={()=>{
-          setOpenModalWelcome(false);
-        }}
-      />
-      <AlertModal 
-        open={openModalEnd} 
-        title={"Título"} 
-        content="Esta es una cosa rara. Esta es una cosa rara Esta es una cosa rara Esta es una cosa rara Esta es una cosa rara" 
-        buttonText={"Aceptar"}
-        onButtonClick={()=>{
-          setOpenModalEnd(false);
-        }}
-      />
+      {
+      currentTest ? (
+        <>
+          <Grid item xs={12}>
+            {
+              data ? (
+                <TestTitle title={data.nombre} color={'white'} />
+              ):(
+                null
+              )
+            }
+          </Grid>
+          <Grid item xs={12}>
+            <div className="tests-container">
+              {questions.map((question, index) => {
+                return (
+                  <RadioQuestion
+                    question={question}
+                    key={index}
+                    scale={{
+                      min: currentTest.rango_inicial,
+                      max: currentTest.rango_final,
+                    }}
+                    onAnswerChange={(value) => handleAnswerChange(index, value)}
+                  />
+                );
+              })}
+            </div>
+          </Grid>
+          <Grid item xs={12} className="lessons-button-container-center">
+            <ButtomCustom onClick={handleSubmit} variant="contained" rounded>
+              Guardar
+            </ButtomCustom>
+          </Grid>
+          <AlertModal 
+            open={openModalWelcome} 
+            title={""} 
+            content={parse(modalInitData.content)}
+            buttonText={modalInitData.buttonText}
+            onButtonClick={()=>{
+              setOpenModalWelcome(false);
+            }}
+          />
+          <AlertModal 
+            open={openModalEnd} 
+            title={"Título"} 
+            content="Esta es una cosa rara. Esta es una cosa rara Esta es una cosa rara Esta es una cosa rara Esta es una cosa rara" 
+            buttonText={"Aceptar"}
+            onButtonClick={()=>{
+              setOpenModalEnd(false);
+            }}
+          />
+        </>
+      ):(
+        null
+      )
+    }
+      
     </Grid>
   );
 };
