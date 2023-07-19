@@ -161,7 +161,7 @@ const InputNumberTest = ({ data, courseCode }) => {
                     {questions.map((ele, index2) => (
                       <>
                         {ele.nombre == ele1 ? (
-                          <div className="question-container">
+                          <div className="question-container" key={index2}>
                             <div className="question input-number-cuestion">
                               {parse(ele.pregunta)}
                             </div>

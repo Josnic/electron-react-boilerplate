@@ -19,11 +19,13 @@ import TestTitle from '../TestTitle';
 import parse from 'html-react-parser';
 import { getPathCourseResource } from '../../../utils/electronFunctions';
 import { sqlite3All } from '../../../helpers/Sqlite3Operations';
-
+import { ToastContainer } from 'react-toastify';
+import OverlayLoader from '../../OverlayLoader'
+import { showToast } from '../../../utils/toast';
 import '../styles.scss';
 
 const RadioButtonTest = ({ data, courseCode }) => {
-  
+  const [open, setOpen] = useState(false);
   const [answers, setAnswers] = useState([]);
   const [questions, setQuestions] = useState([]);
   const [openModalWelcome, setOpenModalWelcome] = useState(true);
@@ -116,8 +118,22 @@ const RadioButtonTest = ({ data, courseCode }) => {
     }
   }, [data])
 
+  const saveTest = async() => {
+    const empty = answers.filter(ele => ele == null);
+    if (empty.length > 0){
+      showToast("Completa todo el formulario");
+    }else{
+      setOpen(true);
+
+      setTimeout(()=>{
+        setOpen(false);
+      },1000)
+    }
+  }
+
   return (
     <Grid container columns={{ xs: 4, md: 12 }} spacing={2}>
+      <OverlayLoader open={open} />
       {
       currentTest ? (
         <>
@@ -175,7 +191,7 @@ const RadioButtonTest = ({ data, courseCode }) => {
         null
       )
     }
-      
+    <ToastContainer />
     </Grid>
   );
 };
