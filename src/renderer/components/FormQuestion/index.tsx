@@ -9,6 +9,7 @@ import { ToastContainer } from 'react-toastify';
 import OverlayLoader from '../../components/OverlayLoader';
 import { getPathCourseResource } from '../../utils/electronFunctions';
 import { sqlite3All } from '../../helpers/Sqlite3Operations';
+import { generateIamPdf } from '../../helpers/formPdf';
 import { showToast } from '../../utils/toast';
 
 import "./styles.scss";
@@ -43,6 +44,7 @@ const FormQuestion = ({ data, courseCode }) => {
     const form = await sqlite3All(
       `SELECT * FROM formularios WHERE cod_formulario = '${data.cod_formulario}' LIMIT 1`
     );
+    console.log(form)
     const questions = await sqlite3All(
       `SELECT * FROM formularios_detalles WHERE cod_formulario = '${data.cod_formulario}' ORDER BY orden ASC`
     );
@@ -51,7 +53,8 @@ const FormQuestion = ({ data, courseCode }) => {
         setQuestions(questions.OK);
         setAnswers(Array(questions.OK.length).fill({
           questionId: null,
-          answerText: ""
+          answerText: "",
+          index: null
         }))
     }else{
       setQuestions([]);
@@ -99,8 +102,22 @@ const FormQuestion = ({ data, courseCode }) => {
   const handleAnswer = (event, index) => {
     const oldState = JSON.parse(JSON.stringify(answers));
     oldState[index].questionId = questions[index].id_pregunta;
-    oldState[index].answerText = (event.target.value).trim()
+    oldState[index].answerText = (event.target.value).trim();
+    oldState[index].index = index;
     setAnswers(oldState);
+  }
+
+  const tranformDataToPdf = () => {
+    const array = [];
+
+    for (let i = 0; i < answers.length; i++){
+      array.push({
+        question: questions[answers[i].index].pregunta,
+        answer: answers[i].answerText
+      })
+    }
+
+    return array;
   }
 
   const saveForm = async()=> {
@@ -109,9 +126,10 @@ const FormQuestion = ({ data, courseCode }) => {
       showToast("Completa todo el formulario");
     }else{
       setOpen(true);
-
+      await generateIamPdf("Yo Soy", tranformDataToPdf());
       setTimeout(()=>{
         setOpen(false);
+
       },1000)
     }
   }
