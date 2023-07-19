@@ -31,7 +31,7 @@ const FormQuestion = ({ data, courseCode }) => {
             images[i].replace('commons', 'commons.asar')
           );
         } else {
-          finalPath = await getPathCourseResource(path + '/img/' + images[i]);
+          finalPath = await getPathCourseResource(path + '/img.asar/' + images[i]);
         }
         content = content.replace(images[i], finalPath);
       }
