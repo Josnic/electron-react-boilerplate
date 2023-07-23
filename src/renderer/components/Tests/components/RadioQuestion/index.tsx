@@ -12,13 +12,13 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import parse from 'html-react-parser';
 
-const RadioQuestion = ({ question, scale }) => {
+const RadioQuestion = ({ question, scale, onAnswerChange }) => {
   const [answer, setAnswer] = useState(null);
   const [numRadios, setNumRadios] = useState(Array(scale.max).fill(0))
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt((event.target as HTMLInputElement).value);
     setAnswer(value);
-    //props.onAnswerChange(parseInt(value));
+    onAnswerChange(parseInt(value));
   };
 
   const LightTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -67,6 +67,7 @@ const RadioQuestion = ({ question, scale }) => {
             row
             name="row-radio-buttons-group"
             onChange={handleChange}
+            key={question.pregunta}
           >
             {radios()}
           </RadioGroup>
