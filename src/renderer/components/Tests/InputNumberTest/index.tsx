@@ -262,7 +262,7 @@ const InputNumberTest = ({ data, courseCode }) => {
     }
 
     const questions = await sqlite3All(
-      `SELECT tests_preguntas_inputn.permite_cero, tests_preguntas_inputn.pregunta, tests_preguntas_inputn.cod_categoria, tests_categorias_preguntas.nombre FROM tests_preguntas_inputn 
+      `SELECT tests_preguntas_inputn.id, tests_preguntas_inputn.permite_cero, tests_preguntas_inputn.pregunta, tests_preguntas_inputn.cod_categoria, tests_categorias_preguntas.nombre FROM tests_preguntas_inputn 
       LEFT JOIN tests_categorias_preguntas ON tests_categorias_preguntas.cod_categoria = tests_preguntas_inputn.cod_categoria
       WHERE tests_preguntas_inputn.cod_test = '${data.test_id}' ORDER BY tests_categorias_preguntas.orden, tests_preguntas_inputn.orden ASC`
     );
