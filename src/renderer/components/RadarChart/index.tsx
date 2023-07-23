@@ -5,12 +5,9 @@ import './styles.scss';
 
 const RadarChart = ({title, series, categories}) =>{
     const chartInstance = useRef();
-
-    const [state, setState] = useState({  
-        series: [{
-          name: 'Series 1',
-          data: [80, 50, 30, 40, 100, 20],
-        }],
+    console.log(title, series, categories)
+    const state = {  
+        series: series,
         options: {
           chart: {
             height: 350,
@@ -24,7 +21,7 @@ const RadarChart = ({title, series, categories}) =>{
             defaultLocale: "es"
           },
           title: {
-            text: "Mapa situacional",
+            text: title,
             align: 'center',
             margin: 10,
             offsetX: 0,
@@ -38,10 +35,10 @@ const RadarChart = ({title, series, categories}) =>{
             },
         },
           xaxis: {
-            categories: ['January', 'February', 'March', 'April', 'May', 'June']
+            categories: categories
           }
         },
-      })
+      }
 
       useEffect(()=>{
         if (chartInstance.current){
@@ -62,7 +59,8 @@ const RadarChart = ({title, series, categories}) =>{
             options={state.options}
             series={state.series}
             type="radar"
-            height={350}
+            width={700}
+            height={500}
           />
         </>
     )
