@@ -19,7 +19,7 @@ const Transition = React.forwardRef(function Transition(
   return <Slide direction="up" ref={ref} {...props} />;
 });
 
-export default function AlertModal({ open, title, content, buttonText, onButtonClick }) {
+export default function AlertModal({ open, title, content, buttonText, onButtonClick, ...restProps }) {
   return (
     <div>
       <Dialog
@@ -27,7 +27,7 @@ export default function AlertModal({ open, title, content, buttonText, onButtonC
         TransitionComponent={Transition}
         keepMounted
         onClose={()=>{}}
-        aria-describedby="alert-dialog-slide-description"
+        {...restProps}
       >
         <DialogTitle>{title}</DialogTitle>
         <DialogContent>
