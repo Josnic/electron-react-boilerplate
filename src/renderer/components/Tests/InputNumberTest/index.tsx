@@ -296,7 +296,7 @@ const InputNumberTest = ({ data, courseCode }) => {
   }, [data]);
 
   return (
-    <Grid container columns={{ xs: 4, md: 12 }} spacing={2}>
+    <Grid container columns={{ xs: 4, md: 12 }} spacing={2} key={data.test_id}>
       <OverlayLoader open={open} />
       {currentTest ? (
         <>
