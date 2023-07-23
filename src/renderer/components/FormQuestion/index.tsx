@@ -11,16 +11,17 @@ import { getPathCourseResource } from '../../utils/electronFunctions';
 import { sqlite3All } from '../../helpers/Sqlite3Operations';
 import { generateIamPdf } from '../../helpers/formPdf';
 import { showToast } from '../../utils/toast';
-
+import AlertModal from '../Tests/components/AlertModal';
 import "./styles.scss";
 
 const FormQuestion = ({ data, courseCode }) => {
   const [questions, setQuestions] = useState([]);
   const [open, setOpen] = useState(false);
+  const [openModalEnd, setOpenModalEnd] = useState(false);
   const [answers, setAnswers] = useState([]);
   const [header, setHeader] = useState(null);
   const [footer, setFooter] = useState(null);
-
+  const [formData, setFormData] = useState(null);
   const imagePaths = async (html, stringImages, path) => {
     const images = stringImages ? stringImages.split(',') : null;
     let content = html;
@@ -45,6 +46,7 @@ const FormQuestion = ({ data, courseCode }) => {
       `SELECT * FROM formularios WHERE cod_formulario = '${data.cod_formulario}' LIMIT 1`
     );
     console.log(form)
+    setFormData(form.OK[0]);
     const questions = await sqlite3All(
       `SELECT * FROM formularios_detalles WHERE cod_formulario = '${data.cod_formulario}' ORDER BY orden ASC`
     );
@@ -85,6 +87,7 @@ const FormQuestion = ({ data, courseCode }) => {
 
   useEffect(() => {
     if (data) {
+      setAnswers([])
       loadFormDetails();
     }
   }, [data]);
@@ -126,12 +129,26 @@ const FormQuestion = ({ data, courseCode }) => {
       showToast("Completa todo el formulario");
     }else{
       setOpen(true);
-      await generateIamPdf("Yo Soy", tranformDataToPdf());
+      
       setTimeout(()=>{
         setOpen(false);
-
+        if (formData.texto_boton && formData.texto_boton != ""){
+          setOpenModalEnd(true);
+        }
+       
       },1000)
     }
+  }
+
+  const ButtonDownload = () => {
+    return (
+      <ButtomCustom variant="contained" onClick={async()=>{
+        const title = data.tipo == "T2" ? "Yo Soy" : data.tipo == "C" ? "MI PROYECTO DE VIDA" : "";
+        await generateIamPdf(title, tranformDataToPdf());
+      }} rounded>
+          {formData.texto_boton}
+      </ButtomCustom>
+    )
   }
 
   return (
@@ -141,7 +158,7 @@ const FormQuestion = ({ data, courseCode }) => {
         {header ? <div>{parse(header)}</div> : null}
       </Grid>
       <Grid item xs={12}>
-        <div className="questions-container">
+        <div className="questions-container" key={data.cod_formulario}>
             {
                 questions && questions.length > 0 ? (
                     <div key={"container"}>
@@ -157,6 +174,7 @@ const FormQuestion = ({ data, courseCode }) => {
                                           id="outlined-multiline-static"
                                           label=""
                                           multiline
+                                          key={question.id}
                                           rows={3}
                                           defaultValue=""
                                           onChange={(event)=> {
@@ -186,6 +204,22 @@ const FormQuestion = ({ data, courseCode }) => {
         </ButtomCustom>
       </Grid>
       <ToastContainer />
+      {
+        formData && formData.texto_boton && formData.texto_boton != "" ? (
+          <AlertModal
+            open={openModalEnd}
+            title={''}
+            content={ButtonDownload()}
+            buttonText={"Cerrar"}
+            onButtonClick={() => {
+              setOpenModalEnd(false);
+            }}
+          />
+        ):(
+          null
+        )
+      }
+      
     </Grid>
   );
 };
