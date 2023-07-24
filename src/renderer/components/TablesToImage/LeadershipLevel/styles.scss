@@ -1,0 +1,29 @@
+.leadership-level-table {
+  border-collapse: collapse;
+  width: 390px;
+  background-color: white;
+  td,
+  th {
+    border: 1px solid #000000;
+    text-align: left;
+    padding: 8px;
+    text-align: center;
+    line-height: 25px;
+  }
+  .text-level {
+    color: purple;
+    font-weight: bold;
+  }
+  .circle {
+    display: block;
+    height: 25px;
+    width: 25px;
+    border-radius: 50%;
+    border: 2px solid red;
+    margin: auto;
+    color: transparent;
+    line-height: 25px;
+    text-align: center;
+    color: black;
+  }
+}
