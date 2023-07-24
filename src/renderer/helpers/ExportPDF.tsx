@@ -1,6 +1,7 @@
 import { PDFDocument } from 'pdf-lib';
 import * as fs from 'fs';
-import download from 'downloadjs/download';
+import { getPathCourseResource } from '../utils/electronFunctions';
+import * as download from 'downloadjs/download';
 
 const base64ToArrayBuffer = (base64) => {
     var binaryString = atob(base64);
