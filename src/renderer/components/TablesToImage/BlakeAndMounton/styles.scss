@@ -1,0 +1,92 @@
+.blake-mounton-level-table-container {
+  width: 510px;
+  background-color: white;
+  position: relative;
+  .blake-mounton-level-table {
+    border-collapse: collapse;
+    width: 500px;
+    background-color: white;
+    td,
+    th {
+      border: 1px solid #000000;
+      text-align: left;
+      padding: 8px;
+      text-align: center;
+      line-height: 25px;
+      min-width: 50px;
+      max-width: 50px;
+      max-height: 50px;
+      min-height: 50px;
+    }
+
+    &.table-over {
+      position: absolute;
+      left: 0;
+      top: 0;
+      background-color: transparent;
+      td,
+      th {
+        border: 1px solid transparent !important;
+        text-align: left;
+        padding: 8px;
+        text-align: center;
+        line-height: 25px;
+        min-width: 50px;
+        max-width: 50px;
+        max-height: 50px;
+        min-height: 50px;
+      }
+
+      .span-1-x {
+        top: 15px;
+        position: relative;
+      }
+
+      .span-1-xy {
+        margin-left: -40px;
+        top: 15px;
+        position: relative;
+      }
+
+      .span-1-y {
+        margin-left: -40px;
+        position: relative;
+      }
+
+    }
+    .text-level {
+      color: purple;
+      font-weight: bold;
+    }
+
+    .no-border {
+      border: 0px solid #000000 !important;
+    }
+
+    .no-border > td {
+      border: 0px solid #000000 !important;
+    }
+
+    .level-red {
+      color: red;
+      font-weight: bold;
+    }
+
+    .level-blue {
+      color: lightblue;
+      font-weight: bold;
+    }
+
+    .td-no-border {
+      border-bottom-style: hidden;
+      border-top-style: hidden;
+      border-left-style: hidden;
+      &.person {
+        writing-mode: vertical-lr;
+        text-orientation: upright;
+        color: lightblue;
+        font-weight: bold;
+      }
+    }
+  }
+}
