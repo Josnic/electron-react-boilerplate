@@ -40,6 +40,7 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
   const [categories, setCategories] = useState([]);
   const categoryResponseArray = useRef([]);
   const [testSaved, setTestSaved] = useState(false);
+  const [unitLessons, setUnitLessons] = useState([]);
   const [modalInitData, setModalInitData] = useState({
     title: '',
     content: '',
@@ -50,6 +51,18 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
     content: '',
     buttonText: '',
   });
+
+  const getLessons = async(units) => {
+    console.log(`SELECT nombre, cod_unidad  FROM lecciones WHERE cod_unidad IN(${units.join("','")})`)
+    const getLessonsName = await sqlite3All(
+      `SELECT nombre, cod_unidad  FROM lecciones WHERE cod_unidad IN('${units.join("','")}')`
+    );
+    console.log(getLessonsName)
+    if (getLessonsName.OK){
+      setUnitLessons(getLessonsName.OK);
+    }
+  }
+
 
   const handleAnswerChange = (index, category, value) => {
     const newAnswers = [...answers];
@@ -128,11 +141,11 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
     if (testData) {
       let category = ``;
       let join = ``;
-      let orderType = ` ORDER BY tests_preguntas_radio.orden ASC`;
+      const orderType = testData.preguntas_aleatorias == 1 ? ` ORDER BY RANDOM() ` : ` ORDER BY tests_preguntas_radio.orden ASC`;
 
       switch (testData.cod_test) {
         case 'COVI_Autoevaluacion':
-          category = `'' AS category`;
+          category = `unidades.nombre AS category`;
           break;
 
         case 'COVI_Raiz_amargura':
@@ -140,9 +153,6 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
           let field = testData.cod_test == 'COVI_Raiz_amargura' ? `raiz` : `ie`;
           category = `tests_categorias_preguntas.nombre AS category`;
           join = `  LEFT JOIN tests_categorias_preguntas ON tests_categorias_preguntas.cod_categoria = tests_preguntas_radio.${field} `;
-          if (testData.cod_test == 'INEM_nivel_IE') {
-            orderType = ` ORDER BY RANDOM() `;
-          }
           break;
       }
 
@@ -151,9 +161,11 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
         tests_preguntas_radio.pregunta, 
         tests_preguntas_radio.informativo,
         tests_preguntas_radio.negativo,
-        tests_preguntas_radio.unidad,
+        tests_preguntas_radio.unidad AS unidad_cod,
+        unidades.nombre AS unidad,
         ${category}
         FROM tests_preguntas_radio 
+        LEFT JOIN unidades ON unidades.cod_unidad = tests_preguntas_radio.unidad
         ${join}
         WHERE tests_preguntas_radio.cod_test = '${data.test_id}' ${orderType}`
       );
@@ -175,6 +187,15 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
             })
           ),
         ];
+        if (testData.cod_test == "COVI_Autoevaluacion"){
+          getLessons([
+            ...new Set(
+              questions.OK.map((ele, index) => {
+                return ele.unidad_cod;
+              })
+            ),
+          ]);
+        }
         setCategories(categoryArray);
       } else {
         setQuestions([]);
@@ -193,7 +214,7 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
   const COVI_AutoevaluacionResponse = async () => {
     setModalEndData({
       title: 'RESULTADO DE TU AUTOEVALUACIÓN',
-      content: '',
+      content: auevResponse(),
       buttonText: 'Aceptar',
     });
     setOpenModalEnd(true);
@@ -267,6 +288,44 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
       </>
     )
   }
+
+  const auevResponse = () => {
+    const category = JSON.parse(JSON.stringify(categoryResponseArray.current)).sort(function (a, b) {
+      return a.value - b.value;
+    })[0].category;
+
+    const unit = questions.filter(ele => ele.category == category)
+
+    const lessons = unitLessons.filter(ele => ele.cod_unidad == unit[0].unidad_cod)
+
+    return (
+      <>
+      <Typography variant="subtitle2" gutterBottom>
+        Tus respuestas indican que debes enfocar mayor atención en la unidad {category} donde se tocarán los siguientes temas:
+      </Typography>
+      {
+        lessons && lessons.length && lessons.length > 0 ? (
+          <List
+          sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+        >
+          {lessons.map((lesson, index) => (
+            <ListItem
+              key={index}
+              disableGutters
+            >
+              <ListItemText primary={`${lesson.nombre}`} />
+            </ListItem>
+          ))}
+        </List>
+        ):(
+          null
+        )
+      }
+      </>
+      
+    )
+  }
+
   const COVI_Raiz_amarguraResponse = async () => {
     setModalEndData({
       title: 'Identificando la Raíz de Amargura',
@@ -342,6 +401,7 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
 
       switch (currentTest.cod_test) {
         case 'COVI_Autoevaluacion':
+          resultByCategory();
           COVI_AutoevaluacionResponse();
           break;
 
