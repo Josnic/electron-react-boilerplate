@@ -12,12 +12,14 @@ import AudioPlayer, {
   VolumeSliderPlacement,
 } from 'react-modern-audio-player';
 import ButtomCustom from '../ButtonRound';
-import './styles.scss';
-
 import parse from 'html-react-parser';
 import * as download from 'downloadjs/download';
+import { useSelector } from 'react-redux';
+import { getMysqlDate } from '../../utils/generals';
 import { getPathCourseResource } from '../../utils/electronFunctions';
 import { useStateWithCallback } from '../../hooks/useStateWithCallback';
+import { sqlite3Run } from '../../helpers/Sqlite3Operations';
+import './styles.scss';
 
 const Audio = ({ playList }) => {
   const [progressType, setProgressType] = useState<ProgressUI>('waveform');
@@ -106,6 +108,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
   const [filePathDownload, setFilePathDownload] = useState(null);
   const [rootMultimedia, setRootMultimedia] = useStateWithCallback([]);
   const [artPlayerInstances, setArtPlayerInstances] = useState([]);
+  const authState = useSelector((state) => state);
   const prepareHtml = async () => {
     setFilePathDownload(null);
     let path = courseCode;
@@ -256,6 +259,22 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
     root.render(component);
   };
 
+  const insertView = async() => {
+    if(type == "SUBLESSON"){
+      const userId = authState && authState.user ? authState.user.email : "test";
+      const result = await sqlite3Run(
+        "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
+        [userId, data.id, getMysqlDate()]
+      );
+    }
+  }
+
+  useEffect(()=>{
+    if (data){
+      insertView();
+    }
+  }, [])
+
   useEffect(() => {
     prepareHtml();
   }, [data]);
@@ -265,6 +284,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
       renderMultimediaComponents();
     }
   }, [html]);
+
 
   return (
     <Grid container columns={{ xs: 4, md: 12 }} spacing={2}>
