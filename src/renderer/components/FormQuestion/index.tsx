@@ -14,7 +14,7 @@ import { showToast } from '../../utils/toast';
 import AlertModal from '../Tests/components/AlertModal';
 import "./styles.scss";
 
-const FormQuestion = ({ data, courseCode }) => {
+const FormQuestion = ({ data, courseCode, onContinue }) => {
   const [questions, setQuestions] = useState([]);
   const [open, setOpen] = useState(false);
   const [openModalEnd, setOpenModalEnd] = useState(false);
@@ -22,6 +22,7 @@ const FormQuestion = ({ data, courseCode }) => {
   const [header, setHeader] = useState(null);
   const [footer, setFooter] = useState(null);
   const [formData, setFormData] = useState(null);
+  const [formSaved, setFormSaved] = useState(false);
   const imagePaths = async (html, stringImages, path) => {
     const images = stringImages ? stringImages.split(',') : null;
     let content = html;
@@ -132,6 +133,7 @@ const FormQuestion = ({ data, courseCode }) => {
       
       setTimeout(()=>{
         setOpen(false);
+        setFormSaved(true);
         if (formData.texto_boton && formData.texto_boton != ""){
           setOpenModalEnd(true);
         }
@@ -199,9 +201,17 @@ const FormQuestion = ({ data, courseCode }) => {
       </Grid>
 
       <Grid item xs={12} className="lessons-button-container-center">
-        <ButtomCustom variant="contained" onClick={()=>{saveForm()}} rounded>
+        {
+          !formSaved ? (
+            <ButtomCustom variant="contained" onClick={()=>{saveForm()}} rounded>
+          Guardar
+        </ButtomCustom>
+          ):(
+            <ButtomCustom variant="contained" onClick={()=>{onContinue()}} rounded>
           Continuar
         </ButtomCustom>
+          )
+        }
       </Grid>
       <ToastContainer />
       {

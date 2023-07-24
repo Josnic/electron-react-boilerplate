@@ -252,6 +252,11 @@ export default function CourseHome() {
                   <FormQuestion 
                     data={formData} 
                     courseCode={courseCode}
+                    onContinue={()=> {
+                      if (nextNodeId){
+                        menuTreeViewRef.current.setSelectedNode(nextNodeId);
+                      }
+                    }}
                   />
                 ):(
                   null
@@ -262,6 +267,11 @@ export default function CourseHome() {
                   <RadioButtonTest 
                     data={testData} 
                     courseCode={courseCode}
+                    onContinue={()=> {
+                      if (nextNodeId){
+                        menuTreeViewRef.current.setSelectedNode(nextNodeId);
+                      }
+                    }}
                   />
                 ):(
                   null
@@ -272,6 +282,11 @@ export default function CourseHome() {
                   <InputNumberTest 
                     data={testData} 
                     courseCode={courseCode}
+                    onContinue={()=> {
+                      if (nextNodeId){
+                        menuTreeViewRef.current.setSelectedNode(nextNodeId);
+                      }
+                    }}
                   />
                 ):(
                   null

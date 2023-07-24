@@ -34,7 +34,7 @@ import { showToast } from '../../../utils/toast';
 import RadarChart from '../../RadarChart';
 import '../styles.scss';
 
-const InputNumberTest = ({ data, courseCode }) => {
+const InputNumberTest = ({ data, courseCode, onContinue }) => {
   const answers = useRef(Array(0).fill({
     category: '',
     value: 0
@@ -46,6 +46,7 @@ const InputNumberTest = ({ data, courseCode }) => {
   const [currentTest, setTest] = useState(null);
   const [open, setOpen] = useState(false);
   const [isOpenRadarModal, setIsOpenRadarModal] = useState(false);
+  const [testSaved, setTestSaved] = useState(false);
   const [modalInitData, setModalInitData] = useState({
     title: '',
     content: '',
@@ -189,6 +190,7 @@ const InputNumberTest = ({ data, courseCode }) => {
       switch (currentTest.cod_test) {
         case 'COVI_AnalisisSituac':
           resultForSituacional();
+          setTestSaved(true);
         break;
       }
     }else{
@@ -389,15 +391,29 @@ const InputNumberTest = ({ data, courseCode }) => {
             </div>
           </Grid>
           <Grid item xs={12} className="lessons-button-container-center">
-            <ButtomCustom
-              variant="contained"
-              onClick={() => {
-                saveResult();
-              }}
-              rounded
-            >
-              Continuar
-            </ButtomCustom>
+            {
+              !testSaved ? (
+                <ButtomCustom
+                  variant="contained"
+                  onClick={() => {
+                    saveResult();
+                  }}
+                  rounded
+                >
+                  Guardar
+                </ButtomCustom>
+              ):(
+                <ButtomCustom
+                  variant="contained"
+                  onClick={() => {
+                    onContinue();
+                  }}
+                  rounded
+                >
+                  Continuar
+                </ButtomCustom>
+              )
+            }
           </Grid>
         </>
       ) : null}

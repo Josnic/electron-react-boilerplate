@@ -30,7 +30,7 @@ import OverlayLoader from '../../OverlayLoader';
 import { showToast } from '../../../utils/toast';
 import '../styles.scss';
 
-const RadioButtonTest = ({ data, courseCode }) => {
+const RadioButtonTest = ({ data, courseCode, onContinue }) => {
   const [open, setOpen] = useState(false);
   const [answers, setAnswers] = useState([]);
   const [questions, setQuestions] = useState([]);
@@ -39,6 +39,7 @@ const RadioButtonTest = ({ data, courseCode }) => {
   const [currentTest, setTest] = useState(null);
   const [categories, setCategories] = useState([]);
   const categoryResponseArray = useRef([]);
+  const [testSaved, setTestSaved] = useState(false);
   const [modalInitData, setModalInitData] = useState({
     title: '',
     content: '',
@@ -235,7 +236,7 @@ const RadioButtonTest = ({ data, courseCode }) => {
             Raíz a trabajar:{' '}
             {
               JSON.parse(JSON.stringify(categoryResponseArray.current)).sort(function (a, b) {
-                return a.value - b.value;
+                return b.value - a.value;
               })[0].category
             }
           </Typography>
@@ -356,6 +357,7 @@ const RadioButtonTest = ({ data, courseCode }) => {
 
       setTimeout(() => {
         setOpen(false);
+        setTestSaved(true);
       }, 1000);
     }
   };
@@ -386,9 +388,18 @@ const RadioButtonTest = ({ data, courseCode }) => {
             </div>
           </Grid>
           <Grid item xs={12} className="lessons-button-container-center">
-            <ButtomCustom onClick={saveTest} variant="contained" rounded>
-              Guardar
-            </ButtomCustom>
+            {
+              !testSaved ? (
+                <ButtomCustom onClick={saveTest} variant="contained" rounded>
+                  Guardar
+                </ButtomCustom>
+              ):(
+                <ButtomCustom onClick={onContinue} variant="contained" rounded>
+                  Continuar
+                </ButtomCustom>
+              )
+            }
+            
           </Grid>
           <AlertModal
             open={openModalWelcome}
