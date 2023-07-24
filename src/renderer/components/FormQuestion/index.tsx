@@ -8,7 +8,9 @@ import parse from 'html-react-parser';
 import { ToastContainer } from 'react-toastify';
 import OverlayLoader from '../../components/OverlayLoader';
 import { getPathCourseResource } from '../../utils/electronFunctions';
-import { sqlite3All } from '../../helpers/Sqlite3Operations';
+import { sqlite3InsertBulk, sqlite3All } from '../../helpers/Sqlite3Operations';
+import { useSelector } from 'react-redux';
+import { getMysqlDate } from '../../utils/generals';
 import { generateIamPdf } from '../../helpers/formPdf';
 import { showToast } from '../../utils/toast';
 import AlertModal from '../Tests/components/AlertModal';
@@ -23,6 +25,7 @@ const FormQuestion = ({ data, courseCode, onContinue }) => {
   const [footer, setFooter] = useState(null);
   const [formData, setFormData] = useState(null);
   const [formSaved, setFormSaved] = useState(false);
+  const authState = useSelector((state) => state);
   const imagePaths = async (html, stringImages, path) => {
     const images = stringImages ? stringImages.split(',') : null;
     let content = html;
@@ -130,8 +133,25 @@ const FormQuestion = ({ data, courseCode, onContinue }) => {
       showToast("Completa todo el formulario");
     }else{
       setOpen(true);
+
+      const userId = authState && authState.user ? authState.user.email : "test";
+      const currentDate = getMysqlDate();
+      const arrayValues = [];
+
+      for (let i = 0; i < answers.length; i++) {
+        arrayValues.push([userId, formData.cod_formulario, answers[i].questionId, answers[i].answerText, currentDate])
+      }
+
+
+      const result = await sqlite3InsertBulk(
+        "INSERT INTO formulario_respuesta VALUES (?,?,?,?,?)", 
+        arrayValues
+      );
+
+      console.log(result)
       
       setTimeout(()=>{
+        
         setOpen(false);
         setFormSaved(true);
         if (formData.texto_boton && formData.texto_boton != ""){

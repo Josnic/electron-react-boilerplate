@@ -8,7 +8,7 @@ var db;
 export function sqlite3Module(ipcMain) {
     console.log("sqlite3  ok", pathDatabase)
 
-    ipcMain.on('SQLITE3_BULK_INSERT_PREPARED', async (event, arg) => {
+    ipcMain.handle('SQLITE3_BULK_INSERT_PREPARED', async (event, arg) => {
         return new Promise((resolve) => {
             db = new sqlite3.Database(pathDatabase);
             const stmt = db.prepare(arg[0]);
@@ -24,7 +24,7 @@ export function sqlite3Module(ipcMain) {
         });
     });
 
-    ipcMain.on('SQLITE3_INSERT_LASTID', async (event, arg) => {
+    ipcMain.handle('SQLITE3_INSERT_LASTID', async (event, arg) => {
         return new Promise((resolve) => {
             db = new sqlite3.Database(pathDatabase);
             const stmt = db.prepare(arg[0]);
