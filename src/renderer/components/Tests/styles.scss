@@ -19,6 +19,12 @@
         padding-top: 10px;
       }
 
+      &.toggle-question {
+        width: 70%;
+        display: flex;
+        padding-top: 15px;
+      }
+
       &.input-number-cuestion {
         width: 80%;
       }
@@ -32,6 +38,13 @@
       width: 40%;
       float: right;
       text-align: right;
+    }
+
+    .toggle-container {
+      width: 30%;
+      float: right;
+      text-align: right;
+      margin-top: 5px;
     }
 
     .input-number-container {

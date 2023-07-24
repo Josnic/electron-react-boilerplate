@@ -27,7 +27,8 @@ import MenuTreeView from './components/MenuTreeView';
 import ContentRenderer from 'renderer/components/ContentRenderer';
 import FormQuestion from '../../components/FormQuestion';
 import RadioButtonTest from '../../components/Tests/RadioButtonTest';
-import InputNumberTest from '../../components/Tests/InputNumberTest'
+import InputNumberTest from '../../components/Tests/InputNumberTest';
+import TrueFalseTest from '../../components/Tests/TrueFalseTest';
 
 import { useNavigate, useParams } from 'react-router-dom';
 
@@ -280,6 +281,21 @@ export default function CourseHome() {
               {
                 testData && testData.test_tipo == "INPUTN" ? (
                   <InputNumberTest 
+                    data={testData} 
+                    courseCode={courseCode}
+                    onContinue={()=> {
+                      if (nextNodeId){
+                        menuTreeViewRef.current.setSelectedNode(nextNodeId);
+                      }
+                    }}
+                  />
+                ):(
+                  null
+                )
+              }
+              {
+                testData && testData.test_tipo == "VF" ? (
+                  <TrueFalseTest 
                     data={testData} 
                     courseCode={courseCode}
                     onContinue={()=> {
