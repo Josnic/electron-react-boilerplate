@@ -320,9 +320,10 @@ const InputNumberTest = ({ data, courseCode }) => {
                         component={'nav'}
                         color={'white'}
                         barColor={'secondary'}
+                        key={ele1}
                       />
 
-                      <Box component="main" sx={{ p: 3 }}>
+                      <Box component="main" sx={{ p: 3 }} key={Math.random()}>
                         {questions.map((ele, index2) => (
                           <>
                             {ele.nombre == ele1 ? (
