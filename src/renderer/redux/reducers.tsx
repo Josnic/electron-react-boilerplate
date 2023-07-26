@@ -2,7 +2,7 @@ import AuthTypes from "./constants";
 
 const initialState = {
     isAuthenticated: false,
-    token: ""
+    user: null
 }
 
 const authReducer = (state = initialState, action) => {
@@ -11,13 +11,13 @@ const authReducer = (state = initialState, action) => {
         return {
           ...state,
           isAuthenticated: true,
-          token: action.token
+          user: action.user
         }
       case AuthTypes.LOGOUT:
         return {
           ...state,
           isAuthenticated: false,
-          token: "" 
+          user: null 
         }
       default:
         return state;
