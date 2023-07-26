@@ -21,6 +21,9 @@ import { sqlite3All } from '../../helpers/Sqlite3Operations';
 
 import Copyright from '../../components/Copyright';
 import { showToast } from '../../utils/toast';
+import {
+  sha256Encode
+} from '../../utils/generals';
 
 export default function SignIn() {
   const [open, setOpen] = React.useState(false);
@@ -36,13 +39,13 @@ export default function SignIn() {
       showToast("Completa los datos");
     }else{
       setOpen(true);
-      const result = await sqlite3All(`SELECT * FROM user WHERE email = '${email}' AND password = '${password}' LIMIT 1`);
+      const result = await sqlite3All(`SELECT * FROM user WHERE email = '${email}' AND password = '${sha256Encode(password)}' LIMIT 1`);
       if (result.OK) {
         setOpen(false);
         if (result.OK.length && result.OK.length == 1) {
           dispatch({
             type: AuthTypes.LOGIN,
-            token: ""
+            user: result.OK[0]
           });
           navigate("/home");
         }else{
