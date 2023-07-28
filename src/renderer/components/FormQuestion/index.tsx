@@ -244,7 +244,7 @@ const FormQuestion = ({ data, courseCode, onContinue }) => {
                         multiline={question.unilinea && question.unilinea == 1 ? false : true}
                         key={question.id}
                         rows={3}
-                        defaultValue={answers[index].answerText ? answers[index].answerText: ""}
+                        defaultValue={answers[index] && answers[index].answerText ? answers[index].answerText: ""}
                         onChange={(event) => {
                           handleAnswer(event, index);
                         }}
