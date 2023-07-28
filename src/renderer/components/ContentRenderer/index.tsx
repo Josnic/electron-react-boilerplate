@@ -230,6 +230,9 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
 
   const renderMultimedia = (identifier, type, source, name) => {
     const container = document.getElementById(identifier);
+    if (container.innerHTML) {
+      container.innerHTML = container.innerHTML.trim();
+    }
     const root = createRoot(container);
     setRootMultimedia(Array.from(rootMultimedia).concat([root]), (prevValue, newValue) => {
       console.log(newValue);
