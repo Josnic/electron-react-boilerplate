@@ -194,6 +194,7 @@ export default function SignUp() {
                 id="birthday"
                 label="Fecha de nacimiento"
                 onClick={handleClick}
+                onBlur={(e)=>{setIsOpen(false)}}
                 value={formatDate(startDate)}
                 inputProps={
                   { readOnly: true, }
