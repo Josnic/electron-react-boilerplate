@@ -150,9 +150,7 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
 
         case 'COVI_Raiz_amargura':
         case 'INEM_nivel_IE':
-          let field = testData.cod_test == 'COVI_Raiz_amargura' ? `raiz` : `ie`;
           category = `tests_categorias_preguntas.nombre AS category`;
-          join = `  LEFT JOIN tests_categorias_preguntas ON tests_categorias_preguntas.cod_categoria = tests_preguntas_radio.${field} `;
           break;
       }
 
@@ -166,6 +164,7 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
         ${category}
         FROM tests_preguntas_radio 
         LEFT JOIN unidades ON unidades.cod_unidad = tests_preguntas_radio.unidad
+        LEFT JOIN tests_categorias_preguntas ON tests_categorias_preguntas.cod_categoria = tests_preguntas_radio.categoria
         ${join}
         WHERE tests_preguntas_radio.cod_test = '${data.test_id}' ${orderType}`
       );
