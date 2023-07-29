@@ -186,6 +186,7 @@ const MenuTreeView  = React.forwardRef(({ data, onClickItem }, ref) =>{
                   labelInfo=""
                   color="#e3742f"
                   bgColor="#fcefe3"
+                  sx={{marginLeft: 2 }}
                   onClick={()=>{
                     setSelectedNode(`SUBLESSON-${index}-${index2}-${index3}`);
                     let nextNodeId = null;
