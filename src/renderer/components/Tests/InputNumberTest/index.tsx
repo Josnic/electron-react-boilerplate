@@ -21,24 +21,28 @@ import CommentIcon from '@mui/icons-material/Comment';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import NumericInput from 'react-numeric-input';
 import Box from '@mui/material/Box';
+import { useSelector } from 'react-redux';
 import CssBaseline from '@mui/material/CssBaseline';
 import Divider from '@mui/material/Divider';
 import TestTitle from '../TestTitle';
 import parse from 'html-react-parser';
 import { getPathCourseResource } from '../../../utils/electronFunctions';
-import { sqlite3All } from '../../../helpers/Sqlite3Operations';
+import { sqlite3All, sqlite3Run, sqlite3InsertBulk } from '../../../helpers/Sqlite3Operations';
 import AlertModal from '../components/AlertModal';
 import { ToastContainer } from 'react-toastify';
 import OverlayLoader from '../../OverlayLoader';
 import { showToast } from '../../../utils/toast';
 import RadarChart from '../../RadarChart';
+import { getMysqlDate } from '../../../utils/generals';
 import '../styles.scss';
 
 const InputNumberTest = ({ data, courseCode, onContinue }) => {
-  const answers = useRef(Array(0).fill({
-    category: '',
-    value: 0
-  }));
+  const answers = useRef(
+    Array(0).fill({
+      category: '',
+      value: 0,
+    })
+  );
   const [questions, setQuestions] = useState(Array(0).fill('Pregunta'));
   const [openModalWelcome, setOpenModalWelcome] = useState(true);
   const [openModalEnd, setOpenModalEnd] = useState(false);
@@ -47,6 +51,7 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
   const [open, setOpen] = useState(false);
   const [isOpenRadarModal, setIsOpenRadarModal] = useState(false);
   const [testSaved, setTestSaved] = useState(false);
+  const authState = useSelector((state) => state);
   const [modalInitData, setModalInitData] = useState({
     title: '',
     content: '',
@@ -59,10 +64,12 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
     buttonText: '',
   });
 
-  const [serieRadarChart, setSerieRadarChart] = useState([{
-    name: 'Área',
-    data: [],
-  }]);
+  const [serieRadarChart, setSerieRadarChart] = useState([
+    {
+      name: 'Área',
+      data: [],
+    },
+  ]);
 
   const [listEndModalSituacional, setListEndModalSituacional] = useState([]);
 
@@ -71,17 +78,21 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
   };
 
   const handleAnswerChange = (valueAsNumber, valueAsString, input) => {
-    const nameParts = input.name.split("-");
-    if ((valueAsNumber < currentTest.rango_inicial && questions[parseInt(nameParts[2])].permite_cero == 0) || valueAsNumber > currentTest.rango_final){
-      showToast("Valor no válido");
-    }else{
+    const nameParts = input.name.split('-');
+    if (
+      (valueAsNumber < currentTest.rango_inicial &&
+        questions[parseInt(nameParts[2])].permite_cero == 0) ||
+      valueAsNumber > currentTest.rango_final
+    ) {
+      showToast('Valor no válido');
+    } else {
       const newAnswers = [...answers.current];
       newAnswers[parseInt(nameParts[2])] = {
         category: nameParts[0],
-        value: valueAsNumber
+        value: valueAsNumber,
       };
       answers.current = newAnswers;
-      console.log(answers.current)
+      console.log(answers.current);
     }
   };
 
@@ -98,7 +109,12 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
             <ListItem
               key={index}
               disableGutters
-              secondaryAction={<Badge badgeContent={`${value.average}`} color="primary"></Badge>}
+              secondaryAction={
+                <Badge
+                  badgeContent={`${value.average}`}
+                  color="primary"
+                ></Badge>
+              }
             >
               <ListItemText primary={`${value.category}`} />
             </ListItem>
@@ -110,95 +126,131 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
             '& > :not(style) ~ :not(style)': {
               ml: 2,
             },
-            textAlign: "center"
+            textAlign: 'center',
           }}
           onClick={preventDefault}
         >
-          <Link onClick={setIsOpenRadarModal} href="#">Ver Mapa</Link>
+          <Link onClick={setIsOpenRadarModal} href="#">
+            Ver Mapa
+          </Link>
         </Box>
       </>
     );
   };
 
-  const resultForSituacional = () => {
+  const resultForSituacional = (resultForSituacional = true) => {
     const arForList = [];
-    console.log(answers.current)
-    for (let i = 0; i < categories.length; i++){
+    console.log(answers.current);
+    for (let i = 0; i < categories.length; i++) {
       let arValues = [];
-      for (let j = 0; j < answers.current.length; j++){
-
+      for (let j = 0; j < answers.current.length; j++) {
         if (answers.current[j].category == categories[i]) {
-          if (answers.current[j].value == 0){
-            if (questions[j].permite_cero == 0){
+          if (answers.current[j].value == 0) {
+            if (questions[j].permite_cero == 0) {
               arValues.push(answers.current[j].value);
             }
-          }else{
+          } else {
             arValues.push(answers.current[j].value);
           }
         }
       }
-      let average = arValues.length > 0 ? 
-        arValues.reduce((accumulator, currentValue) => {
-          return accumulator + currentValue
-        },0) / arValues.length
-        :
-        0;
-      average = Number(average) % 1 == 0 ? Number(average) : Number(average).toFixed(1)
-      
+      let average =
+        arValues.length > 0
+          ? arValues.reduce((accumulator, currentValue) => {
+              return accumulator + currentValue;
+            }, 0) / arValues.length
+          : 0;
+      average =
+        Number(average) % 1 == 0 ? Number(average) : Number(average).toFixed(1);
+
       arForList.push({
         category: categories[i],
-        average: average
-      })
+        average: average,
+      });
     }
 
-    console.log(arForList)
+    console.log(arForList);
 
     setListEndModalSituacional(arForList);
 
-    setSerieRadarChart([{
-      name: "Valor",
-      data: arForList.map(ele =>  Number(ele.average))
-    }]);
+    setSerieRadarChart([
+      {
+        name: 'Valor',
+        data: arForList.map((ele) => Number(ele.average)),
+      },
+    ]);
+    if (resultForSituacional){
 
-    setModalEndData({
-      title: 'ANÁLISIS SITUACIONAL',
-      content: SituationalResponse(),
-      buttonText: 'Aceptar',
-    });
+      setModalEndData({
+        title: 'ANÁLISIS SITUACIONAL',
+        content: SituationalResponse(),
+        buttonText: 'Aceptar',
+      });
 
-    setOpenModalEnd(true);
-  }
+      setOpenModalEnd(true);
+    }
 
-  const saveResult = () => {
+  };
+
+  const saveResult = async() => {
     setOpen(true);
     let canSaving = true;
 
-    for (let i = 0; i < questions.length; i++){
-      if (answers.current[i].value == 0 && questions[i].permite_cero == 0){
+    for (let i = 0; i < questions.length; i++) {
+      if (answers.current[i].value == 0 && questions[i].permite_cero == 0) {
         canSaving = false;
       }
 
-      if (answers.current[i].value != 0 && questions[i].permite_cero == 0){
-        if (answers.current[i].value < currentTest.rango_inicial || answers.current[i].value > currentTest.rango_final){
+      if (answers.current[i].value != 0 && questions[i].permite_cero == 0) {
+        if (
+          answers.current[i].value < currentTest.rango_inicial ||
+          answers.current[i].value > currentTest.rango_final
+        ) {
           canSaving = false;
         }
       }
     }
-    
 
-    if (canSaving){
+    if (canSaving) {
+
+      const userId =
+        authState && authState.user ? authState.user.email : 'test';
+      const currentDate = getMysqlDate();
+      const arrayValues = [];
+
+      for (let i = 0; i < answers.current.length; i++) {
+        arrayValues.push([
+          userId,
+          currentTest.cod_test,
+          questions[i].id,
+          answers.current[i].value,
+          currentDate,
+        ]);
+      }
+
+      const deleteBefore = await sqlite3Run(
+        `DELETE FROM test_inputn_respuestas WHERE cod_test = '${currentTest.cod_test}' AND user_id = '${userId}'`,
+        []
+      );
+      console.log(arrayValues)
+      const result = await sqlite3InsertBulk(
+        'INSERT INTO test_inputn_respuestas VALUES (?,?,?,?,?)',
+        arrayValues
+      );
+
+      console.log(deleteBefore, result)
+
       switch (currentTest.cod_test) {
         case 'COVI_AnalisisSituac':
           resultForSituacional();
           setTestSaved(true);
-        break;
+          break;
       }
-    }else{
-      showToast("Debes completar todos los datos con valores válidos");
+    } else {
+      showToast('Debes completar todos los datos con valores válidos');
     }
 
     setOpen(false);
-    
   };
 
   const imagePaths = async (html, stringImages, path) => {
@@ -264,10 +316,22 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
     }
 
     const questions = await sqlite3All(
-      `SELECT tests_preguntas_inputn.id, tests_preguntas_inputn.permite_cero, tests_preguntas_inputn.pregunta, tests_preguntas_inputn.cod_categoria, tests_categorias_preguntas.nombre FROM tests_preguntas_inputn 
+      `SELECT tests_preguntas_inputn.id, 
+      tests_preguntas_inputn.permite_cero, 
+      tests_preguntas_inputn.pregunta, 
+      tests_preguntas_inputn.cod_categoria, 
+      tests_categorias_preguntas.nombre
+      FROM tests_preguntas_inputn 
       LEFT JOIN tests_categorias_preguntas ON tests_categorias_preguntas.cod_categoria = tests_preguntas_inputn.cod_categoria
       WHERE tests_preguntas_inputn.cod_test = '${data.test_id}' ORDER BY tests_categorias_preguntas.orden, tests_preguntas_inputn.orden ASC`
     );
+
+    const userId = authState && authState.user ? authState.user.email : 'test';
+
+    const answersTest = await sqlite3All(
+      `SELECT * FROM test_inputn_respuestas WHERE cod_test = '${data.test_id}' AND user_id = '${userId}'`
+    );
+
     console.log(questions);
     if (questions.OK) {
       const categoryArray = [
@@ -280,10 +344,25 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
       setCategories(categoryArray);
       console.log(categoryArray);
       setQuestions(questions.OK);
-      answers.current = new Array(questions.OK.length).fill({
-        category: '',
-        value: 0
-      });
+
+      if (answersTest.OK && answersTest.OK.length > 0) {
+        const answersTemp = [];
+        for (let i = 0; i < questions.OK.length; i++) {
+          const r = answersTest.OK.filter(
+            (ele) => ele.id_pregunta == questions.OK[i].id
+          )[0];
+          answersTemp.push({
+            category: questions.OK[i].nombre,
+            value: r.valor,
+          });
+        }
+        answers.current = answersTemp;
+      } else {
+        answers.current = new Array(questions.OK.length).fill({
+          category: '',
+          value: 0,
+        });
+      }
     } else {
       setCategories([]);
       setQuestions([]);
@@ -333,21 +412,34 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
                                 <div className="question input-number-cuestion">
                                   {parse(ele.pregunta)}
                                 </div>
-                                <div className="input-number-container"  key={index2}>
+                                <div
+                                  className="input-number-container"
+                                  key={index2}
+                                >
                                   <NumericInput
                                     key={index2}
                                     strict={false}
-                                    //value={ele.permite_cero == 1 ? 0 : currentTest.rango_inicial}
-                                    name={ele1 + "-input-"+index2}
-                                    min={ele.permite_cero == 1 ? 0 : currentTest.rango_inicial}
+                                    value={
+                                      answers.current[index2] && answers.current[index2].value > 0
+                                        ? answers.current[index2].value 
+                                        : ""
+                                    }
+                                    name={ele1 + '-input-' + index2}
+                                    min={
+                                      ele.permite_cero == 1
+                                        ? 0
+                                        : currentTest.rango_inicial
+                                    }
                                     max={currentTest.rango_final}
                                     step={1}
                                     size={6}
-                                    format={(num)=>{
+                                    format={(num) => {
                                       if (num < currentTest.rango_inicial) {
-                                        return ele.permite_cero == 1 ? 0 : currentTest.rango_inicial;
+                                        return ele.permite_cero == 1
+                                          ? 0
+                                          : currentTest.rango_inicial;
                                       }
-                                      if (num > currentTest.rango_final){
+                                      if (num > currentTest.rango_final) {
                                         return currentTest.rango_final;
                                       }
                                       return num;
@@ -391,29 +483,27 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
             </div>
           </Grid>
           <Grid item xs={12} className="lessons-button-container-center">
-            {
-              !testSaved ? (
-                <ButtomCustom
-                  variant="contained"
-                  onClick={() => {
-                    saveResult();
-                  }}
-                  rounded
-                >
-                  Guardar
-                </ButtomCustom>
-              ):(
-                <ButtomCustom
-                  variant="contained"
-                  onClick={() => {
-                    onContinue();
-                  }}
-                  rounded
-                >
-                  Continuar
-                </ButtomCustom>
-              )
-            }
+            {!testSaved ? (
+              <ButtomCustom
+                variant="contained"
+                onClick={() => {
+                  saveResult();
+                }}
+                rounded
+              >
+                Guardar
+              </ButtomCustom>
+            ) : (
+              <ButtomCustom
+                variant="contained"
+                onClick={() => {
+                  onContinue();
+                }}
+                rounded
+              >
+                Continuar
+              </ButtomCustom>
+            )}
           </Grid>
         </>
       ) : null}
@@ -440,12 +530,18 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
       <AlertModal
         open={isOpenRadarModal}
         title={''}
-        content={<RadarChart title={"Mapa situacional"} series={serieRadarChart} categories={categories}/>}
+        content={
+          <RadarChart
+            title={'Mapa situacional'}
+            series={serieRadarChart}
+            categories={categories}
+          />
+        }
         buttonText={'Cerrar'}
         onButtonClick={() => {
           setIsOpenRadarModal(false);
         }}
-        maxWidth={"lg"}
+        maxWidth={'lg'}
       />
       <ToastContainer />
     </Grid>
