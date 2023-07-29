@@ -104,7 +104,7 @@ export default function SignUp() {
     } else {
       setOpen(true);
       const existsData = await sqlite3All(
-        `SELECT * FROM usuarios WHERE email = '${email}' OR documento = '${document}'`;
+        `SELECT * FROM usuarios WHERE email = '${email}' OR documento = '${document}'`
       );
 
       if (existsData.OK && existsData.OK.length == 0){
