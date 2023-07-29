@@ -8,7 +8,7 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import parse from 'html-react-parser';
 
 const TrueFalseQuestion = ({ question, scale, defaultValue, onAnswerChange }) => {
-  const [alignment, setAlignment] = React.useState<string | null>(defaultValue ? defaultValue : null);
+  const [alignment, setAlignment] = React.useState<string | null>(defaultValue ? defaultValue.toString() : null);
 
   const handleAlignment = (
     event: React.MouseEvent<HTMLElement>,

@@ -20,14 +20,16 @@ import { styled } from '@mui/material/styles';
 import Button from '@mui/material/Button';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import TrueFalseQuestion from '../components/TrueFalseQuestion';
+import { useSelector } from 'react-redux';
 import AlertModal from '../components/AlertModal';
 import TestTitle from '../TestTitle';
 import parse from 'html-react-parser';
 import { getPathCourseResource } from '../../../utils/electronFunctions';
-import { sqlite3All } from '../../../helpers/Sqlite3Operations';
+import { sqlite3All, sqlite3InsertBulk, sqlite3Run } from '../../../helpers/Sqlite3Operations';
 import { ToastContainer } from 'react-toastify';
 import OverlayLoader from '../../OverlayLoader';
 import { showToast } from '../../../utils/toast';
+import { getMysqlDate } from '../../../utils/generals';
 import '../styles.scss';
 
 const TrueFalseTest = ({ data, courseCode, onContinue }) => {
@@ -50,7 +52,7 @@ const TrueFalseTest = ({ data, courseCode, onContinue }) => {
     content: '',
     buttonText: '',
   });
-
+  const authState = useSelector((state) => state);
   const handleAnswerChange = (index, category, value) => {
     const newAnswers = [...answers];
     newAnswers[index] = {
@@ -143,14 +145,40 @@ const TrueFalseTest = ({ data, courseCode, onContinue }) => {
 
       console.log(questions);
 
+      const userId = authState && authState.user ? authState.user.email : 'test';
+
+      const answersTest = await sqlite3All(
+        `SELECT * FROM test_vf_respuestas WHERE cod_test = '${data.test_id}' AND user_id = '${userId}'`
+      );
+      
+
       if (questions.OK) {
+        
         setQuestions(questions.OK);
-        setAnswers(
-          new Array(questions.OK.length).fill({
-            category: '',
-            value: null,
-          })
-        );
+
+        if (answersTest.OK && answersTest.OK.length > 0) {
+          const answersTemp = [];
+          for (let i = 0; i < questions.OK.length; i++) {
+            const r = answersTest.OK.filter(
+              (ele) => ele.id_pregunta == questions.OK[i].id
+            )[0];
+            answersTemp.push({
+              category: questions.OK[i].category,
+              value: r.valor,
+            });
+          }
+          setAnswers(answersTemp);
+        }else{
+          setAnswers(
+            new Array(questions.OK.length).fill({
+              category: '',
+              value: null,
+            })
+          );
+        }
+
+
+        
         const categoryArray = [
           ...new Set(
             questions.OK.map((ele, index) => {
@@ -167,6 +195,43 @@ const TrueFalseTest = ({ data, courseCode, onContinue }) => {
     }
   };
 
+  const insertDataTest = async () => {
+
+    const userId =
+        authState && authState.user ? authState.user.email : 'test';
+      const currentDate = getMysqlDate();
+      const arrayValues = [];
+
+      for (let i = 0; i < answers.length; i++) {
+        arrayValues.push([
+          userId,
+          currentTest.cod_test,
+          questions[i].id,
+          answers[i].value,
+          currentDate,
+        ]);
+      }
+
+      console.log(arrayValues)
+
+    const deleteBefore = await sqlite3Run(
+      `DELETE FROM test_vf_respuestas WHERE cod_test = '${currentTest.cod_test}' AND user_id = '${userId}'`,
+      []
+    );
+    console.log(arrayValues)
+    const result = await sqlite3InsertBulk(
+      'INSERT INTO test_vf_respuestas VALUES (?,?,?,?,?)',
+      arrayValues
+    );
+
+    const result_sublesson = await sqlite3Run(
+      "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
+      [userId, data.id, currentDate]
+    );
+
+    console.log(deleteBefore, result, result_sublesson)
+  }
+
   const saveTest = async () => {
     const empty = answers.filter((ele) => ele.value == null).length;
     if (empty > 0) {
@@ -178,7 +243,7 @@ const TrueFalseTest = ({ data, courseCode, onContinue }) => {
           (ele.value == '0' && ele.category == 'IE_INTRO')
       ).length;
       const percentage = Math.round((100 * extro) / answers.length);
-
+      await insertDataTest();
       setOpen(true);
       setTestSaved(true);
 
@@ -215,6 +280,7 @@ const TrueFalseTest = ({ data, courseCode, onContinue }) => {
                   <TrueFalseQuestion
                     question={question}
                     key={index}
+                    defaultValue={answers[index] && answers[index].value ? answers[index].value: null}
                     scale={{
                       min: currentTest.rango_inicial,
                       max: currentTest.rango_final,

@@ -23,11 +23,13 @@ import RadioQuestion from '../components/RadioQuestion';
 import AlertModal from '../components/AlertModal';
 import TestTitle from '../TestTitle';
 import parse from 'html-react-parser';
+import { useSelector } from 'react-redux';
 import { getPathCourseResource } from '../../../utils/electronFunctions';
-import { sqlite3All } from '../../../helpers/Sqlite3Operations';
+import { sqlite3All, sqlite3Run, sqlite3InsertBulk } from '../../../helpers/Sqlite3Operations';
 import { ToastContainer } from 'react-toastify';
 import OverlayLoader from '../../OverlayLoader';
 import { showToast } from '../../../utils/toast';
+import { getMysqlDate } from '../../../utils/generals';
 import '../styles.scss';
 
 const RadioButtonTest = ({ data, courseCode, onContinue }) => {
@@ -51,6 +53,8 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
     content: '',
     buttonText: '',
   });
+
+  const authState = useSelector((state) => state);
 
   const getLessons = async(units) => {
     console.log(`SELECT nombre, cod_unidad  FROM lecciones WHERE cod_unidad IN(${units.join("','")})`)
@@ -140,7 +144,6 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
     console.log(testData);
     if (testData) {
       let category = ``;
-      let join = ``;
       const orderType = testData.preguntas_aleatorias == 1 ? ` ORDER BY RANDOM() ` : ` ORDER BY tests_preguntas_radio.orden ASC`;
 
       switch (testData.cod_test) {
@@ -148,10 +151,9 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
           category = `unidades.nombre AS category`;
           break;
 
-        case 'COVI_Raiz_amargura':
-        case 'INEM_nivel_IE':
+        default:
           category = `tests_categorias_preguntas.nombre AS category`;
-          break;
+        
       }
 
       const questions = await sqlite3All(
@@ -160,25 +162,48 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
         tests_preguntas_radio.informativo,
         tests_preguntas_radio.negativo,
         tests_preguntas_radio.unidad AS unidad_cod,
+        tests_preguntas_radio.disc,
         unidades.nombre AS unidad,
         ${category}
         FROM tests_preguntas_radio 
         LEFT JOIN unidades ON unidades.cod_unidad = tests_preguntas_radio.unidad
         LEFT JOIN tests_categorias_preguntas ON tests_categorias_preguntas.cod_categoria = tests_preguntas_radio.categoria
-        ${join}
         WHERE tests_preguntas_radio.cod_test = '${data.test_id}' ${orderType}`
       );
 
-      console.log(questions);
+      const userId = authState && authState.user ? authState.user.email : 'test';
+
+      const answersTest = await sqlite3All(
+        `SELECT * FROM test_radio_respuestas WHERE cod_test = '${data.test_id}' AND user_id = '${userId}'`
+      );
+      
+
+      console.log(answersTest);
 
       if (questions.OK) {
         setQuestions(questions.OK);
-        setAnswers(
-          new Array(questions.OK.length).fill({
-            category: '',
-            value: 0,
-          })
-        );
+
+        if (answersTest.OK && answersTest.OK.length > 0) {
+          const answersTemp = [];
+          for (let i = 0; i < questions.OK.length; i++) {
+            const r = answersTest.OK.filter(
+              (ele) => ele.id_pregunta == questions.OK[i].id
+            )[0];
+            answersTemp.push({
+              category: questions.OK[i].category,
+              value: r.valor,
+            });
+          }
+          setAnswers(answersTemp);
+        }else{
+          setAnswers(
+            new Array(questions.OK.length).fill({
+              category: '',
+              value: 0,
+            })
+          );
+        }
+        
         const categoryArray = [
           ...new Set(
             questions.OK.map((ele, index) => {
@@ -391,13 +416,51 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
     categoryResponseArray.current = arForList;
   };
 
+  const insertDataTest = async () => {
+
+    const userId =
+        authState && authState.user ? authState.user.email : 'test';
+      const currentDate = getMysqlDate();
+      const arrayValues = [];
+
+      for (let i = 0; i < answers.length; i++) {
+        arrayValues.push([
+          userId,
+          currentTest.cod_test,
+          questions[i].id,
+          answers[i].value,
+          currentDate,
+        ]);
+      }
+
+      console.log(arrayValues)
+
+    const deleteBefore = await sqlite3Run(
+      `DELETE FROM test_radio_respuestas WHERE cod_test = '${currentTest.cod_test}' AND user_id = '${userId}'`,
+      []
+    );
+    console.log(arrayValues)
+    const result = await sqlite3InsertBulk(
+      'INSERT INTO test_radio_respuestas VALUES (?,?,?,?,?)',
+      arrayValues
+    );
+
+    const result_sublesson = await sqlite3Run(
+      "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
+      [userId, data.id, currentDate]
+    );
+
+    console.log(deleteBefore, result, result_sublesson)
+  }
+
+
   const saveTest = async () => {
     const empty = answers.filter((ele) => ele.value == 0);
     if (empty.length > 0) {
       showToast('Completa todo el formulario');
     } else {
       setOpen(true);
-
+      await insertDataTest();
       switch (currentTest.cod_test) {
         case 'COVI_Autoevaluacion':
           resultByCategory();
@@ -440,6 +503,7 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
                       min: currentTest.rango_inicial,
                       max: currentTest.rango_final,
                     }}
+                    defaultValue={answers[index] && answers[index].value ? answers[index].value: null}
                     onAnswerChange={(value) => handleAnswerChange(index, question.category, value)}
                   />
                 );
