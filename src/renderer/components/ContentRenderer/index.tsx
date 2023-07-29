@@ -285,6 +285,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
   useEffect(() => {
     if (html) {
       renderMultimediaComponents();
+      document.getElementsByClassName("main")[0].scrollTo({ top: 0, left: 0 });
     }
   }, [html]);
 
