@@ -237,8 +237,11 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
         'INSERT INTO test_inputn_respuestas VALUES (?,?,?,?,?)',
         arrayValues
       );
-
-      console.log(deleteBefore, result)
+      
+      const result_sublesson = await sqlite3Run(
+        "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
+        [userId, data.id, currentDate]
+      );
 
       switch (currentTest.cod_test) {
         case 'COVI_AnalisisSituac':
