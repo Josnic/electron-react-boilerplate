@@ -32,7 +32,7 @@ import {
   sha256Encode,
   formatDate
 } from '../../utils/generals';
-import { sqlite3Run } from '../../helpers/Sqlite3Operations';
+import { sqlite3Run, sqlite3All } from '../../helpers/Sqlite3Operations';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import './styles.scss';
@@ -102,36 +102,46 @@ export default function SignUp() {
     } else if (!validateEmail(email)) {
       showToast('El correo electrónico no es correcto');
     } else {
-      alert(sha256Encode(password))
       setOpen(true);
-      const result = await sqlite3Run(
-        'INSERT INTO usuarios VALUES (?,?,?,?,?,?,?)',
-        [
-          fullName,
-          document,
-          email,
-          sha256Encode(password),
-          base64Encode(password),
-          birthday,
-          getMysqlDate().split(' ')[0],
-        ]
+      const existsData = await sqlite3All(
+        `SELECT * FROM usuarios WHERE email = '${email}' OR documento = '${document}'`;
       );
-      if (result.OK) {
-        setReady(true);
-        showToast(
-          'Usuario creado exitosamente. De click en el botón o cierre el mensaje para ir al ',
-          'success',
-          undefined,
-          () => {
-            setOpen(false);
-            navigate('/login');
-          }
+
+      if (existsData.OK && existsData.OK.length == 0){
+        const result = await sqlite3Run(
+          'INSERT INTO usuarios VALUES (?,?,?,?,?,?,?)',
+          [
+            fullName,
+            document,
+            email,
+            birthday,
+            sha256Encode(password),
+            base64Encode(password),
+            getMysqlDate().split(' ')[0],
+          ]
         );
-      } else {
+        if (result.OK) {
+          setReady(true);
+          showToast(
+            'Usuario creado exitosamente. De click en el botón o cierre el mensaje para ir al ',
+            'success',
+            undefined,
+            () => {
+              setOpen(false);
+              navigate('/login');
+            }
+          );
+        } else {
+          setOpen(false);
+          console.log(result);
+          showToast('Ocurrió un error. Intenta nuevamente.', 'error');
+        }
+      }else{
         setOpen(false);
-        console.log(result);
+        console.log(existsData);
         showToast('Ocurrió un error. Intenta nuevamente.', 'error');
       }
+      
     }
   };
 
