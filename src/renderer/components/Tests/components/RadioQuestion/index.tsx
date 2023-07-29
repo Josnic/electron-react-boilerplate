@@ -12,9 +12,9 @@ import IconButton from '@mui/material/IconButton';
 import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import parse from 'html-react-parser';
 
-const RadioQuestion = ({ question, scale, onAnswerChange }) => {
+const RadioQuestion = ({ question, scale, defaultValue, onAnswerChange }) => {
   const [answer, setAnswer] = useState(null);
-  const [numRadios, setNumRadios] = useState(Array(scale.max).fill(0))
+  const [numRadios, setNumRadios] = useState(Array(scale.max).fill(0));
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt((event.target as HTMLInputElement).value);
     setAnswer(value);
@@ -38,28 +38,23 @@ const RadioQuestion = ({ question, scale, onAnswerChange }) => {
     },
   }));
 
-  const radios = () =>{
+  const radios = () => {
     const r = [];
-    for (let i = scale.min; i <= scale.max; i++){
-      r.push(<FormControlLabel value={i} control={<Radio />} label={i} />)
+    for (let i = scale.min; i <= scale.max; i++) {
+      r.push(<FormControlLabel value={i} control={<Radio />} label={i} />);
     }
     return r;
-  }
+  };
 
   return (
     <div className="question-container">
       <div className="question radio-question">
         {parse(question.pregunta)}
-        {
-          question.informativo ? (
+        {question.informativo ? (
           <LightTooltip title={parse(question.informativo)}>
-              <LiveHelpIcon color="disabled" sx={{ cursor: 'pointer' }} />
+            <LiveHelpIcon color="disabled" sx={{ cursor: 'pointer' }} />
           </LightTooltip>
-          ):(
-            null
-          )
-        }
-        
+        ) : null}
       </div>
       <div className="radio-container">
         <FormControl>
@@ -68,6 +63,7 @@ const RadioQuestion = ({ question, scale, onAnswerChange }) => {
             name="row-radio-buttons-group"
             onChange={handleChange}
             key={question.pregunta}
+            defaultValue={defaultValue ? defaultValue : null}
           >
             {radios()}
           </RadioGroup>
