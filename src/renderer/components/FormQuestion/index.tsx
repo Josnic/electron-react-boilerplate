@@ -189,6 +189,11 @@ const FormQuestion = ({ data, courseCode, onContinue }) => {
         arrayValues
       );
 
+      const result_sublesson = await sqlite3Run(
+        "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
+        [userId, data.id, currentDate]
+      );
+
       console.log(result);
 
       setTimeout(() => {
