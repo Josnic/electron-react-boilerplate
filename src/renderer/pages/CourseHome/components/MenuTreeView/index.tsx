@@ -184,7 +184,6 @@ const MenuTreeView = React.forwardRef(({ data, onClickItem }, ref) => {
   };
 
   const handleSelect = (event, nodeIds) => {
-    const nodeIdsCopy = selectedNode.split('-');
     const nodeIdParts = nodeIds.split('-');
     if (nodeIdParts[0] == "LESSON"){
       setExpanded([expanded[0], nodeIds])
@@ -195,6 +194,7 @@ const MenuTreeView = React.forwardRef(({ data, onClickItem }, ref) => {
   
     if (selectedNode) {
       if (nodeIds != selectedNode) {
+        const nodeIdsCopy = selectedNode.split('-');
         if (nodeIdsCopy[0] == 'SUBLESSON') {
           const dataMenuCopy = JSON.parse(JSON.stringify(dataMenu));
           if (
