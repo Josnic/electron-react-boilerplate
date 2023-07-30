@@ -429,6 +429,63 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     )
   }
 
+  const INEMautogestionResponse = () => {
+    const sumAnswer = answers.reduce((accumulator, object) => {
+      return accumulator + object.value;
+    }, 0);
+
+    const average = parseInt(sumAnswer / answers.length)
+    return (
+      <>
+      {
+        average < 3 ? (
+          <>
+            <Typography variant="subtitle2" gutterBottom>
+              {"Necesitas mejorar tu autogestión emocional"}
+            </Typography>
+            <Typography variant="h6" gutterBottom>
+              {"¡Juntos vamos a trabajar en eso!"}
+            </Typography>
+          </>
+        ):(
+          null
+        )
+      }
+      {
+        average >= 3 && average <= 4 ? (
+          <>
+            <Typography variant="subtitle2" gutterBottom>
+              {"Tienes una buena autogestión emocional, pero"}
+            </Typography>
+            <Typography variant="h6" gutterBottom>
+              {"¡Juntos podremos potenciarla!"}
+            </Typography>
+          </>
+        ):(
+          null
+        )
+      }
+
+      {
+        average > 4 ? (
+          <>
+            <Typography variant="subtitle2" gutterBottom>
+              {"!Felicidades tienes una excelente autogestión emocional"}
+            </Typography>
+            <Typography variant="h6" gutterBottom>
+              {"No pierdas esta oportunidad de mejorarla!"}
+            </Typography>
+          </>
+        ):(
+          null
+        )
+      }
+      
+      </>
+      
+    )
+  }
+
   const COVI_Raiz_amarguraResponse = async () => {
     setModalEndData({
       title: 'Identificando la Raíz de Amargura',
@@ -469,6 +526,15 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     setModalEndData({
       title: 'NECESIDADES',
       content: INEMnecesidadesResponse(),
+      buttonText: 'Aceptar',
+    });
+    setOpenModalEnd(true);
+  }
+
+  const INEM_autogestion_Response = async() => {
+    setModalEndData({
+      title: 'AUTOGESTIÓN',
+      content: INEMautogestionResponse(),
       buttonText: 'Aceptar',
     });
     setOpenModalEnd(true);
@@ -597,6 +663,10 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
           case "INEM_necesidades":
             resultByCategory();
             INEM_necesidades_Response();
+          break;
+
+          case "INEM_autogestion":
+            INEM_autogestion_Response();
           break;
       }
 
