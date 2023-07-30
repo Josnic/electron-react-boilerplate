@@ -272,14 +272,9 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
     }
   }
 
-  useEffect(()=>{
-    if (data){
-      insertView();
-    }
-  }, [])
-
   useEffect(() => {
     prepareHtml();
+    insertView();
   }, [data]);
 
   useEffect(() => {
