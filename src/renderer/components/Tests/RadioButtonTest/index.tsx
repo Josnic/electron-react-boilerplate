@@ -177,7 +177,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
         `SELECT * FROM test_radio_respuestas WHERE cod_test = '${data.test_id}' AND user_id = '${userId}'`
       );
       
-
+      console.log(questions.OK.filter(ele => ele.category == null));
       console.log(answersTest);
 
       if (questions.OK) {
@@ -350,6 +350,68 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     )
   }
 
+  const asertividadResponse = () => {
+    const sumAnswer = answers.reduce((accumulator, object) => {
+      return accumulator + object.value;
+    }, 0);
+    let msg = "";
+    if (sumAnswer > 40){
+      msg = "Necesitas mejorar tu nivel de asertividad";
+    }
+    if (sumAnswer >= 40 && sumAnswer <= 52){
+      msg = "Enhorabuena, ¡Tienes un buen nivel de asertividad!, aunque necesitas ejercitarlo habitualmente";
+    }
+
+    if (sumAnswer >= 53) {
+      msg = "¡Excelente! Tienes un muy buen nivel de asertividad, enseña a otros a avanzar";
+    }
+    return (
+      <>
+      <Typography variant="subtitle2" gutterBottom>
+        {msg}
+      </Typography>
+      </>
+      
+    )
+  }
+
+  const INEMhabsocioemocResponse = () => {
+    const arrayToShow = JSON.parse(JSON.stringify(categoryResponseArray.current));
+    arrayToShow.sort((a,b) => b.value - a.value)
+    return (
+      <>
+      <Typography variant="subtitle2" gutterBottom>
+        {"21 a 25: Alto. Felicitaciones por tu alto nivel"}
+      </Typography>
+      <Typography variant="subtitle2" gutterBottom>
+        {"16 a 20: Medio. Continúa potenciando el desarrollo de esta habilidad para aumentar tu bienestar emocional."}
+      </Typography>
+      <Typography variant="subtitle2" gutterBottom>
+        {"5 a 15: Bajo. Existe oportunidad de mejorar este nivel y crecer en tus habilidades sociales."}
+      </Typography>
+      <List
+          sx={{ width: '100%', maxWidth: 360, bgcolor: 'background.paper' }}
+        >
+          {arrayToShow && arrayToShow.map((value, index) => (
+            <ListItem
+              key={index}
+              disableGutters
+              secondaryAction={
+                <Badge
+                  badgeContent={`${value.value}`}
+                  color="primary"
+                ></Badge>
+              }
+            >
+              <ListItemText primary={`${value.category}`} />
+            </ListItem>
+          ))}
+        </List>
+      </>
+      
+    )
+  }
+
   const COVI_Raiz_amarguraResponse = async () => {
     setModalEndData({
       title: 'Identificando la Raíz de Amargura',
@@ -367,6 +429,25 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     });
     setOpenModalEnd(true);
   };
+
+  const INEM_asertividad_Response = async() => {
+    setModalEndData({
+      title: 'NIVEL DE ASERTIVIDAD',
+      content: asertividadResponse(),
+      buttonText: 'Aceptar',
+    });
+    setOpenModalEnd(true);
+  }
+
+  const INEM_hab_socioemoc_Response = async() => {
+    setModalEndData({
+      title: 'NIVEL DE HABILIDADES SOCIOEMOCIONALES',
+      content: INEMhabsocioemocResponse(),
+      buttonText: 'Aceptar',
+    });
+    setOpenModalEnd(true);
+  }
+  
 
   const invertValue = (value) => {
     if (value == currentTest.rango_inicial) {
@@ -475,6 +556,16 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
         case 'INEM_nivel_IE':
           resultByCategory();
           INEM_nivel_IEResponse();
+          break;
+
+          case "INEM_asertividad":
+            resultByCategory();
+            INEM_asertividad_Response();
+          break;
+
+          case "INEM_hab_socioemoc":
+            resultByCategory();
+            INEM_hab_socioemoc_Response();
           break;
       }
 
