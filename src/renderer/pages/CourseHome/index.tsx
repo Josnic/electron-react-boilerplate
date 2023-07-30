@@ -162,7 +162,7 @@ export default function CourseHome() {
     console.log(type, data)
     setShowUnits(false);
     setIsTestFinalize(false);
-      setIsFormFinalize(false);
+    setIsFormFinalize(false);
     if (data.cod_formulario && data.cod_formulario != ""){
       setHtmlContent(null);
       setTestData(null);
@@ -236,6 +236,8 @@ export default function CourseHome() {
             }
             renderContent(type, data)
           }}
+          isFormFinalize={isFormFinalize}
+          isTestFinalize={isTestFinalize}
           ref={menuTreeViewRef} 
         />
       </Drawer>

@@ -92,7 +92,7 @@ function StyledTreeItem(props: StyledTreeItemProps) {
   );
 }
 
-const MenuTreeView = React.forwardRef(({ data, onClickItem }, ref) => {
+const MenuTreeView = React.forwardRef(({ data, onClickItem, isFormFinalize, isTestFinalize}, ref) => {
   const [dataMenu, setDataMenu] = React.useState([]);
   const [selectedNode, setSelectedNode] = React.useState(null);
   const [expanded, setExpanded] = React.useState<string[]>([]);
@@ -124,32 +124,6 @@ const MenuTreeView = React.forwardRef(({ data, onClickItem }, ref) => {
           )
         );
 
-        const dataMenuCopy = JSON.parse(JSON.stringify(dataMenu));
-
-        if (
-          !dataMenuCopy[parseInt(nodeIdParts[1])].lessons[
-            parseInt(nodeIdParts[2])
-          ].sublessons[parseInt(nodeIdParts[3]) - 1].cod_formulario &&
-          !dataMenuCopy[parseInt(nodeIdParts[1])].lessons[
-            parseInt(nodeIdParts[2])
-          ].sublessons[parseInt(nodeIdParts[3]) - 1].test_id
-        ) {
-          dataMenuCopy[parseInt(nodeIdParts[1])].lessons[
-            parseInt(nodeIdParts[2])
-          ].sublessons[parseInt(nodeIdParts[3]) - 1].viewed = 1;
-          setDataMenu(dataMenuCopy);
-        }else{
-
-          if (finalize) {
-            dataMenuCopy[parseInt(nodeIdParts[1])].lessons[
-              parseInt(nodeIdParts[2])
-            ].sublessons[parseInt(nodeIdParts[3]) - 1].viewed = 1;
-            setDataMenu(dataMenuCopy);
-          }
-
-
-        }
-
         if (
           dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2])]
             .sublessons.length -
@@ -179,35 +153,112 @@ const MenuTreeView = React.forwardRef(({ data, onClickItem }, ref) => {
 
         break;
     }
+
+    const selectedNodeParts = selectedNode.split('-');
+
+    if (selectedNodeParts[0] == 'SUBLESSON') {
+      const dataMenuCopy = JSON.parse(JSON.stringify(dataMenu));
+      if (
+        !dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+          parseInt(selectedNodeParts[2])
+        ].sublessons[parseInt(selectedNodeParts[3])].cod_formulario &&
+        !dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+          parseInt(selectedNodeParts[2])
+        ].sublessons[parseInt(selectedNodeParts[3])].test_id
+      ) {
+        dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+          parseInt(selectedNodeParts[2])
+        ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
+        setDataMenu(dataMenuCopy);
+      }
+
+      if (
+        dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+          parseInt(selectedNodeParts[2])
+        ].sublessons[parseInt(selectedNodeParts[3])].test_id &&
+        finalize
+      ) {
+        dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+          parseInt(selectedNodeParts[2])
+        ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
+        setDataMenu(dataMenuCopy);
+      }
+
+      if (
+        dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+          parseInt(selectedNodeParts[2])
+        ].sublessons[parseInt(selectedNodeParts[3])].cod_formulario &&
+        finalize
+      ) {
+        dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+          parseInt(selectedNodeParts[2])
+        ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
+        setDataMenu(dataMenuCopy);
+      }
+    }
+
     console.log(nextNodeId);
     onClickItem(nodeIdParts[0], data, nextNodeId);
   };
 
   const handleSelect = (event, nodeIds) => {
     const nodeIdParts = nodeIds.split('-');
-    if (nodeIdParts[0] == "LESSON"){
-      setExpanded([expanded[0], nodeIds])
+    if (nodeIdParts[0] == 'LESSON') {
+      if (nodeIds != expanded[1]) {
+        setExpanded([expanded[0], nodeIds]);
+      } else {
+        setExpanded([expanded[0]]);
+      }
     }
-    if (nodeIdParts[0] == "UNIT"){
-      setExpanded([nodeIds])
+    if (nodeIdParts[0] == 'UNIT') {
+      if (nodeIds != expanded[0]) {
+        setExpanded([nodeIds]);
+      } else {
+        setExpanded([]);
+      }
     }
-  
+
     if (selectedNode) {
       if (nodeIds != selectedNode) {
-        const nodeIdsCopy = selectedNode.split('-');
-        if (nodeIdsCopy[0] == 'SUBLESSON') {
+        const selectedNodeParts = selectedNode.split('-');
+
+        if (selectedNodeParts[0] == 'SUBLESSON') {
           const dataMenuCopy = JSON.parse(JSON.stringify(dataMenu));
           if (
-            !dataMenuCopy[parseInt(nodeIdsCopy[1])].lessons[
-              parseInt(nodeIdsCopy[2])
-            ].sublessons[parseInt(nodeIdsCopy[3])].cod_formulario &&
-            !dataMenuCopy[parseInt(nodeIdsCopy[1])].lessons[
-              parseInt(nodeIdsCopy[2])
-            ].sublessons[parseInt(nodeIdsCopy[3])].test_id
+            !dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+              parseInt(selectedNodeParts[2])
+            ].sublessons[parseInt(selectedNodeParts[3])].cod_formulario &&
+            !dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+              parseInt(selectedNodeParts[2])
+            ].sublessons[parseInt(selectedNodeParts[3])].test_id
           ) {
-            dataMenuCopy[parseInt(nodeIdsCopy[1])].lessons[
-              parseInt(nodeIdsCopy[2])
-            ].sublessons[parseInt(nodeIdsCopy[3])].viewed = 1;
+            dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+              parseInt(selectedNodeParts[2])
+            ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
+            setDataMenu(dataMenuCopy);
+          }
+
+          if (
+            dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+              parseInt(selectedNodeParts[2])
+            ].sublessons[parseInt(selectedNodeParts[3])].test_id &&
+            isTestFinalize
+          ) {
+            dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+              parseInt(selectedNodeParts[2])
+            ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
+            setDataMenu(dataMenuCopy);
+          }
+
+          if (
+            dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+              parseInt(selectedNodeParts[2])
+            ].sublessons[parseInt(selectedNodeParts[3])].cod_formulario &&
+            isFormFinalize
+          ) {
+            dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
+              parseInt(selectedNodeParts[2])
+            ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
             setDataMenu(dataMenuCopy);
           }
         }
