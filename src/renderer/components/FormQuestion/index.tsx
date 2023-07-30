@@ -114,9 +114,8 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
                 index: indext,
               };
             }
-
-            setAnswers(respTemp);
           }
+          setAnswers(respTemp);
         } else {
           setAnswers(
             Array(questions.OK.length).fill({
