@@ -412,6 +412,23 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     )
   }
 
+  const INEMnecesidadesResponse = () => {
+    const arrayToShow = categoryResponseArray.current.filter(ele => ele.value < 24);
+    let msg = "Eres emocionalmente sano. No es necesario trabajar en el taller práctico del Paso 2";
+    if (arrayToShow.length > 0){
+      const arCatText = arrayToShow.map(ele => ele.category);
+      msg = "Desarrolla el taller práctico del Paso 2 para sanar tu(s) necesidad(es) de " + arCatText.join(",")
+    }
+    return (
+      <>
+      <Typography variant="subtitle2" gutterBottom>
+        {msg}
+      </Typography>
+      </>
+      
+    )
+  }
+
   const COVI_Raiz_amarguraResponse = async () => {
     setModalEndData({
       title: 'Identificando la Raíz de Amargura',
@@ -443,6 +460,15 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     setModalEndData({
       title: 'NIVEL DE HABILIDADES SOCIOEMOCIONALES',
       content: INEMhabsocioemocResponse(),
+      buttonText: 'Aceptar',
+    });
+    setOpenModalEnd(true);
+  }
+
+  const INEM_necesidades_Response = async() => {
+    setModalEndData({
+      title: 'NECESIDADES',
+      content: INEMnecesidadesResponse(),
       buttonText: 'Aceptar',
     });
     setOpenModalEnd(true);
@@ -566,6 +592,11 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
           case "INEM_hab_socioemoc":
             resultByCategory();
             INEM_hab_socioemoc_Response();
+          break;
+
+          case "INEM_necesidades":
+            resultByCategory();
+            INEM_necesidades_Response();
           break;
       }
 
