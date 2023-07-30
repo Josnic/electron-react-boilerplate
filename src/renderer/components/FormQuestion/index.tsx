@@ -8,7 +8,11 @@ import parse from 'html-react-parser';
 import { ToastContainer } from 'react-toastify';
 import OverlayLoader from '../../components/OverlayLoader';
 import { getPathCourseResource } from '../../utils/electronFunctions';
-import { sqlite3InsertBulk, sqlite3All, sqlite3Run } from '../../helpers/Sqlite3Operations';
+import {
+  sqlite3InsertBulk,
+  sqlite3All,
+  sqlite3Run,
+} from '../../helpers/Sqlite3Operations';
 import { useSelector } from 'react-redux';
 import { getMysqlDate } from '../../utils/generals';
 import { generateIamPdf } from '../../helpers/formPdf';
@@ -63,7 +67,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
       `SELECT * FROM formulario_respuesta WHERE cod_formulario = '${data.cod_formulario}' AND user_id = '${userId}'`
     );
 
-    console.log(answersForm)
+    console.log(answersForm);
 
     console.log(questions);
     if (questions.OK) {
@@ -82,13 +86,46 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
         }
         setAnswers(answersTemp);
       } else {
-        setAnswers(
-          Array(questions.OK.length).fill({
+        //pregunta heredada
+        const questionSAr = questions.OK.filter(
+          (ele) => ele.id_pregunta_viene > 0
+        );
+        if (questionSAr.length > 0) {
+          const respTemp = Array(questions.OK.length).fill({
             questionId: null,
             answerText: '',
             index: null,
-          })
-        );
+          });
+          const ids = questionSAr.map((ele) => ele.id_pregunta);
+          const question2 = await sqlite3All(
+            `SELECT * FROM formulario_respuesta WHERE cod_formulario = '${
+              data.cod_formulario
+            }' AND id_pregunta IN (${ids.join(',')})`
+          );
+          console.log(question2);
+          if (question2.OK && question2.OK.length > 0) {
+            for (let i = 0; i < question2.OK.length; i++) {
+              const indext = questions.OK.findIndex(
+                (ele) => ele.id_pregunta == question2.OK[i].id_pregunta
+              );
+              respTemp[indext] = {
+                questionId: question2.OK[i].id_pregunta,
+                answerText: question2.OK[i].respuesta,
+                index: indext,
+              };
+            }
+
+            setAnswers(respTemp);
+          }
+        } else {
+          setAnswers(
+            Array(questions.OK.length).fill({
+              questionId: null,
+              answerText: '',
+              index: null,
+            })
+          );
+        }
       }
     } else {
       setQuestions([]);
@@ -190,7 +227,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
       );
 
       const result_sublesson = await sqlite3Run(
-        "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
+        'INSERT INTO sublecciones_vistas VALUES (?,?,?)',
         [userId, data.id, currentDate]
       );
 
@@ -247,10 +284,18 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
                       <TextField
                         id="outlined-multiline-static"
                         label=""
-                        multiline={question.unilinea && question.unilinea == 1 ? false : true}
+                        multiline={
+                          question.unilinea && question.unilinea == 1
+                            ? false
+                            : true
+                        }
                         key={question.id}
                         rows={3}
-                        defaultValue={answers[index] && answers[index].answerText ? answers[index].answerText: ""}
+                        defaultValue={
+                          answers[index] && answers[index].answerText
+                            ? answers[index].answerText
+                            : ''
+                        }
                         onChange={(event) => {
                           handleAnswer(event, index);
                         }}
