@@ -150,6 +150,8 @@ const TrueFalseTest = ({ data, courseCode, onFinalize, onContinue }) => {
       const answersTest = await sqlite3All(
         `SELECT * FROM test_vf_respuestas WHERE cod_test = '${data.test_id}' AND user_id = '${userId}'`
       );
+
+      console.log(answersTest)
       
 
       if (questions.OK) {
@@ -280,7 +282,7 @@ const TrueFalseTest = ({ data, courseCode, onFinalize, onContinue }) => {
                   <TrueFalseQuestion
                     question={question}
                     key={index}
-                    defaultValue={answers[index] && answers[index].value ? answers[index].value: null}
+                    defaultValue={answers[index] && answers[index].value > -1 ? answers[index].value: null}
                     scale={{
                       min: currentTest.rango_inicial,
                       max: currentTest.rango_final,
