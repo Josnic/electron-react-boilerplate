@@ -32,7 +32,7 @@ import { showToast } from '../../../utils/toast';
 import { getMysqlDate } from '../../../utils/generals';
 import '../styles.scss';
 
-const RadioButtonTest = ({ data, courseCode, onContinue }) => {
+const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
   const [open, setOpen] = useState(false);
   const [answers, setAnswers] = useState([]);
   const [questions, setQuestions] = useState([]);
@@ -450,6 +450,7 @@ const RadioButtonTest = ({ data, courseCode, onContinue }) => {
       [userId, data.id, currentDate]
     );
 
+    onFinalize(true);
     console.log(deleteBefore, result, result_sublesson)
   }
 

@@ -72,7 +72,10 @@ function StyledTreeItem(props: StyledTreeItemProps) {
       label={
         <Box sx={{ display: 'flex', alignItems: 'center', p: 0.5, pr: 0 }}>
           <Box component={LabelIcon} color="inherit" sx={{ mr: 1 }} />
-          <Typography variant="body2" sx={{ fontWeight: 'inherit', flexGrow: 1 }}>
+          <Typography
+            variant="body2"
+            sx={{ fontWeight: 'inherit', flexGrow: 1 }}
+          >
             {labelText}
           </Typography>
           <Typography variant="caption" color="inherit">
@@ -89,60 +92,149 @@ function StyledTreeItem(props: StyledTreeItemProps) {
   );
 }
 
-const MenuTreeView  = React.forwardRef(({ data, onClickItem }, ref) =>{
+const MenuTreeView = React.forwardRef(({ data, onClickItem }, ref) => {
   const [dataMenu, setDataMenu] = React.useState([]);
   const [selectedNode, setSelectedNode] = React.useState(null);
 
-  const setSelectedNodeActive = async(nodeId) => {
-    const nodeIdParts = nodeId.split("-");
+  const setSelectedNodeActive = async (nodeId, finalize) => {
+    const nodeIdParts = nodeId.split('-');
     setSelectedNode(nodeId);
     let data = {};
     let nextNodeId = null;
-    switch(nodeIdParts[0]){
-      case "UNIT":
+    switch (nodeIdParts[0]) {
+      case 'UNIT':
         data = JSON.parse(JSON.stringify(dataMenu[parseInt(nodeIdParts[1])]));
         delete data.lessons;
-      break;
-      
-      case "LESSON":
-        data = JSON.parse(JSON.stringify(dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2])]));
-      break;
+        break;
 
-      case "SUBLESSON":
-        data = JSON.parse(JSON.stringify(dataMenu[parseInt(nodeIdParts[1])]["lessons"][parseInt(nodeIdParts[2])]["sublessons"][parseInt(nodeIdParts[3])]));
-        
-        if (dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2])].sublessons.length - 1 == parseInt(nodeIdParts[3])){
-          if (dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2]) + 1]){
-            nextNodeId = `LESSON-${parseInt(nodeIdParts[1])}-${(parseInt(nodeIdParts[2]) + 1)}`
-          }else{
-            if (dataMenu[parseInt(nodeIdParts[1]) + 1]){
-              nextNodeId = `UNIT-${(parseInt(nodeIdParts[1]) + 1)}-${units[parseInt(nodeIdParts[1]) + 1].cod_unidad}`
+      case 'LESSON':
+        data = JSON.parse(
+          JSON.stringify(
+            dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2])]
+          )
+        );
+        break;
+
+      case 'SUBLESSON':
+        data = JSON.parse(
+          JSON.stringify(
+            dataMenu[parseInt(nodeIdParts[1])]['lessons'][
+              parseInt(nodeIdParts[2])
+            ]['sublessons'][parseInt(nodeIdParts[3])]
+          )
+        );
+
+        const dataMenuCopy = JSON.parse(JSON.stringify(dataMenu));
+
+        if (
+          !dataMenuCopy[parseInt(nodeIdParts[1])].lessons[
+            parseInt(nodeIdParts[2])
+          ].sublessons[parseInt(nodeIdParts[3]) - 1].cod_formulario &&
+          !dataMenuCopy[parseInt(nodeIdParts[1])].lessons[
+            parseInt(nodeIdParts[2])
+          ].sublessons[parseInt(nodeIdParts[3]) - 1].test_id
+        ) {
+          dataMenuCopy[parseInt(nodeIdParts[1])].lessons[
+            parseInt(nodeIdParts[2])
+          ].sublessons[parseInt(nodeIdParts[3]) - 1].viewed = 1;
+          setDataMenu(dataMenuCopy);
+        }else{
+
+          if (finalize) {
+            dataMenuCopy[parseInt(nodeIdParts[1])].lessons[
+              parseInt(nodeIdParts[2])
+            ].sublessons[parseInt(nodeIdParts[3]) - 1].viewed = 1;
+            setDataMenu(dataMenuCopy);
+          }
+
+
+        }
+
+        if (
+          dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2])]
+            .sublessons.length -
+            1 ==
+          parseInt(nodeIdParts[3])
+        ) {
+          if (
+            dataMenu[parseInt(nodeIdParts[1])].lessons[
+              parseInt(nodeIdParts[2]) + 1
+            ]
+          ) {
+            nextNodeId = `LESSON-${parseInt(nodeIdParts[1])}-${
+              parseInt(nodeIdParts[2]) + 1
+            }`;
+          } else {
+            if (dataMenu[parseInt(nodeIdParts[1]) + 1]) {
+              nextNodeId = `UNIT-${parseInt(nodeIdParts[1]) + 1}-${
+                dataMenu[parseInt(nodeIdParts[1]) + 1].cod_unidad
+              }`;
             }
           }
-        }else{
-          nextNodeId = `SUBLESSON-${parseInt(nodeIdParts[1])}-${parseInt(nodeIdParts[2])}-${(parseInt(nodeIdParts[3]) + 1)}`
-        } 
-      break;
+        } else {
+          nextNodeId = `SUBLESSON-${parseInt(nodeIdParts[1])}-${parseInt(
+            nodeIdParts[2]
+          )}-${parseInt(nodeIdParts[3]) + 1}`;
+        }
+
+        break;
     }
-    console.log(nextNodeId)
+    console.log(nextNodeId);
     onClickItem(nodeIdParts[0], data, nextNodeId);
-  }
+  };
 
   const handleSelect = (event, nodeIds) => {
-    console.log(nodeIds)
-  }
+    if (selectedNode) {
+      if (nodeIds != selectedNode) {
+        console.log(nodeIds);
+        const nodeIdsCopy = selectedNode.split('-');
+        if (nodeIdsCopy[0] == 'SUBLESSON') {
+          const dataMenuCopy = JSON.parse(JSON.stringify(dataMenu));
+          if (
+            !dataMenuCopy[parseInt(nodeIdsCopy[1])].lessons[
+              parseInt(nodeIdsCopy[2])
+            ].sublessons[parseInt(nodeIdsCopy[3])].cod_formulario &&
+            !dataMenuCopy[parseInt(nodeIdsCopy[1])].lessons[
+              parseInt(nodeIdsCopy[2])
+            ].sublessons[parseInt(nodeIdsCopy[3])].test_id
+          ) {
+            dataMenuCopy[parseInt(nodeIdsCopy[1])].lessons[
+              parseInt(nodeIdsCopy[2])
+            ].sublessons[parseInt(nodeIdsCopy[3])].viewed = 1;
+            setDataMenu(dataMenuCopy);
+          }
+        }
+      }
+    }
+  };
+
+  const checkLesson = (lesson) => {
+    return (
+      lesson.sublessons &&
+      Array.isArray(lesson.sublessons) &&
+      lesson.sublessons.filter((ele) => ele.viewed == 0).length == 0
+    );
+  };
+
+  const checkUnit = (unit) => {
+    return (
+      unit.lessons &&
+      Array.isArray(unit.lessons) &&
+      unit.lessons.filter((ele) => ele.viewed == 0).length == 0
+    );
+  };
 
   React.useImperativeHandle(ref, () => ({
-    setSelectedNode: setSelectedNodeActive
-  }))
-  
-  React.useEffect(()=>{
+    setSelectedNode: setSelectedNodeActive,
+  }));
+
+  React.useEffect(() => {
     setDataMenu(data);
-  }, [data])
+  }, [data]);
 
   return (
     <TreeView
-      id={"tree-view-menu"}
+      id={'tree-view-menu'}
       defaultCollapseIcon={<ArrowDropDownIcon />}
       defaultExpandIcon={<ArrowRightIcon />}
       defaultEndIcon={<div style={{ width: 24 }} />}
@@ -150,71 +242,94 @@ const MenuTreeView  = React.forwardRef(({ data, onClickItem }, ref) =>{
       onNodeSelect={handleSelect}
       selected={selectedNode}
     >
-      {dataMenu && dataMenu.length > 0 && dataMenu.map((unit, index) => (
-        <StyledTreeItem 
-          nodeId={`UNIT-${index}-${unit.cod_unidad}`}
-          id={`UNIT-${index}-${unit.cod_unidad}`}
-          key={`node-${index}`} 
-          labelText={unit.nombre} 
-          labelIcon={CheckBoxOutlinedIcon}
-          onClick={()=>{
-            setSelectedNode(`UNIT-${index}-${unit.cod_unidad}`);
-            onClickItem("UNIT", unit);
-          }}
-        >
-          
-          {unit.lessons && unit.lessons.map((lesson, index2) => (
-            <StyledTreeItem
-              nodeId={`LESSON-${index}-${index2}`}
-              key={`LESSON-${index}-${index2}`}
-              labelText={lesson.nombre}
-              labelIcon={CheckBoxOutlineBlankOutlinedIcon}
-              labelInfo=""
-              color="#1a73e8"
-              bgColor="#e8f0fe"
-              onClick={()=>{
-                setSelectedNode(`LESSON-${index}-${index2}`);
-                onClickItem("LESSON", lesson)
-              }}
-            >
-              {lesson.sublessons && lesson.sublessons.map((sublesson, index3) => (
+      {dataMenu &&
+        dataMenu.length > 0 &&
+        dataMenu.map((unit, index) => (
+          <StyledTreeItem
+            nodeId={`UNIT-${index}-${unit.cod_unidad}`}
+            id={`UNIT-${index}-${unit.cod_unidad}`}
+            key={`node-${index}`}
+            labelText={unit.nombre}
+            labelIcon={
+              unit.lessons.length == 0
+                ? null
+                : checkLesson(unit) || unit.viewed == 1
+                ? CheckBoxOutlinedIcon
+                : CheckBoxOutlineBlankOutlinedIcon
+            }
+            onClick={() => {
+              setSelectedNode(`UNIT-${index}-${unit.cod_unidad}`);
+              onClickItem('UNIT', unit);
+            }}
+          >
+            {unit.lessons &&
+              unit.lessons.map((lesson, index2) => (
                 <StyledTreeItem
-                  nodeId={`SUBLESSON-${index}-${index2}-${index3}`}
-                  key={`SUBLESSON-${index}-${index2}-${index3}`}
-                  labelText={sublesson.nombre}
-                  labelIcon={CheckBoxOutlinedIcon}
+                  nodeId={`LESSON-${index}-${index2}`}
+                  key={`LESSON-${index}-${index2}`}
+                  labelText={lesson.nombre}
+                  labelIcon={
+                    checkLesson(lesson) || lesson.viewed == 1
+                      ? CheckBoxOutlinedIcon
+                      : CheckBoxOutlineBlankOutlinedIcon
+                  }
                   labelInfo=""
-                  color="#e3742f"
-                  bgColor="#fcefe3"
-                  sx={{marginLeft: 2 }}
-                  onClick={()=>{
-                    setSelectedNode(`SUBLESSON-${index}-${index2}-${index3}`);
-                    let nextNodeId = null;
-                    if (dataMenu[index].lessons[index2].sublessons.length - 1 == index3){
-
-                      if (dataMenu[index].lessons[index2 + 1]){
-                        nextNodeId = `LESSON-${index}-${(index2 + 1)}`
-                      }else{
-                        if (dataMenu[index + 1]){
-                          nextNodeId = `UNIT-${(index + 1)}-${dataMenu[index + 1].cod_unidad}`
-                        }
-                      }
-                     
-
-                    }else{
-                      nextNodeId = `SUBLESSON-${index}-${index2}-${(index3 + 1)}`
-                    } 
-                    onClickItem("SUBLESSON", sublesson, nextNodeId);
+                  color="#1a73e8"
+                  bgColor="#e8f0fe"
+                  onClick={() => {
+                    setSelectedNode(`LESSON-${index}-${index2}`);
+                    onClickItem('LESSON', lesson);
                   }}
-                />
+                >
+                  {lesson.sublessons &&
+                    lesson.sublessons.map((sublesson, index3) => (
+                      <StyledTreeItem
+                        nodeId={`SUBLESSON-${index}-${index2}-${index3}`}
+                        key={`SUBLESSON-${index}-${index2}-${index3}`}
+                        labelText={sublesson.nombre}
+                        labelIcon={
+                          sublesson.viewed > 0
+                            ? CheckBoxOutlinedIcon
+                            : CheckBoxOutlineBlankOutlinedIcon
+                        }
+                        labelInfo=""
+                        color="#e3742f"
+                        bgColor="#fcefe3"
+                        sx={{ marginLeft: 2 }}
+                        onClick={() => {
+                          setSelectedNode(
+                            `SUBLESSON-${index}-${index2}-${index3}`
+                          );
+                          let nextNodeId = null;
+                          if (
+                            dataMenu[index].lessons[index2].sublessons.length -
+                              1 ==
+                            index3
+                          ) {
+                            if (dataMenu[index].lessons[index2 + 1]) {
+                              nextNodeId = `LESSON-${index}-${index2 + 1}`;
+                            } else {
+                              if (dataMenu[index + 1]) {
+                                nextNodeId = `UNIT-${index + 1}-${
+                                  dataMenu[index + 1].cod_unidad
+                                }`;
+                              }
+                            }
+                          } else {
+                            nextNodeId = `SUBLESSON-${index}-${index2}-${
+                              index3 + 1
+                            }`;
+                          }
+                          onClickItem('SUBLESSON', sublesson, nextNodeId);
+                        }}
+                      />
+                    ))}
+                </StyledTreeItem>
               ))}
-            </StyledTreeItem>
-          ))}
-
-        </StyledTreeItem>
-      ))}
+          </StyledTreeItem>
+        ))}
     </TreeView>
   );
-})
+});
 
 export default MenuTreeView;

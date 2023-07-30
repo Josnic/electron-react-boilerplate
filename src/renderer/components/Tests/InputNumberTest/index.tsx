@@ -36,7 +36,7 @@ import RadarChart from '../../RadarChart';
 import { getMysqlDate } from '../../../utils/generals';
 import '../styles.scss';
 
-const InputNumberTest = ({ data, courseCode, onContinue }) => {
+const InputNumberTest = ({ data, courseCode, onFinalize, onContinue }) => {
   const answers = useRef(
     Array(0).fill({
       category: '',
@@ -242,7 +242,8 @@ const InputNumberTest = ({ data, courseCode, onContinue }) => {
         "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
         [userId, data.id, currentDate]
       );
-
+      
+      onFinalize(true);
       switch (currentTest.cod_test) {
         case 'COVI_AnalisisSituac':
           resultForSituacional();

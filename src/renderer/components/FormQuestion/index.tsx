@@ -16,7 +16,7 @@ import { showToast } from '../../utils/toast';
 import AlertModal from '../Tests/components/AlertModal';
 import './styles.scss';
 
-const FormQuestion = ({ data, courseCode, onContinue }) => {
+const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
   const [questions, setQuestions] = useState([]);
   const [open, setOpen] = useState(false);
   const [openModalEnd, setOpenModalEnd] = useState(false);
@@ -199,6 +199,7 @@ const FormQuestion = ({ data, courseCode, onContinue }) => {
       setTimeout(() => {
         setOpen(false);
         setFormSaved(true);
+        onFinalize();
         if (formData.texto_boton && formData.texto_boton != '') {
           setOpenModalEnd(true);
         }

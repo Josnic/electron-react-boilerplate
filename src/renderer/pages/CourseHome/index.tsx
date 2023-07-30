@@ -29,7 +29,7 @@ import FormQuestion from '../../components/FormQuestion';
 import RadioButtonTest from '../../components/Tests/RadioButtonTest';
 import InputNumberTest from '../../components/Tests/InputNumberTest';
 import TrueFalseTest from '../../components/Tests/TrueFalseTest';
-
+import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
 
 import { sqlite3All } from '../../helpers/Sqlite3Operations'
@@ -98,36 +98,60 @@ export default function CourseHome() {
   const [formData, setFormData] = React.useState(null);
   const [testData, setTestData] = React.useState(null);
   const menuTreeViewRef = React.useRef();
+  const authState = useSelector((state) => state);
   const navigate = useNavigate();
   const handleDrawerOpen = () => {
     setOpen(true);
   };
   const [nextNodeId, setNextNodeId] = React.useState(null);
   const { courseCode } = useParams();
+  const [isFormFinalize, setIsFormFinalize] = React.useState(false);
+  const [isTestFinalize, setIsTestFinalize] = React.useState(false);
 
   const handleDrawerClose = () => {
     setOpen(false);
   };
 
-  const loadMenu = async() => {
-    const units = await sqlite3All(`SELECT *, imagen_unid AS imagen, video AS videos FROM unidades WHERE cod_curso = '${courseCode}' ORDER BY orden ASC`);
-    let dataMenu = [];
+  const checkLesson = (lesson) => {
+    return lesson.sublessons &&
+          Array.isArray(lesson.sublessons) &&
+          lesson.sublessons.length > 0 &&
+          lesson.sublessons.filter(ele => ele.viewed == 0).length == 0
+  }
 
+  const checkUnit = (unit) => {
+    return unit.lessons &&
+          Array.isArray(unit.lessons) &&
+          unit.lessons.length > 0 &&
+          unit.lessons.filter(ele => ele.viewed == 0).length == 0
+  }
+
+  const loadMenu = async() => {
+    const units = await sqlite3All(`SELECT *, 0 AS viewed, imagen_unid AS imagen, video AS videos FROM unidades WHERE cod_curso = '${courseCode}' ORDER BY orden ASC`);
+    let dataMenu = [];
+    const userId =
+    authState && authState.user ? authState.user.email : 'test';
     if (units.OK){
       dataMenu = units.OK;
       setUnits(units.OK);
       for (let i = 0; i < dataMenu.length; i++) {
-        const lessons = await sqlite3All(`SELECT *, objetivo AS contenido  FROM lecciones WHERE cod_unidad = '${dataMenu[i].cod_unidad}' ORDER BY cod_leccion ASC`);
+        const lessons = await sqlite3All(`SELECT *, objetivo AS contenido, 0 AS viewed  FROM lecciones WHERE cod_unidad = '${dataMenu[i].cod_unidad}' ORDER BY cod_leccion ASC`);
         if (lessons.OK){
           for (let j = 0; j < lessons.OK.length; j++) {
-            const sublessons = await sqlite3All(`SELECT *, '${dataMenu[i].cod_unidad}' AS cod_unidad, CASE WHEN test_id IS NULL THEN '' ELSE (SELECT test_tipo FROM tests WHERE cod_test = test_id) END AS test_tipo 
-                                                 FROM sublecciones WHERE cod_leccion = '${lessons.OK[j].cod_leccion}' ORDER BY orden ASC`);
+            const sublessons = await sqlite3All(`SELECT *, '${dataMenu[i].cod_unidad}' AS cod_unidad, 
+            (SELECT COUNT(subleccion_id) FROM sublecciones_vistas WHERE sublecciones_vistas.subleccion_id = sublecciones.id AND user_id = '${userId}') AS viewed,
+            CASE WHEN test_id IS NULL THEN '' ELSE (SELECT test_tipo FROM tests WHERE cod_test = test_id) END AS test_tipo 
+            FROM sublecciones 
+            WHERE cod_leccion = '${lessons.OK[j].cod_leccion}' ORDER BY orden ASC`);
             if (sublessons.OK){
               lessons.OK[j]["sublessons"] = sublessons.OK;
+              lessons.OK[j]["viewed"] = checkLesson(lessons.OK[j]) ? 1 : 0;
             }
           }
+          dataMenu[i]["lessons"] = lessons.OK;
+          dataMenu[i]["viewed"] = checkUnit(dataMenu[i])
         }
-        dataMenu[i]["lessons"] = lessons.OK;
+        
       }
     }
     setDataMenu(dataMenu);
@@ -137,7 +161,8 @@ export default function CourseHome() {
   const renderContent = async(type, data) => {
     console.log(type, data)
     setShowUnits(false);
-
+    setIsTestFinalize(false);
+      setIsFormFinalize(false);
     if (data.cod_formulario && data.cod_formulario != ""){
       setHtmlContent(null);
       setTestData(null);
@@ -203,7 +228,7 @@ export default function CourseHome() {
         <Divider />
         <MenuTreeView 
           data={dataMenu} 
-          onClickItem={(type, data, nextNodeIdData) => {
+          onClickItem={async(type, data, nextNodeIdData) => {
             if (nextNodeIdData){
               setNextNodeId(nextNodeIdData);
             }else{
@@ -253,9 +278,12 @@ export default function CourseHome() {
                   <FormQuestion 
                     data={formData} 
                     courseCode={courseCode}
+                    onFinalize={()=>{
+                      setIsFormFinalize(true);
+                    }}
                     onContinue={()=> {
                       if (nextNodeId){
-                        menuTreeViewRef.current.setSelectedNode(nextNodeId);
+                        menuTreeViewRef.current.setSelectedNode(nextNodeId, isFormFinalize);
                       }
                     }}
                   />
@@ -268,9 +296,12 @@ export default function CourseHome() {
                   <RadioButtonTest 
                     data={testData} 
                     courseCode={courseCode}
+                    onFinalize={()=> {
+                      setIsTestFinalize(true);
+                    }}
                     onContinue={()=> {
                       if (nextNodeId){
-                        menuTreeViewRef.current.setSelectedNode(nextNodeId);
+                        menuTreeViewRef.current.setSelectedNode(nextNodeId, isTestFinalize);
                       }
                     }}
                   />
@@ -283,9 +314,12 @@ export default function CourseHome() {
                   <InputNumberTest 
                     data={testData} 
                     courseCode={courseCode}
+                    onFinalize={()=> {
+                      setIsTestFinalize(true);
+                    }}
                     onContinue={()=> {
                       if (nextNodeId){
-                        menuTreeViewRef.current.setSelectedNode(nextNodeId);
+                        menuTreeViewRef.current.setSelectedNode(nextNodeId, isTestFinalize);
                       }
                     }}
                   />
@@ -298,9 +332,12 @@ export default function CourseHome() {
                   <TrueFalseTest 
                     data={testData} 
                     courseCode={courseCode}
+                    onFinalize={()=> {
+                      setIsTestFinalize(true);
+                    }}
                     onContinue={()=> {
                       if (nextNodeId){
-                        menuTreeViewRef.current.setSelectedNode(nextNodeId);
+                        menuTreeViewRef.current.setSelectedNode(nextNodeId, isTestFinalize);
                       }
                     }}
                   />
