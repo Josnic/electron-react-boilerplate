@@ -95,7 +95,7 @@ function StyledTreeItem(props: StyledTreeItemProps) {
 const MenuTreeView = React.forwardRef(({ data, onClickItem }, ref) => {
   const [dataMenu, setDataMenu] = React.useState([]);
   const [selectedNode, setSelectedNode] = React.useState(null);
-
+  const [expanded, setExpanded] = React.useState<string[]>([]);
   const setSelectedNodeActive = async (nodeId, finalize) => {
     const nodeIdParts = nodeId.split('-');
     setSelectedNode(nodeId);
@@ -184,10 +184,17 @@ const MenuTreeView = React.forwardRef(({ data, onClickItem }, ref) => {
   };
 
   const handleSelect = (event, nodeIds) => {
+    const nodeIdsCopy = selectedNode.split('-');
+    const nodeIdParts = nodeIds.split('-');
+    if (nodeIdParts[0] == "LESSON"){
+      setExpanded([expanded[0], nodeIds])
+    }
+    if (nodeIdParts[0] == "UNIT"){
+      setExpanded([nodeIds])
+    }
+  
     if (selectedNode) {
       if (nodeIds != selectedNode) {
-        console.log(nodeIds);
-        const nodeIdsCopy = selectedNode.split('-');
         if (nodeIdsCopy[0] == 'SUBLESSON') {
           const dataMenuCopy = JSON.parse(JSON.stringify(dataMenu));
           if (
@@ -241,6 +248,7 @@ const MenuTreeView = React.forwardRef(({ data, onClickItem }, ref) => {
       sx={{ height: 264, flexGrow: 1, maxWidth: 500, overflowY: 'auto' }}
       onNodeSelect={handleSelect}
       selected={selectedNode}
+      expanded={expanded}
     >
       {dataMenu &&
         dataMenu.length > 0 &&
