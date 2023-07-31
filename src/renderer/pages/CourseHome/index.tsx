@@ -28,6 +28,7 @@ import ContentRenderer from 'renderer/components/ContentRenderer';
 import FormQuestion from '../../components/FormQuestion';
 import RadioButtonTest from '../../components/Tests/RadioButtonTest';
 import InputNumberTest from '../../components/Tests/InputNumberTest';
+import OverlayLoader from '../../components/OverlayLoader';
 import TrueFalseTest from '../../components/Tests/TrueFalseTest';
 import { useSelector } from 'react-redux';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -91,6 +92,7 @@ const DrawerHeader = styled('div')(({ theme }) => ({
 export default function CourseHome() {
   const theme = useTheme();
   const [open, setOpen] = React.useState(true);
+  const [openLoader, setOpenLoader] = React.useState(true);
   const [showUnits, setShowUnits] = React.useState(true);
   const [units, setUnits] = React.useState([]);
   const [dataMenu, setDataMenu] = React.useState([]);
@@ -174,7 +176,7 @@ export default function CourseHome() {
         
       }
     }
-    console.log(dataMenu)
+    setOpenLoader(false);
     getPercentage(dataMenu);
     setDataMenu(dataMenu);
     console.log(dataMenu)
@@ -210,6 +212,7 @@ export default function CourseHome() {
   return (
     <Box sx={{ display: 'flex' }}>
       <CssBaseline />
+      <OverlayLoader open={openLoader} />
       <AppBar position="fixed" open={open}>
         <MenuHeader
           handleDrawerOpen={handleDrawerOpen}

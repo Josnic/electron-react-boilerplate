@@ -18,7 +18,7 @@ import { showToast } from '../../utils/toast';
 import { sqlite3All } from '../../helpers/Sqlite3Operations'; 
 
 const Home = () => {
-  const [openLoader, setOpenLoader] = React.useState(false);
+  const [openLoader, setOpenLoader] = React.useState(true);
   const [courses, setCourses] = useState([]);
   const [percentage, setPercentage] = React.useState(0);
   const navigate = useNavigate();
@@ -50,7 +50,6 @@ const Home = () => {
   }
 
   useEffect(()=>{
-    setOpenLoader(true);
     getCourses();
   }, [])
 
