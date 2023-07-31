@@ -1,6 +1,5 @@
 import { PDFDocument } from 'pdf-lib';
-import * as fs from 'fs';
-import { getPathCourseResource } from '../utils/electronFunctions';
+import { getPathCourseResource, getBinaryContent } from '../utils/electronFunctions';
 import * as download from 'downloadjs/download';
 
 const base64ToArrayBuffer = (base64) => {
@@ -12,8 +11,8 @@ const base64ToArrayBuffer = (base64) => {
     return bytes.buffer;
 } 
 
-export default async(objText, arObjImage, pdfDocument) => {
-    const fileBytes = fs.readFileSync(pdfDocument);
+export default async(objText, arObjImage, pdfDocumentPath) => {
+    const fileBytes = await getBinaryContent(pdfDocumentPath)
     const pdfDoc = await PDFDocument.load(fileBytes);
     const form = pdfDoc.getForm();
     Object.entries(objText).forEach(([key, value]) => {
