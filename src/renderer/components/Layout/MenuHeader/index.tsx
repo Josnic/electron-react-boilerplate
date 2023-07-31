@@ -10,6 +10,7 @@ import { useSelector } from 'react-redux';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import CardHeader from '@mui/material/CardHeader';
 import MenuIcon from '@mui/icons-material/Menu';
+import { getPathCourseResource } from '../../../utils/electronFunctions';
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 12,
@@ -43,6 +44,17 @@ const NumberLinearProgress = (props) =>{
 export default function MenuHeader({ progress, isCourse, courseCode, handleDrawerOpen, open }) {
   const authState = useSelector((state) => state);
   const userName = authState.user ? authState.user.nombre_completo : "test";
+  const [imgCourse, setImageCourse] = React.useState(null);
+  const [imgApp, setImageApp] = React.useState(null);
+  const getImageCourse = async() => {
+    const imgPath = await getPathCourseResource(courseCode + "/img.asar/logo_curso.png");
+    setImageCourse(imgPath)
+  }
+
+  const getImageApp = async() => {
+    const imgPath = await getPathCourseResource("/commonassets/logo.png");
+    setImageApp(imgPath)
+  }
   const processNameForAvatar = (fullName) => {
     const arName = fullName.split(" ");
     if (arName.length == 0){
@@ -58,6 +70,11 @@ export default function MenuHeader({ progress, isCourse, courseCode, handleDrawe
       + arName[1][0] && arName[1][0] != "" ? (arName[1][0]).toUpperCase() : "";
     }
   }
+
+  React.useEffect(()=>{
+    getImageApp();
+    if (isCourse) getImageCourse();
+  }, [])
   return (
       <AppBar position="absolute">
         <Toolbar disableGutters>
@@ -78,17 +95,17 @@ export default function MenuHeader({ progress, isCourse, courseCode, handleDrawe
           }
           <Avatar
             variant="square"
-            src="https://mui.com/static/images/avatar/1.jpg"
-            sx={{ display: { xs: 'none', md: 'flex' }, width: 156, height: 56 }}
+            src={imgApp}
+            sx={{ display: { xs: 'none', md: 'flex' }, width: 156, height: 'auto' }}
           />
           <Box sx={{ flexGrow: 0.5 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             {
-               isCourse ? (
+               isCourse && imgCourse ? (
                 <Avatar
                   variant="square"
-                  src="https://mui.com/static/images/avatar/1.jpg"
-                  sx={{ display: { xs: 'none', md: 'flex' }, width: 56, height: 56 }}
+                  src={imgCourse}
+                  sx={{ display: { xs: 'none', md: 'flex' }, width: 150, height: 'auto' }}
                 />
                ):(
                 null
