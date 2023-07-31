@@ -5,7 +5,6 @@ import './styles.scss';
 
 const RadarChart = ({title, series, categories}) =>{
     const chartInstance = useRef();
-    console.log(title, series, categories)
     const state = {  
         series: series,
         options: {
