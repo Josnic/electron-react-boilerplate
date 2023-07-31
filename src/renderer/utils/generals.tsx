@@ -28,5 +28,5 @@ export const base64Decode = (str) => {
 }
 
 export const sha256Encode = (str) => {
-  return sha256(str);
+  return sha256(str).toString();
 }

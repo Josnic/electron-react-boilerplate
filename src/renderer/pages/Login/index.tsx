@@ -39,7 +39,7 @@ export default function SignIn() {
       showToast("Completa los datos");
     }else{
       setOpen(true);
-      const result = await sqlite3All(`SELECT * FROM user WHERE email = '${email}' AND password = '${sha256Encode(password)}' LIMIT 1`);
+      const result = await sqlite3All(`SELECT * FROM usuario WHERE email = '${email}' AND password1 = '${sha256Encode(password)}' LIMIT 1`);
       if (result.OK) {
         setOpen(false);
         if (result.OK.length && result.OK.length == 1) {
@@ -98,10 +98,10 @@ export default function SignIn() {
               id="password"
               autoComplete="current-password"
             />
-            <FormControlLabel
+            {/*<FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Recordarme"
-            />
+        />*/}
             <Button
               type="submit"
               fullWidth
@@ -112,7 +112,7 @@ export default function SignIn() {
             </Button>
             <Grid container>
               <Grid item xs>
-                <Link
+                {/*<Link
                   component="button"
                   variant="body2"
                   onClick={() => {
@@ -120,7 +120,7 @@ export default function SignIn() {
                   }}
                 >
                   Olvidaste tu contraseña?
-                </Link>
+                </Link>*/}
               </Grid>
               <Grid item>
                 <Link
@@ -136,7 +136,7 @@ export default function SignIn() {
             </Grid>
           </Box>
         </Box>
-        <Copyright sx={{ mt: 8, mb: 4 }} />
+        {/*<Copyright sx={{ mt: 8, mb: 4 }} />*/}
         <ToastContainer />
       </Container>
   );

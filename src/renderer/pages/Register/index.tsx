@@ -84,15 +84,18 @@ export default function SignUp() {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
 
-    const email = data.get('email').trim();
-    const email_repeat = data.get('email_repeat').trim();
+    const email = data.get('email').trim().toLowerCase();
+    const email_repeat = data.get('email_repeat').trim().toLowerCase();
     const fullName = data.get('fullName').trim();
     const document = data.get('document').trim();
     const password = data.get('password').trim();
     const password_repeat = data.get('password_repeat').trim();
     const birthday = startDate ? formatDate(startDate) : '';
+    console.log(sha256Encode(password))
     if (
       email == '' ||
+      email_repeat == '' ||
+      password_repeat == '' ||
       password == '' ||
       fullName == '' ||
       document == '' ||
@@ -101,15 +104,19 @@ export default function SignUp() {
       showToast('Completa los datos');
     } else if (!validateEmail(email)) {
       showToast('El correo electrónico no es correcto');
+    }else if (email != email_repeat) {
+        showToast('Revisa que tu correo electrónico sea válido en ambos campos de texto');
+      }else if (password != password_repeat) {
+        showToast('Revisa que tu contraseña sea la misma en ambos campos de texto');
     } else {
       setOpen(true);
       const existsData = await sqlite3All(
-        `SELECT * FROM usuarios WHERE email = '${email}' OR documento = '${document}'`
+        `SELECT * FROM usuario WHERE email = '${email}' OR documento = '${document}'`
       );
 
       if (existsData.OK && existsData.OK.length == 0){
         const result = await sqlite3Run(
-          'INSERT INTO usuarios VALUES (?,?,?,?,?,?,?)',
+          'INSERT INTO usuario VALUES (?,?,?,?,?,?,?)',
           [
             fullName,
             document,
@@ -123,7 +130,7 @@ export default function SignUp() {
         if (result.OK) {
           setReady(true);
           showToast(
-            'Usuario creado exitosamente. De click en el botón o cierre el mensaje para ir al ',
+            'Usuario creado exitosamente. De click en el botón o cierre el mensaje para ir a la pantalla de inico de sesión',
             'success',
             undefined,
             () => {
@@ -360,7 +367,7 @@ export default function SignUp() {
           </Grid>
         </Box>
       </Box>
-      <Copyright sx={{ mt: 5 }} />
+      {/*<Copyright sx={{ mt: 5 }} />*/}
       <ToastContainer limit={3} autoClose={3000} />
     </Container>
   );
