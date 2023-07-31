@@ -5,6 +5,7 @@ import TextField from '@mui/material/TextField';
 import ButtomCustom from '../../ButtonRound';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
+import DownloadIcon from '@mui/icons-material/Download';
 import RadioGroup from '@mui/material/RadioGroup';
 import Radio from '@mui/material/Radio';
 import List from '@mui/material/List';
@@ -14,6 +15,7 @@ import Box from '@mui/material/Box';
 import Badge from '@mui/material/Badge';
 import FormControlLabel from '@mui/material/FormControlLabel';
 import LiveHelpIcon from '@mui/icons-material/LiveHelp';
+import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import { styled } from '@mui/material/styles';
@@ -22,10 +24,12 @@ import Tooltip, { TooltipProps, tooltipClasses } from '@mui/material/Tooltip';
 import RadioQuestion from '../components/RadioQuestion';
 import AlertModal from '../components/AlertModal';
 import TestTitle from '../TestTitle';
+import BarChart from '../../BarChart';
 import parse from 'html-react-parser';
 import { useSelector } from 'react-redux';
 import { getPathCourseResource } from '../../../utils/electronFunctions';
 import { sqlite3All, sqlite3Run, sqlite3InsertBulk } from '../../../helpers/Sqlite3Operations';
+import exportDiscPdf from '../../../helpers/ExportPDF';
 import { ToastContainer } from 'react-toastify';
 import OverlayLoader from '../../OverlayLoader';
 import { showToast } from '../../../utils/toast';
@@ -43,6 +47,8 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
   const categoryResponseArray = useRef([]);
   const [testSaved, setTestSaved] = useState(false);
   const [unitLessons, setUnitLessons] = useState([]);
+  const [maxWidthModal, setWidthModal] = useState("sm");
+  const radarChartRef = useRef(null);
   const [modalInitData, setModalInitData] = useState({
     title: '',
     content: '',
@@ -486,6 +492,82 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     )
   }
 
+  const downloadDISCFile = async(type, str) => {
+
+    const filePath = type == "course" ? `/disc.asar/${courseCode}/DISC_${str}.pdf` : `/disc.asar/Nivel_DISC_${str}.pdf`
+
+    const userFullName = authState && authState.user ? authState.user.nombre_completo : 'test';
+
+    const objText = {
+      nombre: userFullName
+    }
+
+    const arObjImage = [];
+    if (type == "level") {
+      const img = await radarChartRef.current.getBase64Image()
+      arObjImage.push({
+        imagen: img.imgURI,
+        type: "png"
+      })
+    }
+
+    exportDiscPdf(objText, arObjImage, filePath);
+   
+  }
+
+  const TestDISCResponse = () => {
+    const DISC = {
+      D: 0,
+      I: 0,
+      S: 0,
+      C: 0
+    }
+
+    for (let i = 0; i < answers.length; i++){
+      if (answers[i].value >= 3){
+        const discLetterArray = questions[i].disc.replace(/ /g,"").split(",");
+        for (let j = 0; j < discLetterArray.length; j++) {
+          DISC[discLetterArray[j]] = DISC[discLetterArray[j]] + answers[i].value;
+        }
+      }
+    }
+
+    const sortableDISC = Object.entries(DISC)
+    .sort(([,a],[,b]) => b - a)
+    .reduce((r, [k, v]) => ({ ...r, [k]: v }), {});
+
+    const newKeys = Object.keys(sortableDISC);
+
+    return (
+      <>
+      <Container maxWidth="sm">
+      <Box>
+        <BarChart 
+          ref={radarChartRef}
+          title={'DISC'}
+          series={[
+            {
+              name: "",
+              data: Object.values(DISC)
+            }
+          ]}
+          categories={['D','I','S','C']}
+        />
+      </Box>
+      <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+        <Button onClick={()=>{
+            downloadDISCFile("level", `${newKeys[0]}${newKeys[1]}`)
+        }} startIcon={<DownloadIcon />} variant="contained">Descargar Nivel DISC</Button>
+        <Button onClick={()=>{
+            downloadDISCFile("course", `${newKeys[0]}`)
+        }} startIcon={<DownloadIcon />} variant="contained">Descargar DISC {newKeys[0]}</Button>
+      </Box>
+      </Container>
+      </>
+    )
+  }
+
+
   const COVI_Raiz_amarguraResponse = async () => {
     setModalEndData({
       title: 'Identificando la Raíz de Amargura',
@@ -536,6 +618,16 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
       title: 'AUTOGESTIÓN',
       content: INEMautogestionResponse(),
       buttonText: 'Aceptar',
+    });
+    setOpenModalEnd(true);
+  }
+
+  const Test_DISC_Response = async() => {
+    setWidthModal("lg");
+    setModalEndData({
+      title: 'NIVEL DISC',
+      content: TestDISCResponse(),
+      buttonText: 'Cerrar',
     });
     setOpenModalEnd(true);
   }
@@ -606,21 +698,19 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
         ]);
       }
 
-      console.log(arrayValues)
-
     const deleteBefore = await sqlite3Run(
       `DELETE FROM test_radio_respuestas WHERE cod_test = '${currentTest.cod_test}' AND user_id = '${userId}'`,
       []
-    );
-    console.log(arrayValues)
-    const result = await sqlite3InsertBulk(
-      'INSERT INTO test_radio_respuestas VALUES (?,?,?,?,?)',
-      arrayValues
     );
 
     const result_sublesson = await sqlite3Run(
       "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
       [userId, data.id, currentDate]
+    );
+
+    const result = await sqlite3InsertBulk(
+      'INSERT INTO test_radio_respuestas VALUES (?,?,?,?,?)',
+      arrayValues
     );
 
     onFinalize(true);
@@ -667,6 +757,10 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
 
           case "INEM_autogestion":
             INEM_autogestion_Response();
+          break;
+
+          case "Test_DISC":
+            Test_DISC_Response();
           break;
       }
 
@@ -732,8 +826,11 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
             content={modalEndData.content}
             buttonText={modalEndData.buttonText}
             onButtonClick={() => {
+              setWidthModal("sm");
               setOpenModalEnd(false);
+              radarChartRef.current = null;
             }}
+            maxWidth={maxWidthModal}
           />
         </>
       ) : null}
