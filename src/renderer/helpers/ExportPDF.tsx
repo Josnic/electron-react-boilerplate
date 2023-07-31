@@ -2,7 +2,8 @@ import { PDFDocument } from 'pdf-lib';
 import { getPathCourseResource, getBinaryContent } from '../utils/electronFunctions';
 import * as download from 'downloadjs/download';
 
-const base64ToArrayBuffer = (base64) => {
+const base64ToArrayBuffer = (base64String) => {
+    const base64 = base64String.indexOf(";base64,") != -1 ? base64String.split(";base64,")[1] : base64String
     var binaryString = atob(base64);
     var bytes = new Uint8Array(binaryString.length);
     for (var i = 0; i < binaryString.length; i++) {
@@ -30,7 +31,7 @@ export default async(objText, arObjImage, pdfDocumentPath) => {
         textFieldImage.setImage(embedImage);
     }
     const pdfBytes = await pdfDoc.save();
-    const filenameParts = pdfDocument.split("/");
+    const filenameParts = pdfDocumentPath.split("/");
     const filename = filenameParts[filenameParts.length - 1];
     download(pdfBytes, filename, "application/pdf");
 }

@@ -240,7 +240,7 @@ const TrueFalseTest = ({ data, courseCode, onFinalize, onContinue }) => {
     );
 
     onFinalize(true);
-    console.log(deleteBefore, result, result_sublesson)
+    
   }
 
   const saveTest = async () => {

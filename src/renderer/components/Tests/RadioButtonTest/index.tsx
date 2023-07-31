@@ -506,7 +506,8 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     if (type == "level") {
       const img = await radarChartRef.current.getBase64Image()
       arObjImage.push({
-        grafico_disc: img.imgURI,
+        textField: "grafico_disc",
+        image: img.imgURI,
         type: "png"
       })
     }
@@ -725,7 +726,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     );
 
     onFinalize(true);
-    console.log(deleteBefore, result, result_sublesson)
+    
   }
 
 

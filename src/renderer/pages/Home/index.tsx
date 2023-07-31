@@ -23,7 +23,7 @@ const Home = () => {
   const [percentage, setPercentage] = React.useState(0);
   const navigate = useNavigate();
   const authState = useSelector((state) => state);
-  const userId = authState.user ? authState.user.nombre_completo : "test"
+  const userId = authState.auth.user ? authState.auth.user.nombre_completo : "test"
   const getCourses = async() => {
     const result = await sqlite3All("SELECT * FROM cursos ORDER BY cod_curso ASC");
     console.log(result)
