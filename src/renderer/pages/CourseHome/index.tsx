@@ -263,6 +263,7 @@ export default function CourseHome() {
             }
             renderContent(type, data)
           }}
+          onChangeMenu={getPercentage}
           isFormFinalize={isFormFinalize}
           isTestFinalize={isTestFinalize}
           ref={menuTreeViewRef} 

@@ -121,7 +121,7 @@ export default function MenuHeader({ progress, isCourse, courseCode, handleDrawe
                     </IconButton>
                 }
                 title={userName}
-                subheader={<NumberLinearProgress value={progress} />}
+                subheader={<NumberLinearProgress value={progress ? progress : 0} />}
               />
           </Box>
         </Toolbar>

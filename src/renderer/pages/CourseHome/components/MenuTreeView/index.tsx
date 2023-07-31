@@ -93,7 +93,7 @@ function StyledTreeItem(props: StyledTreeItemProps) {
 }
 
 const MenuTreeView = React.forwardRef(
-  ({ data, onClickItem, isFormFinalize, isTestFinalize }, ref) => {
+  ({ data, onClickItem, isFormFinalize, isTestFinalize, onChangeMenu }, ref) => {
     const [dataMenu, setDataMenu] = React.useState([]);
     const [selectedNode, setSelectedNode] = React.useState(null);
     const [expanded, setExpanded] = React.useState<string[]>([]);
@@ -293,6 +293,10 @@ const MenuTreeView = React.forwardRef(
     React.useEffect(() => {
       setDataMenu(data);
     }, [data]);
+
+    React.useEffect(()=>{
+      onChangeMenu(dataMenu)
+    }, [dataMenu])
 
     return (
       <TreeView
