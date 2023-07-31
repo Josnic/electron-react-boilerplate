@@ -213,9 +213,11 @@ const TrueFalseTest = ({ data, courseCode, onFinalize, onContinue }) => {
           currentDate,
         ]);
       }
-
-      console.log(arrayValues)
-
+    
+    const result_sublesson = await sqlite3Run(
+      "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
+      [userId, data.id, currentDate]
+    );
     const deleteBefore = await sqlite3Run(
       `DELETE FROM test_vf_respuestas WHERE cod_test = '${currentTest.cod_test}' AND user_id = '${userId}'`,
       []
@@ -226,10 +228,6 @@ const TrueFalseTest = ({ data, courseCode, onFinalize, onContinue }) => {
       arrayValues
     );
 
-    const result_sublesson = await sqlite3Run(
-      "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
-      [userId, data.id, currentDate]
-    );
     onFinalize(true);
     console.log(deleteBefore, result, result_sublesson)
   }

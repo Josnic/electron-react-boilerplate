@@ -232,15 +232,13 @@ const InputNumberTest = ({ data, courseCode, onFinalize, onContinue }) => {
         `DELETE FROM test_inputn_respuestas WHERE cod_test = '${currentTest.cod_test}' AND user_id = '${userId}'`,
         []
       );
-      console.log(arrayValues)
-      const result = await sqlite3InsertBulk(
-        'INSERT INTO test_inputn_respuestas VALUES (?,?,?,?,?)',
-        arrayValues
-      );
-      
       const result_sublesson = await sqlite3Run(
         "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
         [userId, data.id, currentDate]
+      );
+      const result = await sqlite3InsertBulk(
+        'INSERT INTO test_inputn_respuestas VALUES (?,?,?,?,?)',
+        arrayValues
       );
       
       onFinalize(true);
