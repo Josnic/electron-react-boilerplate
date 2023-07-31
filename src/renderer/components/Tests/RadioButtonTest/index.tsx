@@ -703,10 +703,21 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
       []
     );
 
-    const result_sublesson = await sqlite3Run(
-      "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
-      [userId, data.id, currentDate]
-    );
+    const validate = await sqlite3All(`SELECT * FROM sublecciones_vistas WHERE user_id = '${userId}' AND subleccion_id = '${data.id}'`)
+  
+    if (validate.OK){
+      if (validate.OK.length > 0){
+        const result_sublesson = await sqlite3Run(
+          `UPDATE sublecciones_vistas SET num_vista = num_vista + 1, ultima_fecha = '${getMysqlDate()}' WHERE user_id = '${userId}' AND subleccion_id = '${data.id}'`, 
+          []
+        );
+      }else{
+        const result_sublesson = await sqlite3Run(
+          "INSERT INTO sublecciones_vistas VALUES (?,?,?,?)", 
+          [userId, data.id, getMysqlDate(), 1]
+        );
+      }
+    }
 
     const result = await sqlite3InsertBulk(
       'INSERT INTO test_radio_respuestas VALUES (?,?,?,?,?)',

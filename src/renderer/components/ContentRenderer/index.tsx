@@ -18,7 +18,7 @@ import { useSelector } from 'react-redux';
 import { getMysqlDate } from '../../utils/generals';
 import { getPathCourseResource } from '../../utils/electronFunctions';
 import { useStateWithCallback } from '../../hooks/useStateWithCallback';
-import { sqlite3Run } from '../../helpers/Sqlite3Operations';
+import { sqlite3Run, sqlite3All } from '../../helpers/Sqlite3Operations';
 import './styles.scss';
 
 const Audio = ({ playList }) => {
@@ -265,10 +265,24 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
   const insertView = async() => {
     if(type == "SUBLESSON"){
       const userId = authState && authState.user ? authState.user.email : "test";
-      const result = await sqlite3Run(
-        "INSERT INTO sublecciones_vistas VALUES (?,?,?)", 
-        [userId, data.id, getMysqlDate()]
-      );
+
+      const validate = await sqlite3All(`SELECT * FROM sublecciones_vistas WHERE user_id = '${userId}' AND subleccion_id = '${data.id}'`)
+      console.log(validate.OK.length)
+      if (validate.OK){
+        if (validate.OK.length > 0){
+          const result = await sqlite3Run(
+            `UPDATE sublecciones_vistas SET num_vista = num_vista + 1, ultima_fecha = '${getMysqlDate()}' WHERE user_id = '${userId}' AND subleccion_id = '${data.id}'`, 
+            []
+          );
+          console.log(result)
+        }else{
+          const result = await sqlite3Run(
+            "INSERT INTO sublecciones_vistas VALUES (?,?,?,?)", 
+            [userId, data.id, getMysqlDate(), 1]
+          );
+          console.log(result)
+        }
+      }
     }
   }
 
