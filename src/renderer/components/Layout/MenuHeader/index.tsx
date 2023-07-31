@@ -66,8 +66,8 @@ export default function MenuHeader({ progress, isCourse, courseCode, handleDrawe
     }
 
     if (arName.length >= 2){
-      return arName[0][0] && arName[0][0] != "" ? (arName[0][0]).toUpperCase() : "U"
-      + arName[1][0] && arName[1][0] != "" ? (arName[1][0]).toUpperCase() : "";
+      return (arName[0][0] && arName[0][0] != "" ? (arName[0][0]).toUpperCase() : "U")
+      + (arName[1][0] && arName[1][0] != "" ? (arName[1][0]).toUpperCase() : "");
     }
   }
 
