@@ -6,6 +6,7 @@ import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
 import Avatar from '@mui/material/Avatar';
+import { useSelector } from 'react-redux';
 import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgress';
 import CardHeader from '@mui/material/CardHeader';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -39,7 +40,24 @@ const NumberLinearProgress = (props) =>{
 }
 
 
-export default function MenuHeader({ username, progress, isCourse, handleDrawerOpen, open }) {
+export default function MenuHeader({ progress, isCourse, courseCode, handleDrawerOpen, open }) {
+  const authState = useSelector((state) => state);
+  const userName = authState.user ? authState.user.nombre_completo : "test";
+  const processNameForAvatar = (fullName) => {
+    const arName = fullName.split(" ");
+    if (arName.length == 0){
+      return "U";
+    }
+
+    if (arName.length == 1){
+      return arName[0][0] && arName[0][0] != "" ? (arName[0][0]).toUpperCase() : "U";
+    }
+
+    if (arName.length >= 2){
+      return arName[0][0] && arName[0][0] != "" ? (arName[0][0]).toUpperCase() : "U"
+      + arName[1][0] && arName[1][0] != "" ? (arName[1][0]).toUpperCase() : "";
+    }
+  }
   return (
       <AppBar position="absolute">
         <Toolbar disableGutters>
@@ -82,11 +100,11 @@ export default function MenuHeader({ username, progress, isCourse, handleDrawerO
               <CardHeader
                 avatar={
                     <IconButton sx={{ p: 0, display: { md: 'flex' } }}>
-                      <Avatar alt="Remy Sharp" src="https://mui.com/static/images/avatar/2.jpg" />
+                      <Avatar>{processNameForAvatar(userName)}</Avatar>
                     </IconButton>
                 }
-                title={"nombre de usuario"}
-                subheader={<NumberLinearProgress value={50} />}
+                title={userName}
+                subheader={<NumberLinearProgress value={progress} />}
               />
           </Box>
         </Toolbar>

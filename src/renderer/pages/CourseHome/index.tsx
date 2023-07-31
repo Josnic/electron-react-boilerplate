@@ -107,10 +107,30 @@ export default function CourseHome() {
   const { courseCode } = useParams();
   const [isFormFinalize, setIsFormFinalize] = React.useState(false);
   const [isTestFinalize, setIsTestFinalize] = React.useState(false);
+  const [percentage, setPercentage] = React.useState(0);
 
   const handleDrawerClose = () => {
     setOpen(false);
   };
+
+  const getPercentage = (data) => {
+    const percentages = [];
+    for (let i = 0; i < data.length; i++){
+      if (data[i].lessons && data[i].lessons.length > 0){
+        for (let j = 0; j < data[i].lessons.length;j++){
+          if (data[i].lessons[j].sublessons && data[i].lessons[j].sublessons.length > 0){
+            const ar = data[i].lessons[j].sublessons.filter(ele => ele.viewed == 1);
+            percentages.push((ar.length * 100) / data[i].lessons[j].sublessons.length)
+          }
+        }
+      }
+    }
+
+    const finalPercentage = percentages.reduce((accumulator, value) => {
+      return accumulator + value;
+    }, 0);
+    setPercentage(parseInt(finalPercentage / percentages.length))
+  }
 
   const checkLesson = (lesson) => {
     return lesson.sublessons &&
@@ -154,6 +174,8 @@ export default function CourseHome() {
         
       }
     }
+    console.log(dataMenu)
+    getPercentage(dataMenu);
     setDataMenu(dataMenu);
     console.log(dataMenu)
   }
@@ -193,6 +215,8 @@ export default function CourseHome() {
           handleDrawerOpen={handleDrawerOpen}
           open={open}
           isCourse={true}
+          progress={percentage}
+          courseCode={courseCode}
         />
       </AppBar>
       <Drawer
