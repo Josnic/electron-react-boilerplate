@@ -12,7 +12,7 @@ import './styles.scss';
 const BarChart = forwardRef(({ title, series, categories }, ref) => {
   const chartInstance = useRef();
 
-  var colors = ['#FF4560', '#FEB019', '#00E396', '#008FFB'];
+  var colors = ['#BD2230', '#F8B237', '#138F38', '#0F70B7'];
 
   const state = {
     series: series,
@@ -84,7 +84,7 @@ const BarChart = forwardRef(({ title, series, categories }, ref) => {
   };
 
   const getBase64Image = async () => {
-    return await hartInstance.current.chart.dataURI();
+    return await chartInstance.current.chart.dataURI();
   };
 
   React.useImperativeHandle(ref, () => ({
