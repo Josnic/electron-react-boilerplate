@@ -152,7 +152,7 @@ export default function CourseHome() {
     const units = await sqlite3All(`SELECT *, 0 AS viewed, imagen_unid AS imagen, video AS videos FROM unidades WHERE cod_curso = '${courseCode}' ORDER BY orden ASC`);
     let dataMenu = [];
     const userId =
-    authState && authState.user ? authState.user.email : 'test';
+    authState && authState.auth.user ? authState.auth.user.email : 'test';
     if (units.OK){
       dataMenu = units.OK;
       setUnits(units.OK);

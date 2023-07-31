@@ -264,7 +264,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
 
   const insertView = async() => {
     if(type == "SUBLESSON"){
-      const userId = authState && authState.user ? authState.user.email : "test";
+      const userId = authState && authState.auth.user ? authState.auth.user.email : "test";
 
       const validate = await sqlite3All(`SELECT * FROM sublecciones_vistas WHERE user_id = '${userId}' AND subleccion_id = '${data.id}'`)
       console.log(validate.OK.length)

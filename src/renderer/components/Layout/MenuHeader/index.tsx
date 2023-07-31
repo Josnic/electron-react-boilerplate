@@ -43,7 +43,7 @@ const NumberLinearProgress = (props) =>{
 
 export default function MenuHeader({ progress, isCourse, courseCode, handleDrawerOpen, open }) {
   const authState = useSelector((state) => state);
-  const userName = authState.user ? authState.user.nombre_completo : "test";
+  const userName = authState.auth.user ? authState.auth.user.nombre_completo : "test";
   const [imgCourse, setImageCourse] = React.useState(null);
   const [imgApp, setImageApp] = React.useState(null);
   const getImageCourse = async() => {

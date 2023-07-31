@@ -145,7 +145,7 @@ const TrueFalseTest = ({ data, courseCode, onFinalize, onContinue }) => {
 
       console.log(questions);
 
-      const userId = authState && authState.user ? authState.user.email : 'test';
+      const userId = authState && authState.auth.user ? authState.auth.user.email : 'test';
 
       const answersTest = await sqlite3All(
         `SELECT * FROM test_vf_respuestas WHERE cod_test = '${data.test_id}' AND user_id = '${userId}'`
@@ -200,7 +200,7 @@ const TrueFalseTest = ({ data, courseCode, onFinalize, onContinue }) => {
   const insertDataTest = async () => {
 
     const userId =
-        authState && authState.user ? authState.user.email : 'test';
+        authState && authState.auth.user ? authState.auth.user.email : 'test';
       const currentDate = getMysqlDate();
       const arrayValues = [];
 

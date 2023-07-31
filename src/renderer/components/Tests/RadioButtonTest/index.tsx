@@ -177,7 +177,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
         WHERE tests_preguntas_radio.cod_test = '${data.test_id}' ${orderType}`
       );
 
-      const userId = authState && authState.user ? authState.user.email : 'test';
+      const userId = authState && authState.auth.user ? authState.auth.user.email : 'test';
 
       const answersTest = await sqlite3All(
         `SELECT * FROM test_radio_respuestas WHERE cod_test = '${data.test_id}' AND user_id = '${userId}'`
@@ -496,7 +496,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
 
     const filePath = type == "course" ? `/disc.asar/${courseCode}/DISC_${str}.pdf` : `/disc.asar/Nivel_DISC_${str}.pdf`
 
-    const userFullName = authState && authState.user ? authState.user.nombre_completo : 'test';
+    const userFullName = authState && authState.auth.user ? authState.auth.user.nombre_completo : 'test';
 
     const objText = {
       nombre_usuario: userFullName
@@ -684,7 +684,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
   const insertDataTest = async () => {
 
     const userId =
-        authState && authState.user ? authState.user.email : 'test';
+        authState && authState.auth.user ? authState.auth.user.email : 'test';
       const currentDate = getMysqlDate();
       const arrayValues = [];
 

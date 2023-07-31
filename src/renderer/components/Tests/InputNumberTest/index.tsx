@@ -214,7 +214,7 @@ const InputNumberTest = ({ data, courseCode, onFinalize, onContinue }) => {
     if (canSaving) {
 
       const userId =
-        authState && authState.user ? authState.user.email : 'test';
+        authState && authState.auth.user ? authState.auth.user.email : 'test';
       const currentDate = getMysqlDate();
       const arrayValues = [];
 
@@ -339,7 +339,7 @@ const InputNumberTest = ({ data, courseCode, onFinalize, onContinue }) => {
       WHERE tests_preguntas_inputn.cod_test = '${data.test_id}' ORDER BY tests_categorias_preguntas.orden, tests_preguntas_inputn.orden ASC`
     );
 
-    const userId = authState && authState.user ? authState.user.email : 'test';
+    const userId = authState && authState.auth.user ? authState.auth.user.email : 'test';
 
     const answersTest = await sqlite3All(
       `SELECT * FROM test_inputn_respuestas WHERE cod_test = '${data.test_id}' AND user_id = '${userId}'`

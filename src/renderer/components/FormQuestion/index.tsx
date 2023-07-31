@@ -61,7 +61,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
       `SELECT * FROM formularios_detalles WHERE cod_formulario = '${data.cod_formulario}' ORDER BY orden ASC`
     );
 
-    const userId = authState && authState.user ? authState.user.email : 'test';
+    const userId = authState && authState.auth.user ? authState.auth.user.email : 'test';
 
     const answersForm = await sqlite3All(
       `SELECT * FROM formulario_respuesta WHERE cod_formulario = '${data.cod_formulario}' AND user_id = '${userId}'`
@@ -202,7 +202,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
       setOpen(true);
 
       const userId =
-        authState && authState.user ? authState.user.email : 'test';
+        authState && authState.auth.user ? authState.auth.user.email : 'test';
       const currentDate = getMysqlDate();
       const arrayValues = [];
 
