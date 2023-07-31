@@ -499,14 +499,14 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     const userFullName = authState && authState.user ? authState.user.nombre_completo : 'test';
 
     const objText = {
-      nombre: userFullName
+      nombre_usuario: userFullName
     }
 
     const arObjImage = [];
     if (type == "level") {
       const img = await radarChartRef.current.getBase64Image()
       arObjImage.push({
-        imagen: img.imgURI,
+        grafico_disc: img.imgURI,
         type: "png"
       })
     }
