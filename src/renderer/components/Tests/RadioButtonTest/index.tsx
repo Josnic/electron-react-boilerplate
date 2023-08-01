@@ -545,7 +545,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
       <Box>
         <BarChart 
           ref={radarChartRef}
-          title={'DISC'}
+          title={''}
           series={[
             {
               name: "",
