@@ -52,6 +52,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
   };
 
   const loadFormDetails = async () => {
+    setFormSaved(false);
     const form = await sqlite3All(
       `SELECT * FROM formularios WHERE cod_formulario = '${data.cod_formulario}' LIMIT 1`
     );
@@ -169,6 +170,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
     setQuestions([]);
     setHeader(null);
     setFooter(null);
+    setFormSaved(false);
   }, []);
 
   useEffect(() => {
