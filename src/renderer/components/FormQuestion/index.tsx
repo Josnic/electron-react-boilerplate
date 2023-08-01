@@ -91,23 +91,22 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
         const questionSAr = questions.OK.filter(
           (ele) => ele.id_pregunta_viene > 0
         );
+        console.log(questionSAr)
         if (questionSAr.length > 0) {
           const respTemp = Array(questions.OK.length).fill({
             questionId: null,
             answerText: '',
             index: null,
           });
-          const ids = questionSAr.map((ele) => ele.id_pregunta);
+          const ids = questionSAr.map((ele) => ele.id_pregunta_viene);
           const question2 = await sqlite3All(
-            `SELECT * FROM formulario_respuesta WHERE cod_formulario = '${
-              data.cod_formulario
-            }' AND id_pregunta IN (${ids.join(',')})`
+            `SELECT * FROM formulario_respuesta WHERE id_pregunta IN (${ids.join(',')}) GROUP BY id_pregunta`
           );
           console.log(question2);
           if (question2.OK && question2.OK.length > 0) {
             for (let i = 0; i < question2.OK.length; i++) {
               const indext = questions.OK.findIndex(
-                (ele) => ele.id_pregunta == question2.OK[i].id_pregunta
+                (ele) => ele.id_pregunta_viene == question2.OK[i].id_pregunta
               );
               respTemp[indext] = {
                 questionId: question2.OK[i].id_pregunta,
