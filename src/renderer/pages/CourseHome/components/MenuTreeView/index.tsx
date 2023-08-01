@@ -172,7 +172,6 @@ const MenuTreeView = React.forwardRef(
             dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
               parseInt(selectedNodeParts[2])
             ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
-            setDataMenu(dataMenuCopy);
           }
 
           if (
@@ -184,7 +183,6 @@ const MenuTreeView = React.forwardRef(
             dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
               parseInt(selectedNodeParts[2])
             ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
-            setDataMenu(dataMenuCopy);
           }
 
           if (
@@ -196,8 +194,18 @@ const MenuTreeView = React.forwardRef(
             dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
               parseInt(selectedNodeParts[2])
             ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
-            setDataMenu(dataMenuCopy);
           }
+          for (let i = 0; i < dataMenuCopy.length; i++){
+            if (dataMenuCopy[i].lessons && dataMenuCopy[i].lessons.length > 0){
+              for (let j = 0; j < dataMenuCopy[i].lessons.length;j++){
+                dataMenuCopy[i].lessons[j]["viewed"] = checkLesson(dataMenuCopy[i].lessons[j]) ? 1 : 0;
+              }
+              dataMenuCopy[i]["viewed"] = checkUnit(dataMenuCopy[i])
+            }
+          }
+
+          onChangeMenu(dataMenuCopy);
+          setDataMenu(dataMenuCopy);
         }
       }
 
@@ -239,7 +247,6 @@ const MenuTreeView = React.forwardRef(
               dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
                 parseInt(selectedNodeParts[2])
               ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
-              setDataMenu(dataMenuCopy);
             }
 
             if (
@@ -251,7 +258,6 @@ const MenuTreeView = React.forwardRef(
               dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
                 parseInt(selectedNodeParts[2])
               ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
-              setDataMenu(dataMenuCopy);
             }
 
             if (
@@ -263,8 +269,19 @@ const MenuTreeView = React.forwardRef(
               dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
                 parseInt(selectedNodeParts[2])
               ].sublessons[parseInt(selectedNodeParts[3])].viewed = 1;
-              setDataMenu(dataMenuCopy);
             }
+
+            for (let i = 0; i < dataMenuCopy.length; i++){
+              if (dataMenuCopy[i].lessons && dataMenuCopy[i].lessons.length > 0){
+                for (let j = 0; j < dataMenuCopy[i].lessons.length;j++){
+                  dataMenuCopy[i].lessons[j]["viewed"] = checkLesson(dataMenuCopy[i].lessons[j]) ? 1 : 0;
+                }
+                dataMenuCopy[i]["viewed"] = checkUnit(dataMenuCopy[i])
+              }
+            }
+
+            onChangeMenu(dataMenuCopy);
+            setDataMenu(dataMenuCopy);
           }
         }
       }
@@ -294,10 +311,6 @@ const MenuTreeView = React.forwardRef(
       setDataMenu(data);
     }, [data]);
 
-    React.useEffect(()=>{
-      onChangeMenu(dataMenu)
-    }, [dataMenu])
-
     return (
       <TreeView
         id={'tree-view-menu'}
@@ -320,7 +333,7 @@ const MenuTreeView = React.forwardRef(
               labelIcon={
                 unit.lessons.length == 0
                   ? null
-                  : checkLesson(unit) || unit.viewed == 1
+                  : checkUnit(unit) || unit.viewed == 1
                   ? CheckBoxOutlinedIcon
                   : CheckBoxOutlineBlankOutlinedIcon
               }
