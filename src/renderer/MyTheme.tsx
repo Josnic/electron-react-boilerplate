@@ -10,6 +10,9 @@ export const themeOptions: ThemeOptions = {
     },
     secondary: {
       main: '#1285AB',
+    },
+    warning: {
+      main: '#dc6600'
     }
   },
   components: {

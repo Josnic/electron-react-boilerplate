@@ -558,10 +558,10 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
       <Box sx={{ display: "flex", justifyContent: "space-between" }}>
         <Button onClick={()=>{
             downloadDISCFile("level", `${newKeys[0]}${newKeys[1]}`)
-        }} startIcon={<DownloadIcon />} variant="contained">Descargar Nivel DISC</Button>
+        }} startIcon={<DownloadIcon />} variant="contained" color={"warning"}>PDF Temperamento</Button>
         <Button onClick={()=>{
             downloadDISCFile("course", `${newKeys[0]}`)
-        }} startIcon={<DownloadIcon />} variant="contained">Descargar DISC {newKeys[0]}</Button>
+        }} startIcon={<DownloadIcon />} variant="contained" color={"warning"}>PDF comportamiento</Button>
       </Box>
       </Container>
       </>
