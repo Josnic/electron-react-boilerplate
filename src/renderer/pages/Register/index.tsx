@@ -91,7 +91,7 @@ export default function SignUp() {
     const password = data.get('password').trim();
     const password_repeat = data.get('password_repeat').trim();
     const birthday = startDate ? formatDate(startDate) : '';
-    console.log(sha256Encode(password))
+
     if (
       email == '' ||
       email_repeat == '' ||
@@ -211,7 +211,6 @@ export default function SignUp() {
                 id="birthday"
                 label="Fecha de nacimiento"
                 onClick={handleClick}
-                onBlur={(e)=>{setIsOpen(false)}}
                 value={formatDate(startDate)}
                 inputProps={
                   { readOnly: true, }
@@ -281,7 +280,6 @@ export default function SignUp() {
                     </IconButton>
                   </div>
                 )}
-                selected={startDate}
               />
               ):(null)}
             </Grid>
