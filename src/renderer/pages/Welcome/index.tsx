@@ -34,7 +34,7 @@ export default function Welcome() {
               autoMini: true,
               screenshot: true,
               setting: true,
-              loop: true,
+              loop: false,
               flip: true,
               playbackRate: true,
               aspectRatio: true,
