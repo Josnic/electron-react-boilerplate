@@ -14,7 +14,7 @@ export default function Welcome() {
   const [urlVideo, setUrlVideo] = React.useState(null);
 
   const getUrlVideo = async() => {
-    const video = await getPathCourseResource('commonassets/bienvenida.mp4');
+    const video = await getPathCourseResource('commonassets/intro.mp4');
     setUrlVideo(video);
   }
 
