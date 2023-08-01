@@ -127,6 +127,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
         }
       }
     } else {
+      setAnswers([]);
       setQuestions([]);
     }
     const path = courseCode;
@@ -159,12 +160,13 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
 
   useEffect(() => {
     if (data) {
-      setAnswers([]);
       loadFormDetails();
     }
   }, [data]);
 
   useEffect(() => {
+    setAnswers([]);
+    setQuestions([]);
     setHeader(null);
     setFooter(null);
   }, []);
@@ -285,7 +287,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
           {questions && questions.length > 0 ? (
             <div key={'container'}>
               {questions.map((question, index) => (
-                <div key={question.id} className="question-container-form">
+                <div key={question.id_pregunta} className="question-container-form">
                   <div className="question">
                     <div>{parse(question.pregunta)}</div>
                   </div>
@@ -299,7 +301,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
                             ? false
                             : true
                         }
-                        key={question.id}
+                        key={question.id_pregunta}
                         rows={3}
                         defaultValue={
                           answers[index] && answers[index].answerText
