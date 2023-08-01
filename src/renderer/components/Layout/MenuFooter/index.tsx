@@ -84,14 +84,14 @@ export default function MenuFooter({ isCourse, open }) {
         return <CardMembershipIcon sx={{ color: color }} />;
       },
     },
-    {
+    /*{
       id: 'downloads',
       text: 'Centro de descargas',
       hidden: isCourse ? false : true,
       icon: (color) => {
         return <CloudDownloadIcon sx={{ color: color }} />;
       },
-    }
+    }*/
   ];
 
   const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
