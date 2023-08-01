@@ -48,7 +48,7 @@ export default function SignUp() {
   const getYear = (date) => {
     return date.getYear();
   };
-  const years = range(1990, new Date().getFullYear() + 1, 1);
+  const years = range(1920, new Date().getFullYear() + 1, 1);
   const months = [
     'Enero',
     'Febrero',
