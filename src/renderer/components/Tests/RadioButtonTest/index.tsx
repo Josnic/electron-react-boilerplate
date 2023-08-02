@@ -499,7 +499,10 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     const userFullName = authState && authState.auth.user ? authState.auth.user.nombre_completo : 'test';
 
     const objText = {
-      nombre_usuario: userFullName
+      nombre_usuario: {
+        value: userFullName,
+        textAlign: "Center"
+      }
     }
 
     const arObjImage = [];
@@ -508,7 +511,8 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
       arObjImage.push({
         textField: "grafico_disc",
         image: img.imgURI,
-        type: "png"
+        type: "png",
+        textAlign: "Center"
       })
     }
 
