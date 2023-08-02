@@ -139,9 +139,9 @@ export default function MenuFooter({ isCourse, open, courseCode }) {
           }
         }
 
-        if (courseconfiguration.constancia_porc_lecciones >= parseInt(constancia_porc_lecciones.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0))  &&
-          courseconfiguration.constancia_porc_formularios >= parseInt(constancia_porc_formularios.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0)) &&
-          courseconfiguration.constancia_porc_tests >= parseInt(constancia_porc_tests.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0))
+        if (courseconfiguration.constancia_porc_lecciones <= parseInt(constancia_porc_lecciones.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0))  &&
+          courseconfiguration.constancia_porc_formularios <= parseInt(constancia_porc_formularios.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0)) &&
+          courseconfiguration.constancia_porc_tests <= parseInt(constancia_porc_tests.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0))
         ){
           const filePath = `/constancias.asar/${courseCode}.pdf`
 

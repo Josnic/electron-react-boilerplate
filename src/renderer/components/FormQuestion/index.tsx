@@ -288,7 +288,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
           {questions && questions.length > 0 ? (
             <div key={'container'}>
               {questions.map((question, index) => (
-                <div key={question.id_pregunta} className="question-container-form">
+                <div key={Math.random()} className="question-container-form">
                   <div className="question">
                     <div>{parse(question.pregunta)}</div>
                   </div>
@@ -302,7 +302,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
                             ? false
                             : true
                         }
-                        key={question.id_pregunta}
+                        key={Math.random()}
                         rows={3}
                         defaultValue={
                           answers[index] && answers[index].answerText
