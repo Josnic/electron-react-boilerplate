@@ -166,7 +166,7 @@ export default function MenuFooter({ isCourse, open, courseCode }) {
               value: userFullName,
               fontFamily: "BonheurRoyale-Regular",
               textAlign: "Center",
-              fontSize: 38
+              fontSize: 25
             },
             identificacion: {
               value: authState && authState.auth.user ? authState.auth.user.documento : 'test',
@@ -188,50 +188,6 @@ export default function MenuFooter({ isCourse, open, courseCode }) {
 
           exportDiscPdf(objText, [], filePath, customFonts);
         }else{
-          const filePath = `/constancias.asar/${courseCode}.pdf`
-
-          const userFullName = authState && authState.auth.user ? authState.auth.user.nombre_completo : 'test';
-          const today = formatDate(new Date(getMysqlDate())).split("-");
-          const months = [
-            "Enero", "Febrero", "Marzo",
-            "Abril", "Mayo", "Junio", "Julio",
-            "Agosto", "Septiembre", "Octubre",
-            "Noviembre", "Diciembre"
-          ]
-
-          const customFonts = [
-            {
-              name: "BonheurRoyale-Regular",
-              font: '/commonassets/BonheurRoyale-Regular.ttf'
-            }
-          ]
-
-          const objText = {
-            nombre: {
-              value: userFullName,
-              fontFamily: "BonheurRoyale-Regular",
-              textAlign: "Center",
-              fontSize: 38
-            },
-            identificacion: {
-              value: authState && authState.auth.user ? authState.auth.user.documento : 'test',
-              textAlign: "Center"
-            },
-            dia: {
-              value: today[2],
-              textAlign: "Center"
-            },
-            mes: {
-              value: months[parseInt(today[1]) - 1].toLowerCase(),
-              textAlign: "Center"
-            },
-            ano: {
-              value: today[0],
-              textAlign: "Center"
-            },
-          }
-
-          exportDiscPdf(objText, [], filePath, customFonts);
           showToast('No es posible generar la constancia ya que te falta realizar actividades.');
         }
 
