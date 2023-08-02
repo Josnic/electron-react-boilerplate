@@ -361,7 +361,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
       return accumulator + object.value;
     }, 0);
     let msg = "";
-    if (sumAnswer > 40){
+    if (sumAnswer < 40){
       msg = "Necesitas mejorar tu nivel de asertividad";
     }
     if (sumAnswer >= 40 && sumAnswer <= 52){
