@@ -93,11 +93,18 @@ export default function MenuHeader({ progress, isCourse, courseCode, handleDrawe
               null
             )
           }
-          <Avatar
-            variant="square"
-            src={imgApp}
-            sx={{ display: { xs: 'none', md: 'flex' }, width: 156, height: 'auto' }}
-          />
+          {
+            imgApp ? (
+              <Avatar
+                variant="square"
+                src={imgApp}
+                sx={{ display: { xs: 'none', md: 'flex' }, width: 156, height: 'auto' }}
+              />
+            ):(
+              null
+            )
+          }
+          
           <Box sx={{ flexGrow: 0.5 }} />
           <Box sx={{ display: { xs: 'none', md: 'flex' } }}>
             {
