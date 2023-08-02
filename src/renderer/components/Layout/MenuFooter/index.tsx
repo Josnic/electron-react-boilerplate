@@ -19,16 +19,20 @@ import ExitToAppIcon from '@mui/icons-material/ExitToApp';
 import CardMembershipIcon from '@mui/icons-material/CardMembership';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import LanguageIcon from '@mui/icons-material/Language';
+import { ToastContainer } from 'react-toastify';
 import { styled, useTheme } from '@mui/material/styles';
+import OverlayLoader from '../../OverlayLoader';
 import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
-
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-
+import { formatDate, getMysqlDate } from '../../../utils/generals';
 import AuthTypes from '../../../redux/constants';
-import { openSystemBrowser } from '../../../utils/electronFunctions';
+import { openSystemBrowser, getPathCourseResource } from '../../../utils/electronFunctions';
+import { showToast } from '../../../utils/toast';
+import { sqlite3Run, sqlite3All } from '../../../helpers/Sqlite3Operations';
+import exportDiscPdf from '../../../helpers/ExportPDF';
 const drawerWidth = 300;
 
 const AppBar = styled(MuiAppBar, {
@@ -48,16 +52,198 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-export default function MenuFooter({ isCourse, open }) {
+export default function MenuFooter({ isCourse, open, courseCode }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-
+  const authState = useSelector((state) => state);
+  const [openLoader, setOpenLoader] = React.useState(false);
   const closeSession = () => {
     dispatch({
       type: AuthTypes.LOGOUT,
     });
     navigate('/');
   };
+
+  const checkLesson = (lesson) => {
+    return lesson.sublessons &&
+          Array.isArray(lesson.sublessons) &&
+          lesson.sublessons.length > 0 &&
+          lesson.sublessons.filter(ele => ele.viewed == 0).length == 0
+  }
+
+  const checkUnit = (unit) => {
+    return unit.lessons &&
+          Array.isArray(unit.lessons) &&
+          unit.lessons.length > 0 &&
+          unit.lessons.filter(ele => ele.viewed == 0).length == 0
+  }
+
+  const getContance = async() => {
+    setOpenLoader(true);
+    const constancia_porc_lecciones = [];
+    const constancia_porc_formularios = [];
+    const constancia_porc_tests = [];
+    const userId = authState && authState.auth.user ? authState.auth.user.email : "test";
+    const units = await sqlite3All(`SELECT *, 0 AS viewed, imagen_unid AS imagen, video AS videos FROM unidades WHERE cod_curso = '${courseCode}' ORDER BY orden ASC`);
+    if (units.OK){
+      const dataMenu = units.OK;
+      for (let i = 0; i < dataMenu.length; i++) {
+        const lessons = await sqlite3All(`SELECT *, objetivo AS contenido, 0 AS viewed  FROM lecciones WHERE cod_unidad = '${dataMenu[i].cod_unidad}' ORDER BY cod_leccion ASC`);
+        if (lessons.OK){
+          for (let j = 0; j < lessons.OK.length; j++) {
+            const sublessons = await sqlite3All(`SELECT *, '${dataMenu[i].cod_unidad}' AS cod_unidad, 
+            (SELECT COUNT(subleccion_id) FROM sublecciones_vistas WHERE sublecciones_vistas.subleccion_id = sublecciones.id AND user_id = '${userId}') AS viewed,
+            CASE WHEN test_id IS NULL THEN '' ELSE (SELECT test_tipo FROM tests WHERE cod_test = test_id) END AS test_tipo 
+            FROM sublecciones 
+            WHERE cod_leccion = '${lessons.OK[j].cod_leccion}' ORDER BY orden ASC`);
+            if (sublessons.OK){
+              lessons.OK[j]["sublessons"] = sublessons.OK;
+              lessons.OK[j]["viewed"] = checkLesson(lessons.OK[j]) ? 1 : 0;
+            }else{
+              lessons.OK[j]["sublessons"] = [];
+              lessons.OK[j]["viewed"] = 1;
+            }
+          }
+          dataMenu[i]["lessons"] = lessons.OK;
+          dataMenu[i]["viewed"] = checkUnit(dataMenu[i])
+        }else{
+          dataMenu[i]["lessons"] = [];
+          dataMenu[i]["viewed"] = 1;
+        }
+      }
+
+      const configuration = await sqlite3All(`SELECT * FROM configuracion WHERE cod_curso = '${courseCode}' LIMIT 1`);
+      console.log(configuration)
+      if (configuration.OK && configuration.OK.length > 0){
+        const courseconfiguration = configuration.OK[0];
+
+        for (let i = 0; i < dataMenu.length; i++) {
+          if (dataMenu[i].lessons.length > 0){
+            for (let j = 0; j < dataMenu[i].lessons.length; j++) {
+              if (dataMenu[i].lessons[j].sublessons.length > 0){
+                const sublessons = dataMenu[i].lessons[j].sublessons;
+                const tests = sublessons.filter(ele => ele.test_id && ele.test_id != "");
+                const forms = sublessons.filter(ele => ele.cod_formulario && ele.cod_formulario != "");
+                const restlessons = sublessons.filter(ele => !ele.cod_formulario && !ele.test_id);
+                if (restlessons.length > 0){
+                  constancia_porc_lecciones.push( (restlessons.filter(ele => ele.viewed == 1).length * 100 ) /  restlessons.length);
+                }
+                if (forms.length > 0){
+                  constancia_porc_formularios.push( (forms.filter(ele => ele.viewed == 1).length * 100 ) /  forms.length);
+                }
+                if (tests.length > 0){
+                  constancia_porc_tests.push((tests.filter(ele => ele.viewed == 1).length * 100 ) /  tests.length);
+                }
+              }
+            }
+          }
+        }
+
+        if (courseconfiguration.constancia_porc_lecciones >= parseInt(constancia_porc_lecciones.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0))  &&
+          courseconfiguration.constancia_porc_formularios >= parseInt(constancia_porc_formularios.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0)) &&
+          courseconfiguration.constancia_porc_tests >= parseInt(constancia_porc_tests.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0))
+        ){
+          const filePath = `/constancias.asar/${courseCode}.pdf`
+
+          const userFullName = authState && authState.auth.user ? authState.auth.user.nombre_completo : 'test';
+          const today = formatDate(new Date(getMysqlDate())).split("-");
+          const months = [
+            "Enero", "Febrero", "Marzo",
+            "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre",
+            "Noviembre", "Diciembre"
+          ]
+
+          const customFonts = [
+            {
+              name: "BonheurRoyale-Regular",
+              font: '/commonassets/BonheurRoyale-Regular.ttf'
+            }
+          ]
+
+          const objText = {
+            nombre: {
+              value: userFullName,
+              fontFamily: "BonheurRoyale-Regular",
+              textAlign: "Center",
+              fontSize: 38
+            },
+            identificacion: {
+              value: authState && authState.auth.user ? authState.auth.user.documento : 'test',
+              textAlign: "Center"
+            },
+            dia: {
+              value: today[2],
+              textAlign: "Center"
+            },
+            mes: {
+              value: months[parseInt(today[1]) - 1].toLowerCase(),
+              textAlign: "Center"
+            },
+            ano: {
+              value: today[0],
+              textAlign: "Center"
+            },
+          }
+
+          exportDiscPdf(objText, [], filePath, customFonts);
+        }else{
+          const filePath = `/constancias.asar/${courseCode}.pdf`
+
+          const userFullName = authState && authState.auth.user ? authState.auth.user.nombre_completo : 'test';
+          const today = formatDate(new Date(getMysqlDate())).split("-");
+          const months = [
+            "Enero", "Febrero", "Marzo",
+            "Abril", "Mayo", "Junio", "Julio",
+            "Agosto", "Septiembre", "Octubre",
+            "Noviembre", "Diciembre"
+          ]
+
+          const customFonts = [
+            {
+              name: "BonheurRoyale-Regular",
+              font: '/commonassets/BonheurRoyale-Regular.ttf'
+            }
+          ]
+
+          const objText = {
+            nombre: {
+              value: userFullName,
+              fontFamily: "BonheurRoyale-Regular",
+              textAlign: "Center",
+              fontSize: 38
+            },
+            identificacion: {
+              value: authState && authState.auth.user ? authState.auth.user.documento : 'test',
+              textAlign: "Center"
+            },
+            dia: {
+              value: today[2],
+              textAlign: "Center"
+            },
+            mes: {
+              value: months[parseInt(today[1]) - 1].toLowerCase(),
+              textAlign: "Center"
+            },
+            ano: {
+              value: today[0],
+              textAlign: "Center"
+            },
+          }
+
+          exportDiscPdf(objText, [], filePath, customFonts);
+          showToast('No es posible generar la constancia ya que te falta realizar actividades.');
+        }
+
+      }else{
+        showToast('Ocurrió un error. Intenta nuevamente.');
+      }
+
+    }else{
+      showToast('Curso sin contenido.');
+    }
+    setOpenLoader(false);
+  }
 
   const pages = [
     {
@@ -105,9 +291,8 @@ export default function MenuFooter({ isCourse, open }) {
     setAnchorElNav(event.currentTarget);
   };
 
-  const handleClickNavMenu = (id) => {
+  const handleClickNavMenu = async(id) => {
     setAnchorElNav(null);
-    let path = '/';
     switch (id) {
       case 'close-session':
         closeSession();
@@ -117,12 +302,12 @@ export default function MenuFooter({ isCourse, open }) {
         break;
 
       case 'certificate':
+        await getContance();
         break;
 
       case 'downloads':
         break;
     }
-    navigate(path);
   };
 
   return (
@@ -132,6 +317,7 @@ export default function MenuFooter({ isCourse, open }) {
       color="primary"
       sx={{ top: 'auto', bottom: 0 }}
     >
+      <OverlayLoader open={openLoader} />
       <Toolbar disableGutters>
         <Box sx={{ flexGrow: 1, display: { xs: 'flex', md: 'none' } }}>
           <IconButton size="large" onClick={handleOpenNavMenu} color="inherit">
@@ -208,6 +394,7 @@ export default function MenuFooter({ isCourse, open }) {
           </MenuItem>
         </Box>
       </Toolbar>
+      <ToastContainer />
     </AppBar>
   );
 }

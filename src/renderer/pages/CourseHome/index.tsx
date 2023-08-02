@@ -381,7 +381,11 @@ export default function CourseHome() {
         </Box>
 
         <Box className="footer">
-          <MenuFooter open={open} isCourse={true} />
+          <MenuFooter 
+            open={open} 
+            isCourse={true} 
+            courseCode={courseCode}
+          />
         </Box>
       </Main>
     </Box>
