@@ -1,4 +1,5 @@
 import sha256 from 'crypto-js/sha256';
+import MD5 from 'crypto-js/md5';
 
 export const validateEmail = (email) => {
   const pattern = '^[a-zA-Z0-9._%-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,4}$';
@@ -29,4 +30,8 @@ export const base64Decode = (str) => {
 
 export const sha256Encode = (str) => {
   return sha256(str).toString();
+}
+
+export const md5Encode = (str) => {
+  return MD5(str).toString();
 }
