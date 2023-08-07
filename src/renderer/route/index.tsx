@@ -7,6 +7,9 @@ import Login from '../pages/Login';
 import Register from '../pages/Register';
 import Home from '../pages/Home';
 import CourseHome from '../pages/CourseHome';
+import Init from '../pages/Init';
+import Activate from '../pages/Activate';
+import RecoveryPasword from '../pages/RecoveryPasword';
 import {
   BrowserRouter,
   Routes,
@@ -30,8 +33,11 @@ const RouteApp = () => {
     <ThemeProvider theme={MyTheme}>
       <Router>
         <Routes>
-          <Route path="/" element={<Welcome />} />
+          <Route path="/" element={<Init />} />
+          <Route path="/welcome" element={<Welcome />} />
+          <Route path="/activation" element={<Activate />} />
           <Route path="/login" element={<Login />} />
+          <Route path="/recovery" element={<RecoveryPasword />} />
           <Route path="/register" element={<Register />} />
           <Route
             path="/home"
