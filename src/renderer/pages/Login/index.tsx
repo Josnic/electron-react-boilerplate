@@ -112,15 +112,15 @@ export default function SignIn() {
             </Button>
             <Grid container>
               <Grid item xs>
-                {/*<Link
+                <Link
                   component="button"
                   variant="body2"
                   onClick={() => {
-                    navigate("/register")
+                    navigate("/recovery")
                   }}
                 >
                   Olvidaste tu contraseña?
-                </Link>*/}
+                </Link>
               </Grid>
               <Grid item>
                 <Link
