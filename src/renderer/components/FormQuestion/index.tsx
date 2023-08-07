@@ -52,6 +52,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
   };
 
   const loadFormDetails = async () => {
+    setAnswers([]);
     setFormSaved(false);
     const form = await sqlite3All(
       `SELECT * FROM formularios WHERE cod_formulario = '${data.cod_formulario}' LIMIT 1`
@@ -162,7 +163,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
     if (data) {
       loadFormDetails();
     }
-  }, [data]);
+  }, [data.id]);
 
   useEffect(() => {
     setAnswers([]);
@@ -288,12 +289,12 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
           {questions && questions.length > 0 ? (
             <div key={'container'}>
               {questions.map((question, index) => (
-                <div key={Math.random()} className="question-container-form">
+                <div key={question.id_pregunta} className="question-container-form">
                   <div className="question">
                     <div>{parse(question.pregunta)}</div>
                   </div>
-                  <div className="answer-container" key={'answer' + index}>
-                    <FormControl sx={{ minWidth: 120, width: '95%' }}>
+                  <div className="answer-container" key={question.id_pregunta}>
+                    <FormControl sx={{ minWidth: 120, width: '95%' }} key={question.id_pregunta}>
                       <TextField
                         id="outlined-multiline-static"
                         label=""
@@ -302,10 +303,10 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
                             ? false
                             : true
                         }
-                        key={Math.random()}
+                        key={question.id_pregunta}
                         rows={3}
                         defaultValue={
-                          answers[index] && answers[index].answerText
+                          answers[index] && answers[index].answerText != ''
                             ? answers[index].answerText
                             : ''
                         }
