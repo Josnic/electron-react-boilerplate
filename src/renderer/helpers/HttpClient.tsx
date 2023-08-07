@@ -25,7 +25,7 @@ export default () =>{
     const API = axios.create({
         baseURL: process.env.REACT_APP_API_GATEWAY_URL,
         timeout: 4000,
-        headers: {'accept': 'application/json'}
+        headers: {'accept': 'application/json', api_key: ""}
     })
     API.interceptors.request.use(function (request) {
         const authState = AuthStore.getState().auth;
