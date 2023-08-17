@@ -315,19 +315,15 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
           null
         )
       }
-      {
-        type == "SUBLESSON" ? (
-          <Grid item xs={12} className="lessons-button-container-center">
-            <ButtomCustom onClick={()=>{
-              onContinue();
-            }} variant="contained" rounded>
-              Continuar
-            </ButtomCustom>
-          </Grid>
-        ):(
-          null
-        )
-      }
+    
+      <Grid item xs={12} className="lessons-button-container-center">
+        <ButtomCustom onClick={()=>{
+          onContinue();
+        }} variant="contained" rounded>
+          Continuar
+        </ButtomCustom>
+      </Grid>
+      
     </Grid>
   );
 };

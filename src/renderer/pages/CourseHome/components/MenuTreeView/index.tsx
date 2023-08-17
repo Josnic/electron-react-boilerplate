@@ -106,6 +106,17 @@ const MenuTreeView = React.forwardRef(
         case 'UNIT':
           data = JSON.parse(JSON.stringify(dataMenu[parseInt(nodeIdParts[1])]));
           delete data.lessons;
+
+          if (dataMenu[parseInt(nodeIdParts[1])].lessons && dataMenu[parseInt(nodeIdParts[1])].lessons.length > 0){
+            nextNodeId = `LESSON-${parseInt(nodeIdParts[1])}-${0}`;
+          }else{
+            if (dataMenu[parseInt(nodeIdParts[1]) + 1]) {
+              nextNodeId = `UNIT-${(parseInt(nodeIdParts[1]) + 1)}-${
+                dataMenu[parseInt(nodeIdParts[1]) + 1].cod_unidad
+              }`;
+            }
+          }
+          setExpanded([nodeId]);
           break;
 
         case 'LESSON':
@@ -116,6 +127,24 @@ const MenuTreeView = React.forwardRef(
               ]
             )
           );
+
+          if ( dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2])].sublessons &&  dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2])].sublessons.length > 0){
+            nextNodeId =  `SUBLESSON-${nodeIdParts[1]}-${parseInt(nodeIdParts[2])}-${0}`
+          }
+
+          if (!dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2])].sublessons ||  dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2])].sublessons.length == 0){
+
+            if (dataMenu[parseInt(nodeIdParts[1])].lessons[parseInt(nodeIdParts[2]) + 1]) {
+              nextNodeId = `LESSON-${parseInt(nodeIdParts[1])}-${(parseInt(nodeIdParts[2]) + 1)}`;
+            } else {
+              if (dataMenu[parseInt(nodeIdParts[1]) + 1]) {
+                nextNodeId = `UNIT-${parseInt(nodeIdParts[1]) + 1}-${
+                  dataMenu[parseInt(nodeIdParts[1]) + 1].cod_unidad
+                }`;
+              }
+            }
+          }
+          setExpanded([expanded[0], nodeId]);
           break;
 
         case 'SUBLESSON':
@@ -339,7 +368,18 @@ const MenuTreeView = React.forwardRef(
               }
               onClick={() => {
                 setSelectedNode(`UNIT-${index}-${unit.cod_unidad}`);
-                onClickItem('UNIT', unit);
+                let nextNodeId = null;
+                if (dataMenu[index].lessons && dataMenu[index].lessons.length > 0){
+                  nextNodeId = `LESSON-${index}-${0}`;
+                }else{
+                  if (dataMenu[index + 1]) {
+                    nextNodeId = `UNIT-${index + 1}-${
+                      dataMenu[index + 1].cod_unidad
+                    }`;
+                  }
+                }
+                
+                onClickItem('UNIT', unit, nextNodeId);
               }}
             >
               {unit.lessons &&
@@ -358,7 +398,25 @@ const MenuTreeView = React.forwardRef(
                     bgColor="#e8f0fe"
                     onClick={() => {
                       setSelectedNode(`LESSON-${index}-${index2}`);
-                      onClickItem('LESSON', lesson);
+                      let nextNodeId = null;
+
+                      if (lesson.sublessons && lesson.sublessons.length > 0){
+                        nextNodeId =  `SUBLESSON-${index}-${index2}-${0}`
+                      }else{
+                        if (!lesson.sublessons || lesson.sublessons.length == 0){
+
+                          if (dataMenu[index].lessons[index2 + 1]) {
+                            nextNodeId = `LESSON-${index}-${index2 + 1}`;
+                          } else {
+                            if (dataMenu[index + 1]) {
+                              nextNodeId = `UNIT-${index + 1}-${
+                                dataMenu[index + 1].cod_unidad
+                              }`;
+                            }
+                          }
+                        }
+                      }
+                      onClickItem('LESSON', lesson, nextNodeId);
                     }}
                   >
                     {lesson.sublessons &&
