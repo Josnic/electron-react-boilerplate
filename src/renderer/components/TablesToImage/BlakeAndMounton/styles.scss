@@ -2,13 +2,14 @@
   width: 510px;
   background-color: white;
   position: relative;
+  padding-top: 20px;
   .blake-mounton-level-table {
     border-collapse: collapse;
     width: 500px;
     background-color: white;
     td,
     th {
-      border: 1px solid #000000;
+      border: 1px solid #005375;
       text-align: left;
       padding: 8px;
       text-align: center;
@@ -24,6 +25,7 @@
       left: 0;
       top: 0;
       background-color: transparent;
+      margin-top: 20px;
       td,
       th {
         border: 1px solid transparent !important;
@@ -35,6 +37,7 @@
         max-width: 50px;
         max-height: 50px;
         min-height: 50px;
+        color: #005375;
       }
 
       .span-1-x {
@@ -55,7 +58,7 @@
 
     }
     .text-level {
-      color: purple;
+      color: rgba(0, 83, 117, .5);
       font-weight: bold;
     }
 
@@ -68,13 +71,25 @@
     }
 
     .level-red {
-      color: red;
+      color: #dc6600 !important;
       font-weight: bold;
     }
 
     .level-blue {
-      color: lightblue;
+      color: #005375;
       font-weight: bold;
+    }
+
+    .border-width {
+      border: 1.05px solid #005375;
+    }
+
+    .dot {
+      height: 12px;
+      width: 12px;
+      background-color: #dc6600;
+      border-radius: 50%;
+      display: inline-block;
     }
 
     .td-no-border {
@@ -84,7 +99,7 @@
       &.person {
         writing-mode: vertical-lr;
         text-orientation: upright;
-        color: lightblue;
+        color: #005375;
         font-weight: bold;
       }
     }

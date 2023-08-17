@@ -1,16 +1,28 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, forwardRef, useImperativeHandle } from 'react';
 import * as download from 'downloadjs/download';
 import * as htmlToImage from 'html-to-image';
 import './styles.scss';
 
-const BlakeAndMounton = ({ positions }) => {
+const BlakeAndMounton = forwardRef(({ positions }, ref) => { 
+
+  const [image, setImage] = useState(null)
+
   useEffect(() => {
     htmlToImage
       .toPng(document.getElementById('blake-mounton-level-table-container'))
       .then(function (dataUrl) {
+        setImage(dataUrl)
         //download(dataUrl, 'my-node.png');
       });
   }, []);
+
+  const getBase64Image = async () => {
+    return image;
+  };
+
+  useImperativeHandle(ref, () => ({
+    getBase64Image: getBase64Image,
+  }));
 
   useEffect(() => {
     
@@ -53,7 +65,7 @@ const BlakeAndMounton = ({ positions }) => {
           const y = positions[i].y == 1 ? 2 : positions[i].y;
           span = document.getElementById(`bam-span-${x}-${y}`);
           console.log(span)
-          span.innerHTML = 'x';
+          span.innerHTML = '<div class="dot"></div>';
           let finalSpanClass = '';
 
           if (positions[i].y == 1 == 1 && positions[i].x == 1) {
@@ -76,7 +88,7 @@ const BlakeAndMounton = ({ positions }) => {
           span = document.getElementById(
             `bam-span-${positions[i].x}-${positions[i].y}`
           );
-          span.innerHTML = 'x';
+          span.innerHTML = '<div class="dot"></div>';
         }
       }
     }
@@ -105,7 +117,7 @@ const BlakeAndMounton = ({ positions }) => {
       >
         <tr>
           <td className="td-no-border level-red">Alto</td>
-          <td>9</td>
+          <td  className='border-width'>9</td>
           <td rowSpan="4" colSpan="4" className="text-level">
             Acomodadizo
           </td>
@@ -117,16 +129,16 @@ const BlakeAndMounton = ({ positions }) => {
           <td rowSpan="7" className="td-no-border person">
             Personas
           </td>
-          <td>8</td>
+          <td  className='border-width'>8</td>
         </tr>
         <tr>
-          <td>7</td>
+          <td  className='border-width'>7</td>
         </tr>
         <tr>
-          <td>6</td>
+          <td  className='border-width'>6</td>
         </tr>
         <tr>
-          <td>5</td>
+          <td className='border-width'>5</td>
           <td rowSpan="4" colSpan="4" className="text-level">
             Indiferente
           </td>
@@ -135,25 +147,25 @@ const BlakeAndMounton = ({ positions }) => {
           </td>
         </tr>
         <tr>
-          <td>4</td>
+          <td className='border-width'>4</td>
         </tr>
         <tr>
-          <td>3</td>
+          <td className='border-width'>3</td>
         </tr>
         <tr>
-          <td>2</td>
+          <td className='border-width'>2</td>
         </tr>
         <tr>
           <td className="td-no-border level-red">Bajo</td>
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-          <td>4</td>
-          <td>5</td>
-          <td>6</td>
-          <td>7</td>
-          <td>8</td>
-          <td>9</td>
+          <td className='border-width'>1</td>
+          <td className='border-width'>2</td>
+          <td className='border-width'>3</td>
+          <td className='border-width'>4</td>
+          <td className='border-width'>5</td>
+          <td className='border-width'>6</td>
+          <td className='border-width'>7</td>
+          <td className='border-width'>8</td>
+          <td className='border-width'>9</td>
         </tr>
         <tr className="no-border">
           <td></td>
@@ -207,15 +219,15 @@ const BlakeAndMounton = ({ positions }) => {
         </tr>
         <tr>
           <td className="td-no-border level-red">Bajo</td>
-          <td>1</td>
-          <td>2</td>
-          <td>3</td>
-          <td>4</td>
-          <td>5</td>
-          <td>6</td>
-          <td>7</td>
-          <td>8</td>
-          <td>9</td>
+          <td className='border-width'>1</td>
+          <td className='border-width'>2</td>
+          <td className='border-width'>3</td>
+          <td className='border-width'>4</td>
+          <td className='border-width'>5</td>
+          <td className='border-width'>6</td>
+          <td className='border-width'>7</td>
+          <td className='border-width'>8</td>
+          <td className='border-width'>9</td>
         </tr>
         <tr className="no-border">
           <td></td>
@@ -228,6 +240,6 @@ const BlakeAndMounton = ({ positions }) => {
       </table>
     </div>
   );
-};
+});
 
 export default BlakeAndMounton;

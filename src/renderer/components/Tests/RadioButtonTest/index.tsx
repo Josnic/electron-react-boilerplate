@@ -25,6 +25,7 @@ import RadioQuestion from '../components/RadioQuestion';
 import AlertModal from '../components/AlertModal';
 import TestTitle from '../TestTitle';
 import BarChart from '../../BarChart';
+import BlakeAndMounton from '../../TablesToImage/BlakeAndMounton';
 import parse from 'html-react-parser';
 import { useSelector } from 'react-redux';
 import { getPathCourseResource } from '../../../utils/electronFunctions';
@@ -49,6 +50,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
   const [unitLessons, setUnitLessons] = useState([]);
   const [maxWidthModal, setWidthModal] = useState("sm");
   const radarChartRef = useRef(null);
+  const blakeMoutontRef = useRef(null);
   const [modalInitData, setModalInitData] = useState({
     title: '',
     content: '',
@@ -520,6 +522,25 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
    
   }
 
+  const downloadLITRFile = async() => {
+
+    const filePath = `/pdftest.asar/LITR_BM.pdf`
+    const userFullName = authState && authState.auth.user ? authState.auth.user.nombre_completo : 'test';
+    const objText = {
+    }
+    const table = await blakeMoutontRef.current.getBase64Image()
+
+    const arObjImage = [{
+       textField: "grafico",
+        image: table,
+        type: "png",
+        textAlign: "Center"
+    }];
+
+    exportDiscPdf(objText, arObjImage, filePath);
+   
+  }
+
   const TestDISCResponse = () => {
     const DISC = {
       D: 0,
@@ -567,6 +588,42 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
             downloadDISCFile("course", `${newKeys[0]}`)
         }} startIcon={<DownloadIcon />} variant="contained" color={"warning"}>PDF comportamiento</Button>
       </Box>
+      </Container>
+      </>
+    )
+  }
+
+  const LITRBlakeMoutonResponse = () => {
+    
+    const positionX = categoryResponseArray.current.filter(ele => ele.category == "TAREAS");
+    const positionY = categoryResponseArray.current.filter(ele => ele.category == "PERSONAS");
+    return (
+      <>
+      <Container maxWidth="sm">
+        <Box>
+          <BlakeAndMounton ref={blakeMoutontRef} positions={[{x: Math.round(positionX[0].value / 5), y: Math.round(positionY[0].value / 5)}]} />
+        </Box>
+        <Box>
+        {categoryResponseArray.current && categoryResponseArray.current.map((value, index) => (
+          <ListItem
+            key={index}
+            disableGutters
+            secondaryAction={
+              <Badge
+                badgeContent={`${value.value}`}
+                color="primary"
+              ></Badge>
+            }
+          >
+            <ListItemText primary={`${value.category}`} />
+          </ListItem>
+        ))}
+        </Box>
+        <Box sx={{ display: "flex", justifyContent: "center" }}>
+          <Button onClick={()=>{
+             downloadLITRFile()
+          }} startIcon={<DownloadIcon />} variant="contained" color={"warning"}>Descargar PDF</Button>
+        </Box>
       </Container>
       </>
     )
@@ -632,6 +689,16 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     setModalEndData({
       title: 'NIVEL DISC',
       content: TestDISCResponse(),
+      buttonText: 'Cerrar',
+    });
+    setOpenModalEnd(true);
+  }
+
+  const LITR_Blake_Mouton_Response = async() => {
+    setWidthModal("lg");
+    setModalEndData({
+      title: 'Estilo de liderazgo de Blake and Mouton',
+      content: LITRBlakeMoutonResponse(),
       buttonText: 'Cerrar',
     });
     setOpenModalEnd(true);
@@ -777,6 +844,11 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
 
           case "Test_DISC":
             Test_DISC_Response();
+          break;
+
+          case "LITR_Blake_Mouton":
+            resultByCategory();
+            LITR_Blake_Mouton_Response();
           break;
       }
 
