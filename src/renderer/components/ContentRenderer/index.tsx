@@ -12,6 +12,7 @@ import AudioPlayer, {
   VolumeSliderPlacement,
 } from 'react-modern-audio-player';
 import ButtomCustom from '../ButtonRound';
+import ResponsiveIframe from '../ResponsiveIframe';
 import parse from 'html-react-parser';
 import * as download from 'downloadjs/download';
 import { useSelector } from 'react-redux';
@@ -103,7 +104,7 @@ const Video = ({ source, getInstance }) => {
   );
 };
 
-const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
+const ContentRenderer = ({ data, type, courseCode, onContinue, onLoadEnd }) => {
   const [html, setHtml] = useState(null);
   const [filePathDownload, setFilePathDownload] = useState(null);
   const [rootMultimedia, setRootMultimedia] = useStateWithCallback([]);
@@ -140,22 +141,19 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
     
     if (Array.isArray(interactives)) {
       for (let i = 0; i < interactives.length; i++) {
-        const finalPath = await getPathCourseResource(
-          path + '/interactivos/' + data.cod_unidad + ".asar/" + interactives[i]
-        );
+        let regex = /\n*\s*<iframe.*?\\?>.*?<\/iframe\\?>\s*\n*/gi;
         if (content){
-          content = content.replace(interactives[i], finalPath + "/index.html");
+          content = content.replace(regex, "<div id='iframe-"+interactives[i]+"'></div>");
         }else{
-          content2 += '<iframe style="max-width: 100%; width: 773px; height: 434px;" rte-for="insertvideo" border="0" allowfullscreen="" src="'+finalPath + "/index.html"+'"></iframe>'
+          content2 += "<div id='iframe-"+interactives[i]+"'></div>"
         }
       }
     }
-
-    //videos 
+ 
     if (!content){
       const videos = data.videos ? data.videos.split(',') : null;
       const audios = data.audios ? data.audios.split(',') : null;
-      let path = courseCode;
+      const iframe = data.interactivos ? data.interactivos.split(',') : null;
       if (Array.isArray(videos)) {
         for (let i = 0; i < videos.length; i++) {
           content2 += "<div id='"+videos[i]+"'></div>"
@@ -165,6 +163,12 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
       if (Array.isArray(audios)) {
         for (let i = 0; i < audios.length; i++) {
           content2 += "<div id='"+audios[i]+"'></div>"
+        }
+      }
+
+      if (Array.isArray(iframe)) {
+        for (let i = 0; i < iframe.length; i++) {
+          content2 += "<div id='iframe-"+iframe[i]+"'></div>"
         }
       }
     }
@@ -208,6 +212,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
   const renderMultimediaComponents = async () => {
     const videos = data.videos ? data.videos.split(',') : null;
     const audios = data.audios ? data.audios.split(',') : null;
+    const iframe = data.interactivos ? data.interactivos.split(',') : null;
     let path = courseCode;
     if (Array.isArray(videos)) {
       for (let i = 0; i < videos.length; i++) {
@@ -224,6 +229,15 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
           path + '/audios.asar/' + audios[i]
         );
         await renderMultimedia(audios[i], 'AUDIO', finalPath, data.nombre);
+      }
+    }
+
+    if (Array.isArray(iframe)) {
+      for (let i = 0; i < iframe.length; i++){
+        const finalPath = await getPathCourseResource(
+          path + '/interactivos/' + data.cod_unidad + ".asar/" + iframe[i]  + "/index.html"
+        );
+        await renderMultimedia("iframe-" + iframe[i], 'IFRAME', finalPath, data.nombre);
       }
     }
   };
@@ -257,6 +271,10 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
           setArtPlayerInstances(artPlayerInstances => [...artPlayerInstances, artInstance])
         }} />;
       break;
+
+      case 'IFRAME':
+        component = <ResponsiveIframe id={identifier} sourceUrl={source} title={""} />
+      break;
     }
 
     root.render(component);
@@ -284,6 +302,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
         }
       }
     }
+    onLoadEnd()
   }
 
   useEffect(() => {
