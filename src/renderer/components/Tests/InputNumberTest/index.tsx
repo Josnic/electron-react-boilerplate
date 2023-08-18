@@ -385,7 +385,9 @@ const InputNumberTest = ({ data, courseCode, onFinalize, onContinue }) => {
 
   useEffect(() => {
     if (data) {
+      setOpen(true);
       loadTestData();
+      setOpen(false);
     }
   }, [data]);
 

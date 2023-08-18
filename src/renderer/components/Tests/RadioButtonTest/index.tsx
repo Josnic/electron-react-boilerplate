@@ -239,7 +239,9 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
 
   useEffect(() => {
     if (data) {
+      setOpen(true);
       loadTestData();
+      setOpen(false);
     }
   }, [data]);
 

@@ -248,6 +248,7 @@ const TrueFalseTest = ({ data, courseCode, onFinalize, onContinue }) => {
     if (empty > 0) {
       showToast('Debes completar todo el test');
     } else {
+      setOpen(true);
       const extro = answers.filter(
         (ele) =>
           (ele.value == '1' && ele.category == 'IE_EXTRO') ||
@@ -255,7 +256,6 @@ const TrueFalseTest = ({ data, courseCode, onFinalize, onContinue }) => {
       ).length;
       const percentage = Math.round((100 * extro) / answers.length);
       await insertDataTest();
-      setOpen(true);
       setTestSaved(true);
 
       setModalEndData({
@@ -272,7 +272,9 @@ const TrueFalseTest = ({ data, courseCode, onFinalize, onContinue }) => {
 
   useEffect(() => {
     if (data) {
+      setOpen(true);
       loadTestData();
+      setOpen(false);
     }
   }, [data]);
 

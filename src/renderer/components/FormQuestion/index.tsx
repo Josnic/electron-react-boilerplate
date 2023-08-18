@@ -161,7 +161,9 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
 
   useEffect(() => {
     if (data) {
+      setOpen(true);
       loadFormDetails();
+      setOpen(false);
     }
   }, [data.id]);
 

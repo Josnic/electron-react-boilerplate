@@ -13,6 +13,7 @@ import AudioPlayer, {
 } from 'react-modern-audio-player';
 import ButtomCustom from '../ButtonRound';
 import ResponsiveIframe from '../ResponsiveIframe';
+import OverlayLoader from '../OverlayLoader';
 import parse from 'html-react-parser';
 import * as download from 'downloadjs/download';
 import { useSelector } from 'react-redux';
@@ -104,8 +105,9 @@ const Video = ({ source, getInstance }) => {
   );
 };
 
-const ContentRenderer = ({ data, type, courseCode, onContinue, onLoadEnd }) => {
+const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
   const [html, setHtml] = useState(null);
+  const [open, setOpen] = useState(false);
   const [filePathDownload, setFilePathDownload] = useState(null);
   const [rootMultimedia, setRootMultimedia] = useStateWithCallback([]);
   const [artPlayerInstances, setArtPlayerInstances] = useState([]);
@@ -302,12 +304,13 @@ const ContentRenderer = ({ data, type, courseCode, onContinue, onLoadEnd }) => {
         }
       }
     }
-    onLoadEnd()
   }
 
   useEffect(() => {
+    setOpen(true);
     prepareHtml();
     insertView();
+    setOpen(false);
   }, [data]);
 
   useEffect(() => {
@@ -320,6 +323,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue, onLoadEnd }) => {
 
   return (
     <Grid container columns={{ xs: 4, md: 12 }} spacing={2}>
+      <OverlayLoader open={open} />
       <Grid item xs={12}>
         {html ? <div className="mt-content">{parse(html)}</div> : null}
       </Grid>
