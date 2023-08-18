@@ -143,11 +143,12 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
     
     if (Array.isArray(interactives)) {
       for (let i = 0; i < interactives.length; i++) {
-        let regex = /\n*\s*<iframe.*?\\?>.*?<\/iframe\\?>\s*\n*/gi;
+        //let regex = /\n*\s*<iframe.*?\\?>.*?<\/iframe\\?>\s*\n*/gi;
+        let regex = /\n*\s*<iframe.*?\\?>.*?<\/iframe\\?>\s*\n*/;
         if (content){
-          content = content.replace(regex, "<div id='iframe-"+interactives[i]+"'></div>");
+          content = content.replace(regex, "<div id='iframe_"+interactives[i]+"'></div>");
         }else{
-          content2 += "<div id='iframe-"+interactives[i]+"'></div>"
+          content2 += "<div id='iframe_"+interactives[i]+"'></div>"
         }
       }
     }
@@ -170,7 +171,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
 
       if (Array.isArray(iframe)) {
         for (let i = 0; i < iframe.length; i++) {
-          content2 += "<div id='iframe-"+iframe[i]+"'></div>"
+          content2 += "<div id='iframe_"+iframe[i]+"'></div>"
         }
       }
     }
@@ -239,14 +240,14 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
         const finalPath = await getPathCourseResource(
           path + '/interactivos/' + data.cod_unidad + ".asar/" + iframe[i]  + "/index.html"
         );
-        await renderMultimedia("iframe-" + iframe[i], 'IFRAME', finalPath, data.nombre);
+        await renderMultimedia("iframe_" + iframe[i], 'IFRAME', finalPath, data.nombre);
       }
     }
   };
 
   const renderMultimedia = (identifier, type, source, name) => {
     const container = document.getElementById(identifier);
-    if (container.innerHTML) {
+    if (container && container.innerHTML) {
       container.innerHTML = container.innerHTML.trim();
     }
     const root = createRoot(container);
@@ -315,8 +316,8 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
 
   useEffect(() => {
     if (html) {
-      renderMultimediaComponents();
-      document.getElementsByClassName("main")[0].scrollTo({ top: 0, left: 0 });
+        renderMultimediaComponents();
+        document.getElementsByClassName("main")[0].scrollTo({ top: 0, left: 0 });
     }
   }, [html]);
 
