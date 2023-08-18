@@ -3,6 +3,7 @@ import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
 import { ToastContainer } from 'react-toastify';
 import { showToast } from '../../utils/toast';
+import { useNavigate } from 'react-router-dom';
 import { sqlite3All, sqlite3Run } from '../../helpers/Sqlite3Operations';
 import AuthTypes from './../../redux/constants';
 import { sha256Encode, base64Decode } from '../../utils/generals';
@@ -10,6 +11,7 @@ import httpClient from '../../helpers/httpClient';
 import { getMachineId, isInternetAvailable } from '../../utils/electronFunctions';
 
 const Init = () => {
+  const navigate = useNavigate();
   const activationValidate = async(data) => {
     const machineId = await getMachineId();
     if (base64Decode(data.estado) == 'ACTIVO') {
@@ -32,6 +34,7 @@ const Init = () => {
   
           if (response.error) {
             //showToast('Tu licencia no es válida.', 'error');
+            showToast('No fue posible obtener información de la licencia.', 'error');
           } else {
             const data = response.data;
             if (data.isValid && data.isValid == true) {

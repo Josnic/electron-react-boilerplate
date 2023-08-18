@@ -21,7 +21,7 @@ import { sqlite3All, sqlite3Run } from '../../helpers/Sqlite3Operations';
 
 import Copyright from '../../components/Copyright';
 import { showToast } from '../../utils/toast';
-import { sha256Encode, base64Decode, md5Encode } from '../../utils/generals';
+import { sha256Encode, base64Decode, base64Encode, md5Encode } from '../../utils/generals';
 import httpClient from '../../helpers/httpClient';
 import {
   getMachineId,
@@ -40,11 +40,11 @@ export default function Activate() {
     setOpen(true);
 
     const resultFile = await readSerialFiles(pin);
+    console.log(resultFile)
     if (resultFile.ok && resultFile.found && resultFile.found == true) {
       const isReachable = await isInternetAvailable('google.com');
-
+      const machineId = await getMachineId();
       if (isReachable) {
-        const machineId = await getMachineId();
         const response = await httpClient().post('/', {
           licenseSerial: base64Decode(data.serial_licencia),
           machineId: data.serial_maquina,
@@ -52,6 +52,7 @@ export default function Activate() {
 
         if (response.error) {
           //showToast('Tu licencia no es válida.', 'error');
+          showToast('No fue posible obtener información de la licencia.', 'error');
         } else {
           const data = response.data;
           if (data.isAcivated && data.isAcivated == true) {
@@ -68,13 +69,17 @@ export default function Activate() {
       }
     } else {
       setOpen(false);
+      showToast(
+        'No fue posible activar tu licencia. Verifica que tu pin sea válido e intenta nuevamente.',
+        'error'
+      )
     }
   };
 
   const insertData = async (pin, machineId, isActive) => {
     const result = await sqlite3Run('INSERT INTO activacion VALUES (?,?,?)', [
       base64Encode(pin),
-      serial,
+      machineId,
       base64Encode(isActive ? 'ACTIVE' : 'EARRING'),
     ]);
     if (result.OK) {
@@ -102,7 +107,7 @@ export default function Activate() {
     if (pin == '') {
       showToast('Digita un pin válido');
     } else {
-      requestActivation(pin);
+      await requestActivation(md5Encode(pin));
     }
   };
 

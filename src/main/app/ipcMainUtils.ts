@@ -67,7 +67,7 @@ export function ipcMainUtils(ipcMain) {
       );
       try {
         data = data.split('\n');
-        currentSerial = args[0];
+        const currentSerial = args[0];
         let found = false;
         for (var i = 0; i < data.length; i++) {
           console.log(data[i] + '---' + currentSerial);
