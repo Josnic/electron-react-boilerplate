@@ -23,7 +23,7 @@ const errorHandler = (error) => {
 export default () =>{
 
     const API = axios.create({
-        baseURL: process.env.REACT_APP_API_GATEWAY_URL,
+        //baseURL: "http://locahost",
         timeout: 4000,
         headers: {'accept': 'application/json', api_key: ""}
     })

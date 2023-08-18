@@ -29,6 +29,7 @@ import {
   deleteSerialFiles,
   isInternetAvailable,
 } from '../../utils/electronFunctions';
+import { userApi, tokenApi, BAD_REQUEST_ERRORS } from '../../constants';
 
 export default function Activate() {
   const [open, setOpen] = React.useState(false);
@@ -39,25 +40,34 @@ export default function Activate() {
   const requestActivation = async (pin) => {
     setOpen(true);
 
-    const resultFile = await readSerialFiles(pin);
-    console.log(resultFile)
+    const resultFile = await readSerialFiles(md5Encode(pin));
     if (resultFile.ok && resultFile.found && resultFile.found == true) {
-      const isReachable = await isInternetAvailable('google.com');
+      const isReachable = await isInternetAvailable('https://google.com');
       const machineId = await getMachineId();
       if (isReachable) {
-        const response = await httpClient().post('/', {
-          licenseSerial: base64Decode(data.serial_licencia),
-          machineId: data.serial_maquina,
+        const response = await httpClient().post('http://educationfortheworld.com.py:7000/v1', {
+          serialLicense: pin,
+          serialMachine: machineId,
+          user: userApi,
+          token: tokenApi
         });
 
         if (response.error) {
-          //showToast('Tu licencia no es válida.', 'error');
-          showToast('No fue posible obtener información de la licencia.', 'error');
+
+          if (response.data.type == "response"){
+            setOpen(false);
+            const statusCode = response.data.error.status;
+            const dataResponse = response.data.error.data;
+            showToast('No fue posible obtener información de la licencia. Error '+ statusCode +"-"+dataResponse.message + '. Verifica e intenta de nuevo.', 'error');
+          }else{
+            insertData(pin, machineId, false);
+          }
         } else {
           const data = response.data;
-          if (data.isAcivated && data.isAcivated == true) {
+          if (data.code && parseInt(data.code) == 201) {
             insertData(pin, machineId, true);
           } else {
+            setOpen(false);
             showToast(
               'No fue posible activar tu licencia. Intenta nuevamente.',
               'error'
@@ -77,10 +87,11 @@ export default function Activate() {
   };
 
   const insertData = async (pin, machineId, isActive) => {
+    const state = isActive ? 'ACTIVE' : 'EARRING'
     const result = await sqlite3Run('INSERT INTO activacion VALUES (?,?,?)', [
       base64Encode(pin),
       machineId,
-      base64Encode(isActive ? 'ACTIVE' : 'EARRING'),
+      base64Encode(state),
     ]);
     if (result.OK) {
       setReady(true);
@@ -107,7 +118,7 @@ export default function Activate() {
     if (pin == '') {
       showToast('Digita un pin válido');
     } else {
-      await requestActivation(md5Encode(pin));
+      await requestActivation(pin);
     }
   };
 
