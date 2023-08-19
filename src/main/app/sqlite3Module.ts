@@ -2,7 +2,9 @@ import sqlite from 'sqlite3';
 import { app } from 'electron';
 const sqlite3 = sqlite.verbose();
 import * as path from 'path';
-const pathDatabase = path.join(app.getAppPath(), "release/app/data.db")
+
+const localPath = app.isPackaged ? "../" : "release/app/";
+const pathDatabase = path.join(app.getAppPath(), `${localPath}data.db`)
 var db;
 
 export function sqlite3Module(ipcMain) {

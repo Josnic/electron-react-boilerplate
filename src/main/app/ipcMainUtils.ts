@@ -2,7 +2,9 @@ import { join } from 'path';
 import { app, shell } from 'electron';
 import * as fs from 'fs';
 import { machineIdSync } from 'node-machine-id';
-import { isInternetAvailable } from 'is-internet-available'
+import { isInternetAvailable } from 'is-internet-available';
+
+const localPath = app.isPackaged ? "../" : "release/app";
 
 export function ipcMainUtils(ipcMain) {
   ipcMain.on('openBrowser', async (event, arg) => {
@@ -13,7 +15,7 @@ export function ipcMainUtils(ipcMain) {
     return new Promise((resolve) => {
       const finalPath =
         (process.env.NODE_ENV === 'development' ? 'file://' : '') +
-        join(app.getAppPath(), 'release/app/' + args[0]);
+        join(app.getAppPath(), `${localPath}/` + args[0]);
       resolve(finalPath);
     });
   });
@@ -21,14 +23,14 @@ export function ipcMainUtils(ipcMain) {
   ipcMain.handle('getBinaryContent', async (event, ...args) => {
     return new Promise((resolve) => {
       const file = fs.readFileSync(
-        join(app.getAppPath(), 'release/app', args[0])
+        join(app.getAppPath(), `${localPath}`, args[0])
       );
       resolve(file);
     });
   });
 
   ipcMain.handle('isInternetAvailable', async (event, ...args) => {
-    const domain = args[0] ? args[0] : "google.com";
+    const domain = args[0] ? args[0] : "https://google.com";
     return new Promise((resolve) => {
         isInternetAvailable({ authority: domain }).then((status)=>{
             resolve(status)
@@ -47,7 +49,7 @@ export function ipcMainUtils(ipcMain) {
   ipcMain.handle('deleteSerialFiles', async (event, ...args) => {
     return new Promise((resolve) => {
         try{
-            fs.unlinkSync(join(app.getAppPath(), 'release/app', 'fslite.qoc'));
+            fs.unlinkSync(join(app.getAppPath(), `${localPath}`, 'fslite.qoc'));
             resolve({
                 ok:true
             })
@@ -62,7 +64,7 @@ export function ipcMainUtils(ipcMain) {
   ipcMain.handle('readSerialFiles', async (event, ...args) => {
     return new Promise((resolve) => {
       let data = fs.readFileSync(
-        join(app.getAppPath(), 'release/app', 'fslite.qoc'),
+        join(app.getAppPath(), `${localPath}`, 'fslite.qoc'),
         { encoding: 'utf8' }
       );
       try {
