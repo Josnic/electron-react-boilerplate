@@ -296,7 +296,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
                     <div>{parse(question.pregunta)}</div>
                   </div>
                   <div className="answer-container" key={question.id_pregunta}>
-                    <FormControl sx={{ minWidth: 120, width: '95%' }} key={question.id_pregunta}>
+                    <FormControl sx={{ minWidth: 120, width: '100%' }} key={question.id_pregunta}>
                       <TextField
                         id="outlined-multiline-static"
                         label=""
