@@ -612,7 +612,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
             disableGutters
             secondaryAction={
               <Badge
-                badgeContent={`${value.value}`}
+                badgeContent={`${ Math.round(Number(value.value) / 5)}`}
                 color="primary"
               ></Badge>
             }
@@ -804,7 +804,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
 
 
   const saveTest = async () => {
-    const empty = answers.filter((ele) => ele.value == 0);
+    const empty = answers.filter((ele) => ele.value < currentTest.rango_inicial);
     if (empty.length > 0) {
       showToast('Completa todo el formulario');
     } else {
