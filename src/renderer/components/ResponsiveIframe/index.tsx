@@ -79,7 +79,7 @@ const VideoIframe: React.FC<IProps> = (props) => {
     <iframe
       ref={iframeRef}
       title={title}
-      width="80%"
+      width="95%"
       height={`${videoHeight}px`}
       src={sourceUrl}
       frameBorder="0"
