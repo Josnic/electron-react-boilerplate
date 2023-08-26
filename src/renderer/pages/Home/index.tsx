@@ -21,10 +21,19 @@ const Home = () => {
   const [openLoader, setOpenLoader] = React.useState(true);
   const [courses, setCourses] = useState([]);
   const [percentage, setPercentage] = React.useState(0);
+  const [legalPage, setLegalPage] = React.useState('<div></div>');
+  const [website, setWebsite] = React.useState('');
   const navigate = useNavigate();
   const authState = useSelector((state) => state);
   const userId = authState.auth.user ? authState.auth.user.nombre_completo : "test"
   const getCourses = async() => {
+    const generalTem = await sqlite3All(`SELECT * FROM general LIMIT 1`);
+
+    if (generalTem.OK){
+      setLegalPage(generalTem.OK[0].paginalegal)
+      setWebsite(generalTem.OK[0].sitioweb)
+    }
+
     const result = await sqlite3All("SELECT * FROM cursos ORDER BY cod_curso ASC");
     console.log(result)
     if (result.OK) {
@@ -85,7 +94,10 @@ const Home = () => {
                     </div>
                 </Box>
                 <Box className="footer">
-                    <MenuFooter />
+                    <MenuFooter 
+                      legalPage={legalPage}
+                      website={website}
+                    />
                 </Box>
                 <ToastContainer limit={3} autoClose={3000} />
             </Container>

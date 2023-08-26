@@ -110,7 +110,8 @@ export default function CourseHome() {
   const [isFormFinalize, setIsFormFinalize] = React.useState(false);
   const [isTestFinalize, setIsTestFinalize] = React.useState(false);
   const [percentage, setPercentage] = React.useState(0);
-
+  const [legalPage, setLegalPage] = React.useState('<div></div>');
+  const [website, setWebsite] = React.useState('');
   const handleDrawerClose = () => {
     setOpen(false);
   };
@@ -149,6 +150,17 @@ export default function CourseHome() {
   }
 
   const loadMenu = async() => {
+    const courseDataTem = await sqlite3All(`SELECT paginalegal FROM cursos WHERE cod_curso = '${courseCode}' LIMIT 1`);
+    const generalTem = await sqlite3All(`SELECT sitioweb FROM general LIMIT 1`);
+    
+    if (courseDataTem.OK){
+      setLegalPage(courseDataTem.OK[0].paginalegal)
+    }
+
+    if (generalTem.OK){
+      setWebsite(generalTem.OK[0].sitioweb)
+    }
+
     const units = await sqlite3All(`SELECT *, 0 AS viewed, imagen_unid AS imagen, video AS videos FROM unidades WHERE cod_curso = '${courseCode}' ORDER BY orden ASC`);
     let dataMenu = [];
     const userId =
@@ -385,6 +397,8 @@ export default function CourseHome() {
             open={open} 
             isCourse={true} 
             courseCode={courseCode}
+            legalPage={legalPage}
+            website={website}
           />
         </Box>
       </Main>

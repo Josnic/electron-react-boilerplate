@@ -4,12 +4,7 @@ import Box from '@mui/material/Box';
 import Toolbar from '@mui/material/Toolbar';
 import IconButton from '@mui/material/IconButton';
 import Typography from '@mui/material/Typography';
-import Avatar from '@mui/material/Avatar';
-import LinearProgress, {
-  linearProgressClasses,
-} from '@mui/material/LinearProgress';
-import CardHeader from '@mui/material/CardHeader';
-import Button from '@mui/material/Button';
+import ArticleIcon from '@mui/icons-material/Article';
 import Menu from '@mui/material/Menu';
 import MenuIcon from '@mui/icons-material/Menu';
 import MenuItem from '@mui/material/MenuItem';
@@ -26,12 +21,14 @@ import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { useDispatch, useSelector } from 'react-redux';
+import parse from 'html-react-parser';
 import { useNavigate } from 'react-router-dom';
 import { formatDate, getMysqlDate } from '../../../utils/generals';
 import AuthTypes from '../../../redux/constants';
 import { openSystemBrowser, getPathCourseResource } from '../../../utils/electronFunctions';
 import { showToast } from '../../../utils/toast';
 import { sqlite3Run, sqlite3All } from '../../../helpers/Sqlite3Operations';
+import AlertModal from '../../Tests/components/AlertModal';
 import exportDiscPdf from '../../../helpers/ExportPDF';
 const drawerWidth = 300;
 
@@ -52,11 +49,12 @@ const AppBar = styled(MuiAppBar, {
   }),
 }));
 
-export default function MenuFooter({ isCourse, open, courseCode }) {
+export default function MenuFooter({ isCourse, open, courseCode, legalPage, website }) {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const authState = useSelector((state) => state);
   const [openLoader, setOpenLoader] = React.useState(false);
+  const [showLegal, setShowLegal] = React.useState(false);
   const closeSession = () => {
     dispatch({
       type: AuthTypes.LOGOUT,
@@ -226,6 +224,14 @@ export default function MenuFooter({ isCourse, open, courseCode }) {
         return <CardMembershipIcon sx={{ color: color }} />;
       },
     },
+    {
+      id: 'legal',
+      text: 'Página legal',
+      hidden: false,
+      icon: (color) => {
+        return <ArticleIcon sx={{ color: color }} />;
+      },
+    },
     /*{
       id: 'downloads',
       text: 'Centro de descargas',
@@ -260,6 +266,12 @@ export default function MenuFooter({ isCourse, open, courseCode }) {
       case 'certificate':
         await getContance();
         break;
+
+        case 'legal':
+          if(legalPage){
+            setShowLegal(true);
+          }
+          break;
 
       case 'downloads':
         break;
@@ -340,7 +352,7 @@ export default function MenuFooter({ isCourse, open, courseCode }) {
           <MenuItem
             key={'menu-browser'}
             onClick={() => {
-              openSystemBrowser('https://www.google.com');
+              openSystemBrowser(website);
             }}
           >
             <ListItemIcon key="unique-open">
@@ -351,6 +363,15 @@ export default function MenuFooter({ isCourse, open, courseCode }) {
         </Box>
       </Toolbar>
       <ToastContainer />
+      <AlertModal
+          open={showLegal}
+          title={''}
+          content={legalPage ? parse(legalPage) : ''}
+          buttonText={'Cerrar'}
+          onButtonClick={() => {
+            setShowLegal(false);
+          }}
+        />
     </AppBar>
   );
 }
