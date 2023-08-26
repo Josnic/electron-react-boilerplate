@@ -21,6 +21,8 @@ import Drawer from '@mui/material/Drawer';
 import CssBaseline from '@mui/material/CssBaseline';
 import MuiAppBar, { AppBarProps as MuiAppBarProps } from '@mui/material/AppBar';
 import { useDispatch, useSelector } from 'react-redux';
+import { confirmAlert } from 'react-confirm-alert'; // Import
+import 'react-confirm-alert/src/react-confirm-alert.css'; // Import css
 import parse from 'html-react-parser';
 import { useNavigate } from 'react-router-dom';
 import { formatDate, getMysqlDate } from '../../../utils/generals';
@@ -28,6 +30,7 @@ import AuthTypes from '../../../redux/constants';
 import { openSystemBrowser, getPathCourseResource } from '../../../utils/electronFunctions';
 import { showToast } from '../../../utils/toast';
 import { sqlite3Run, sqlite3All } from '../../../helpers/Sqlite3Operations';
+import { syncData } from '../../../helpers/sync';
 import AlertModal from '../../Tests/components/AlertModal';
 import exportDiscPdf from '../../../helpers/ExportPDF';
 const drawerWidth = 300;
@@ -261,6 +264,39 @@ export default function MenuFooter({ isCourse, open, courseCode, legalPage, webs
         break;
 
       case 'sync':
+        confirmAlert({
+          title: 'Confirmar',
+          message: '¿Deseas realizar el proceso de sincronización? Debes tener una conexión a internet estable. Este proceso puede durar algunos minutos.',
+          buttons: [
+            {
+              label: 'Sincronizar',
+              onClick: async() => {
+                setOpenLoader(true);
+                const userId = authState && authState.auth.user ? authState.auth.user.email : "test";
+                try{
+                  const result = await syncData(userId);
+                  setOpenLoader(false);
+                  if (result.error){
+                    showToast(result?.error, 'error');
+                  }else{
+                    showToast("Sincronización finalizada con éxito.")
+                  }
+                }catch(e){
+                  console.log(e)
+                  setOpenLoader(false);
+                  showToast("Ocurrió un error desconocido. Intenta nuevamente.", 'error');
+                }
+                
+              }
+            },
+            {
+              label: 'Cancelar',
+              onClick: () => {
+
+              }
+            }
+          ]
+        });
         break;
 
       case 'certificate':

@@ -1,12 +1,13 @@
 import { sqlite3All } from './Sqlite3Operations';
 import httpClient from './httpClient';
 import { isInternetAvailable } from '../utils/electronFunctions';
-import { base64Decode } from '../../utils/generals';
+import { base64Decode } from '../utils/generals';
 
-export const sync = async(userId) => {
+export const syncData = async(userId) => {
     const license = await sqlite3All(`SELECT * FROM activacion LIMIT 1`);
-    const isReachable = await isInternetAvailable('google.com');
-    if (license.OK && license.OK.length == 1 && isReachable){
+    const isReachable = await isInternetAvailable('https://google.com');
+    const user = await sqlite3All(`SELECT * FROM usuario WHERE email = '${userId}' LIMIT 1`);
+    if (license.OK && license.OK.length == 1 && isReachable && user.OK && user.OK.length == 1){
 
         //lecciones 
 
@@ -25,27 +26,29 @@ export const sync = async(userId) => {
         ){
 
             const obj = {
-                userId: userId,
+                user: user,
                 data: {
                     lessons:  lessons.OK,
                     forms: forms.OK,
                     radiotest: radiotest.OK,
                     inputntest:inputntest.OK,
                     vftest: vftest.OK
-                }
+                },
                 license: {
                     machineId: license.OK[0].serial_maquina,
-                    licenseSerial: base64Decode(license.OK[0]..serial_licencia),
+                    licenseSerial: base64Decode(license.OK[0].serial_licencia),
                 }
             }
 
-            const response = await httpClient().post('/', obj);
+            const response = await httpClient().post('http://educationfortheworld.com.py:7000', obj);
             if (response.error) {
                 return {
                     error: "Ha ocurrido un error en la sincronización remota. Intenta nuevamente"
                 }
               } else {
-                
+                return {
+                    OK: true
+                }
               }
       
 
@@ -55,5 +58,9 @@ export const sync = async(userId) => {
             }
         }
 
+    }else{
+        return {
+            error: "Datos no válidos. Contacta a tu proveedor."
+        }
     }
 } 
