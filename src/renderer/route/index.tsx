@@ -10,6 +10,7 @@ import CourseHome from '../pages/CourseHome';
 import Init from '../pages/Init';
 import Activate from '../pages/Activate';
 import RecoveryPasword from '../pages/RecoveryPasword';
+import Update from '../pages/Update';
 import {
   BrowserRouter,
   Routes,
@@ -52,6 +53,14 @@ const RouteApp = () => {
             element={
               <ProtectedRoute>
                 <CourseHome />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/update"
+            element={
+              <ProtectedRoute>
+                <Update />
               </ProtectedRoute>
             }
           />
