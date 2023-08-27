@@ -39,14 +39,17 @@ export default function Activate() {
     }
   }
 
-  const requestActivation = async (email) => {
+  const requestCode = async (email, fullName) => {
     const isReachable = await isInternetAvailable('https://google.com');
 
     if (isReachable) {
-      const response = await httpClient().post('/', {
-        email: email,
+      const response = await httpClient().post('http://educationfortheworld.com.py/apiv1-dskapp/', {
+        CONFIRM_CODE: {
+          email: email,
+          fullName: fullName
+        }
       });
-
+      console.log(response)
       if (response.error) {
         setOpen(false);
         showToast(
@@ -56,11 +59,11 @@ export default function Activate() {
       } else {
         setOpen(false);
         const data = response.data;
-        if (data.code && data.code != '') {
-          setConfirmCode(data.code);
+        if (data.OK.data.code && data.OK.data.code != '') {
+          setConfirmCode(data.OK.data.code);
         } else {
           showToast(
-            'No fue posible activar tu licencia. Intenta nuevamente.',
+            'No fue posible continuar con el proceso. Intenta nuevamente.',
             'error'
           );
         }
@@ -70,6 +73,7 @@ export default function Activate() {
       showToast('No cuentas con conexión a internet.', 'error');
     }
   };
+
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -82,9 +86,9 @@ export default function Activate() {
       const result = await sqlite3All(
         `SELECT * FROM usuario WHERE email = '${email}' LIMIT 1`
       );
-      if (result.OK) {
+      if (result.OK && result.OK.length == 1) {
         setPwd(result.OK[0].password2)
-        requestActivation(email);
+        requestCode(email, result.OK[0].nombre_completo);
       } else {
         setOpen(false);
         showToast('Ocurrió un error en BD. Intenta de nuevo.');
@@ -135,7 +139,7 @@ export default function Activate() {
             autoComplete="off"
             autoFocus
           />
-
+           {confirmCode ? (
           <TextField
             margin="normal"
             required
@@ -149,6 +153,7 @@ export default function Activate() {
             }}
             autoFocus
           />
+           ):(null)}
           {confirmCode ? (
             <Button
               type="button"
@@ -156,7 +161,7 @@ export default function Activate() {
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
               onClick={()=>{
-                
+                confirmCodeResult()
               }}
             >
               Confirmar código
@@ -196,6 +201,9 @@ export default function Activate() {
             </Typography>
             <Typography variant="h6" gutterBottom>
              {base64Decode(pwd)}
+            </Typography>
+            <Typography variant="subtitle1" gutterBottom>
+             Te recomendamos realizar el cambio de la misma una vez inicies sesión.
             </Typography>
             </>}
           buttonText={'Ir a iniciar sesión'}
