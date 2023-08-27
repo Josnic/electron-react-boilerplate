@@ -3,8 +3,6 @@ import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
 import TextField from '@mui/material/TextField';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Checkbox from '@mui/material/Checkbox';
 import Link from '@mui/material/Link';
 import Grid from '@mui/material/Grid';
 import Box from '@mui/material/Box';
@@ -14,12 +12,10 @@ import Container from '@mui/material/Container';
 import { ToastContainer } from 'react-toastify';
 import OverlayLoader from '../../components/OverlayLoader';
 import { useDispatch } from 'react-redux';
-import { useNavigate, NavLink } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
+import AlertModal from '../../components/Tests/components/AlertModal';
+import { sqlite3All } from '../../helpers/Sqlite3Operations';
 
-import AuthTypes from './../../redux/constants';
-import { sqlite3All, sqlite3Run } from '../../helpers/Sqlite3Operations';
-
-import Copyright from '../../components/Copyright';
 import { showToast } from '../../utils/toast';
 import { base64Decode } from '../../utils/generals';
 import httpClient from '../../helpers/httpClient';
@@ -44,7 +40,7 @@ export default function Activate() {
   }
 
   const requestActivation = async (email) => {
-    const isReachable = await isInternetAvailable('google.com');
+    const isReachable = await isInternetAvailable('https://google.com');
 
     if (isReachable) {
       const response = await httpClient().post('/', {
@@ -159,7 +155,9 @@ export default function Activate() {
               fullWidth
               variant="contained"
               sx={{ mt: 3, mb: 2 }}
-              onClick={}
+              onClick={()=>{
+                
+              }}
             >
               Confirmar código
             </Button>
@@ -172,7 +170,7 @@ export default function Activate() {
           >
             {!confirmCode ? 'Enviar correo' : 'Volver a enviar correo'}
           </Button>
-          <Grid container>
+          <Grid container sx={{textAlign: "center"}}>
             <Grid item xs>
               <Link
                 component="button"

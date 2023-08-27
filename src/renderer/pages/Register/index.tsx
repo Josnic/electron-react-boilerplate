@@ -350,8 +350,8 @@ export default function SignUp() {
           >
             Registrar
           </Button>
-          <Grid container justifyContent="flex-end">
-            <Grid item>
+          <Grid container>
+            <Grid item sx={{margin: "auto"}}>
               <Link
                 component="button"
                 variant="body2"
