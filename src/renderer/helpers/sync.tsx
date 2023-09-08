@@ -12,7 +12,7 @@ export const syncData = async(userId) => {
         //lecciones 
 
         const lessons = await sqlite3All(`SELECT * FROM sublecciones_vistas WHERE user_id = '${userId}'`);
-        const forms = await sqlite3All(`SELECT * FROM formualrio_respuesta WHERE user_id = '${userId}`);
+        const forms = await sqlite3All(`SELECT * FROM formulario_respuesta WHERE user_id = '${userId}`);
         const radiotest = await sqlite3All(`SELECT * FROM test_radio_respuestas WHERE user_id = '${userId}`);
         const inputntest = await sqlite3All(`SELECT * FROM test_inputn_respuestas WHERE user_id = '${userId}`);
         const vftest = await sqlite3All(`SELECT * FROM test_vf_respuestas WHERE user_id = '${userId}`);
@@ -26,7 +26,7 @@ export const syncData = async(userId) => {
         ){
 
             const obj = {
-                user: user,
+                user: user.OK[0],
                 data: {
                     lessons:  lessons.OK,
                     forms: forms.OK,
@@ -40,7 +40,9 @@ export const syncData = async(userId) => {
                 }
             }
 
-            const response = await httpClient().post('http://educationfortheworld.com.py:7000', obj);
+            const response = await httpClient().post('http://educationfortheworld.com.py:7000', {
+                SYNCHRONIZE: obj
+            });
             if (response.error) {
                 return {
                     error: "Ha ocurrido un error en la sincronización remota. Intenta nuevamente"
