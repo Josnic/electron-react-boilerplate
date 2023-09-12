@@ -37,3 +37,256 @@ iframe {
     margin: auto;
     display: block;
 }
+
+
+:root {
+    --cxce-fuente-texto:arial;
+  
+    /* opcional: system-ui */
+    --cxce-color-1:#ed7a5f;
+  
+    /* color claro del logo - palo rosa */
+    --cxce-color-2:#384659;
+  
+    /* color oscuro del logo - gris */
+    --cxce-color-3:white;
+  
+    /* color 3 logo - blanco */
+  }
+  
+  /* Títulos redondeados y con fondos degradados */
+  
+  .cxce-titulo {
+    font-family: var(--cxce-fuente-texto);
+    color: white;
+    background: linear-gradient(135deg, var(--cxce-color-1), var(--cxce-color-2));
+    font-weight: bold;
+    padding: 10px;
+    text-align: center;
+    border-radius: 10px;
+    border-left: 10px solid var(--cxce-color-2);
+  }
+  
+  /* Párrafos resaltados de CX.*/
+  
+  .cxce-parrafo-resaltado {
+    font-family: var(--cxce-fuente-texto);
+    color: white;
+    background: var(--cxce-color-1);
+    max-width: 90%;
+    margin: auto;
+    padding: 15px;
+    border-right: 15px solid var(--cxce-color-2);
+    border-radius: 10px;
+    text-align: center;
+    font-size: 18px;
+    line-height: 1.2;
+  }
+  
+  /* Párrafos normales de CX */
+  
+  .cxce-parrafo-normal {
+    font-family: var(--cxce-fuente-texto);
+    color: black;
+    padding-left: 15px;
+    padding-right: 15px;
+    text-align: justify;
+    line-height: 1.2;
+  }
+  
+  /* ---- INICIO FRASES CÉLEBRES ---- */
+  /* Frases célebres tipo 1 - en caja de color */
+  
+  .cxce-frase-celebre1 {
+    background: var(--cxce-color-1);
+    font-family: var(--cxce-fuente-texto);
+    max-width: 80%;
+    margin: auto;
+    padding: 20px 20px;
+    border-radius: 10px;
+    text-align: justify;
+    box-shadow: 1px 5px 20px gray;
+    margin: 15px auto;
+    border-right: 15px solid var(--cxce-color-2);
+  
+    img {
+      width: 170px;
+      object-fit: contain;
+      border-radius: 10px;
+      float: left;
+      margin-right: 25px;
+      box-shadow: 1px 5px 20px gray;
+    }
+  
+    p {
+      text-align: center;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--cxce-color-3);
+    }
+  
+    h1 {
+      text-align: center;
+      font-size: 70px;
+      color: var(--cxce-color-3);
+      margin-top: -10px;
+      margin-bottom: -50px;
+      font-family: var(--cxce-fuente-texto);
+    }
+  }
+  
+  /* Frases célebres tipo 1 - en caja blanca */
+  
+  .cxce-frase-celebre2 {
+    font-family: var(--cxce-fuente-texto);
+    max-width: 80%;
+    margin: auto;
+    padding: 20px 20px;
+    border-radius: 10px;
+    text-align: justify;
+    box-shadow: 1px 5px 20px gray;
+    margin: 15px auto;
+    border-right: 15px solid var(--cxce-color-2);
+  
+    img {
+      width: 170px;
+      object-fit: contain;
+      border-radius: 10px;
+      float: left;
+      margin-right: 25px;
+      box-shadow: 1px 5px 20px gray;
+    }
+  
+    p {
+      text-align: center;
+      font-size: 20px;
+      font-style: italic;
+      color: var(--cxce-color-1);
+    }
+  
+    h1 {
+      text-align: center;
+      font-size: 70px;
+      color: var(--cxce-color-1);
+      margin-top: -10px;
+      margin-bottom: -50px;
+      font-family: var(--cxce-fuente-texto);
+    }
+  }
+  
+  /* ---- FIN FRASES CÉLEBRES ---- */
+  
+  /* ---- INICIO LISTAS GENERALES ---- */
+  
+  .cxce-lista-ul {
+    font-family: var(--cxce-fuente-texto);
+    padding-right: 15px;
+    text-align: justify;
+    line-height: 1.3;
+    list-style-type: circle;
+  }
+  
+  .cxce-lista-ol {
+    font-family: var(--cxce-fuente-texto);
+    padding-right: 15px;
+    text-align: justify;
+    line-height: 1.3;
+  }
+  
+  /* ---- FIN LISTAS GENERALES ---- */
+  
+  /* ---- INICIO CAPÍTULOS ---- */
+  /* Línea de nombre del capítulo*/
+  
+  .cxce-capitulo {
+    font-family: var(--cxce-fuente-texto);
+    margin: 0 auto;
+  }
+  
+  .cxce-capitulo-pre {
+    display: inline-block;
+    line-height: 0.28;
+    border-style: hidden hidden dashed hidden;
+    border-width: 5px;
+    border-color: var(--cxce-color-1);
+  }
+  
+  .cxce-capitulo-nombre {
+    color: var(--cxce-color-2);
+    line-height: 0.8;
+    text-transform: uppercase;
+    display: inline-block;
+    text-align: center;
+    padding-right: 15px;
+    box-shadow: -5px -5px 0 0 var(--cxce-color-1) inset;
+  }
+  
+  .cxce-capitulo-numero {
+    background: var(--cxce-color-1);
+    line-height: 0.8;
+    color: white;
+    display: inline-block;
+    text-align: center;
+    padding-right: 15px;
+    padding-left: 15px;
+  }
+  
+  /* Línea de imagen del objetivo del capítulo 
+  "EN ESTE CAPÍTULO LOGRARÁS" */
+  
+  .cxce-objetivo-capitulo {
+    font-family: var(--cxce-fuente-texto);
+    margin: 0 auto;
+  }
+  
+  .cxce-img-objetivo-capitulo {
+    display: inline-block;
+    padding-top: 20px;
+    vertical-align: bottom;
+  
+    img {
+      height: 63px;
+    }
+  }
+  
+  .cxce-texto-objetivo-capitulo {
+    display: inline-block;
+    color: var(--cxce-color-2);
+  }
+  
+  /* Lista de objetivos del capítulo */
+  
+  .cxce-lista-objetivo {
+    font-family: var(--cxce-fuente-texto);
+    font-size: 20px;
+    padding-right: 30px;
+    text-align: justify;
+    line-height: 1.3;
+    list-style-type: square;
+  }
+  
+  /* ---- FIN CAPÍTULOS ---- */
+  
+  /* Videos interactivos de muestra 
+  En la app web no se hacen así */
+  
+  .interactivo-contenedor {
+    background: gray;
+    margin: 0 auto;
+    max-width: 80%;
+    position: relative;
+    padding-bottom: 56.25%;
+    padding-top: 30px;
+    height: 0;
+    overflow: hidden;
+    display: flex;
+  
+    iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      height: 100%;
+      width: 100%;
+    }
+  }
+  
