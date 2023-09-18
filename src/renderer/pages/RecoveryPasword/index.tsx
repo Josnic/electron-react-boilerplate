@@ -43,7 +43,7 @@ export default function Activate() {
     const isReachable = await isInternetAvailable('https://google.com');
 
     if (isReachable) {
-      const response = await httpClient().post('http://educationfortheworld.com.py/apiv1-dskapp/', {
+      const response = await httpClient().post('https://educationfortheworld.com.py/apiv1-dskapp/', {
         CONFIRM_CODE: {
           email: email,
           fullName: fullName
