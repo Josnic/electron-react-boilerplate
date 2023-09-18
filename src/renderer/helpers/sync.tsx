@@ -11,11 +11,12 @@ export const syncData = async(userId) => {
 
         //lecciones 
 
-        const lessons = await sqlite3All(`SELECT * FROM sublecciones_vistas WHERE user_id = '${userId}'`);
-        const forms = await sqlite3All(`SELECT * FROM formulario_respuesta WHERE user_id = '${userId}`);
-        const radiotest = await sqlite3All(`SELECT * FROM test_radio_respuestas WHERE user_id = '${userId}`);
-        const inputntest = await sqlite3All(`SELECT * FROM test_inputn_respuestas WHERE user_id = '${userId}`);
-        const vftest = await sqlite3All(`SELECT * FROM test_vf_respuestas WHERE user_id = '${userId}`);
+        const lessons = await sqlite3All(`SELECT * FROM sublecciones_vistas WHERE user_id = '${userId}' GROUP BY subleccion_id`);
+        const forms = await sqlite3All(`SELECT * FROM formulario_respuesta WHERE user_id = '${userId}'`);
+        const radiotest = await sqlite3All(`SELECT * FROM test_radio_respuestas WHERE user_id = '${userId}'`);
+        const inputntest = await sqlite3All(`SELECT * FROM test_inputn_respuestas WHERE user_id = '${userId}'`);
+        const vftest = await sqlite3All(`SELECT * FROM test_vf_respuestas WHERE user_id = '${userId}'`);
+        console.log(lessons, forms, radiotest, inputntest, vftest)
 
         if (
             lessons.OK &&
@@ -51,114 +52,139 @@ export const syncData = async(userId) => {
                 }
               } else {
 
-                const toUpdate = response.data.ok.data.toUpdate;
-                const toInsert = response.data.ok.data.toInsert;
+                if (response.status == 201 && response.data.OK.data){
 
-                //eliminación
+                    const toUpdate = response.data.OK.data.data.toUpdate;
+                    const toInsert = response.data.OK.data.data.toInsert;
 
-                if (toUpdate.forms.length > 0){
-                    await sqlite3Run(
-                        `DELETE FROM formulario_respuesta WHERE cod_formulario IN('${toUpdate.forms.join("','")}') AND user_id = '${userId}'`,
-                        []
-                    ); 
-                }
-                
-                if (toUpdate.radiotest.length > 0){
-                    await sqlite3Run(
-                        `DELETE FROM test_radio_respuestas WHERE cod_test IN('${toUpdate.radiotest.join("','")}') AND user_id = '${userId}'`,
-                        []
-                      );
-                }
+                    //eliminación
 
-                if (toUpdate.inputntest.length > 0){
-                    await sqlite3Run(
-                        `DELETE FROM test_inputn_respuestas WHERE cod_test IN('${toUpdate.inputntest.join("','")}') AND user_id = '${userId}'`,
-                        []
-                    );
-                }
-
-                if (toUpdate.vftest.length > 0){
-                    await sqlite3Run(
-                        `DELETE FROM test_vf_respuestas WHERE cod_test IN('${toUpdate.vftest.join("','")}') user_id = '${userId}'`,
-                        []
-                    );
-                }
-
-                //inserción
-
-                if (toInsert.forms.length > 0){
-                    const arForm = [];
-                    for (let i = 0; i < toInsert.forms.length; i++){
-                        arForm.push([
-                            userId,
-                            toInsert.forms[i].cod_formulario,
-                            toInsert.forms[i].id_pregunta,
-                            toInsert.forms[i].respuesta,
-                            toInsert.forms[i].fecha,
-                        ])
+                    if (toUpdate.forms.length > 0){
+                        await sqlite3Run(
+                            `DELETE FROM formulario_respuesta WHERE cod_formulario IN('${toUpdate.forms.join("','")}') AND user_id = '${userId}'`,
+                            []
+                        ); 
                     }
-                    await sqlite3InsertBulk(
-                        'INSERT INTO formulario_respuesta VALUES (?,?,?,?,?)',
-                        arForm
-                      );
-                }
-                
-                if (toInsert.radiotest.length > 0){
-                    const arRadio = [];
-                    for (let i = 0; i < toInsert.radiotest.length; i++){
-                        arRadio.push([
-                            userId,
-                            toInsert.radiotest[i].cod_test,
-                            toInsert.radiotest[i].id_pregunta,
-                            toInsert.radiotest[i].valor,
-                            toInsert.radiotest[i].fecha
-                        ])
+                    
+                    if (toUpdate.radiotest.length > 0){
+                        await sqlite3Run(
+                            `DELETE FROM test_radio_respuestas WHERE cod_test IN('${toUpdate.radiotest.join("','")}') AND user_id = '${userId}'`,
+                            []
+                        );
                     }
-                    await sqlite3InsertBulk(
-                        'INSERT INTO test_radio_respuestas VALUES (?,?,?,?,?)',
-                        arRadio
-                      );
-                }
 
-                if (toInsert.inputntest.length > 0){
-
-                    const arInput = [];
-                    for (let i = 0; i < toInsert.inputntest.length; i++){
-                        arInput.push([
-                            userId,
-                            toInsert.inputntest[i].cod_test,
-                            toInsert.inputntest[i].id_pregunta,
-                            toInsert.inputntest[i].valor,
-                            toInsert.inputntest[i].fecha
-                        ])
+                    if (toUpdate.inputntest.length > 0){
+                        await sqlite3Run(
+                            `DELETE FROM test_inputn_respuestas WHERE cod_test IN('${toUpdate.inputntest.join("','")}') AND user_id = '${userId}'`,
+                            []
+                        );
                     }
-                    await sqlite3InsertBulk(
-                        'INSERT INTO test_inputn_respuestas VALUES (?,?,?,?,?)',
-                        arInput
-                      );
-                }
 
-                if (toInsert.vftest.length > 0){
-                    const arVtest = [];
-                    for (let i = 0; i < toInsert.vftest.length; i++){
-                        arVtest.push([
-                            userId,
-                            toInsert.vftest[i].cod_test,
-                            toInsert.vftest[i].id_pregunta,
-                            toInsert.vftest[i].valor,
-                            toInsert.vftest[i].fecha
-                        ])
+                    if (toUpdate.vftest.length > 0){
+                        await sqlite3Run(
+                            `DELETE FROM test_vf_respuestas WHERE cod_test IN('${toUpdate.vftest.join("','")}') user_id = '${userId}'`,
+                            []
+                        );
                     }
-                    await sqlite3InsertBulk(
-                        'INSERT INTO test_inputn_respuestas VALUES (?,?,?,?,?)',
-                        arVtest
-                      );
-                }
+
+                    //inserción
+
+                    if (toInsert.lessons.length > 0){
+                        const arLessons = [];
+                        for (let i = 0; i < toInsert.lessons.length; i++){
+                            arLessons.push([
+                                userId,
+                                toInsert.lessons[i].subleccion_id,
+                                toInsert.lessons[i].ultima_fecha,
+                                toInsert.lessons[i].num_vista,
+                            ])
+                        }
+                        await sqlite3InsertBulk(
+                            'INSERT INTO sublecciones_vistas VALUES (?,?,?,?)',
+                            arLessons
+                        );
+                    }
+
+                    if (toInsert.forms.length > 0){
+                        const arForm = [];
+                        for (let i = 0; i < toInsert.forms.length; i++){
+                            arForm.push([
+                                userId,
+                                toInsert.forms[i].cod_formulario,
+                                toInsert.forms[i].id_pregunta,
+                                toInsert.forms[i].respuesta,
+                                toInsert.forms[i].fecha,
+                            ])
+                        }
+                        await sqlite3InsertBulk(
+                            'INSERT INTO formulario_respuesta VALUES (?,?,?,?,?)',
+                            arForm
+                        );
+                    }
+                    
+                    if (toInsert.radiotest.length > 0){
+                        const arRadio = [];
+                        for (let i = 0; i < toInsert.radiotest.length; i++){
+                            arRadio.push([
+                                userId,
+                                toInsert.radiotest[i].cod_test,
+                                toInsert.radiotest[i].id_pregunta,
+                                toInsert.radiotest[i].valor,
+                                toInsert.radiotest[i].fecha
+                            ])
+                        }
+                        await sqlite3InsertBulk(
+                            'INSERT INTO test_radio_respuestas VALUES (?,?,?,?,?)',
+                            arRadio
+                        );
+                    }
+
+                    if (toInsert.inputntest.length > 0){
+
+                        const arInput = [];
+                        for (let i = 0; i < toInsert.inputntest.length; i++){
+                            arInput.push([
+                                userId,
+                                toInsert.inputntest[i].cod_test,
+                                toInsert.inputntest[i].id_pregunta,
+                                toInsert.inputntest[i].valor,
+                                toInsert.inputntest[i].fecha
+                            ])
+                        }
+                        await sqlite3InsertBulk(
+                            'INSERT INTO test_inputn_respuestas VALUES (?,?,?,?,?)',
+                            arInput
+                        );
+                    }
+
+                    if (toInsert.vftest.length > 0){
+                        const arVtest = [];
+                        for (let i = 0; i < toInsert.vftest.length; i++){
+                            arVtest.push([
+                                userId,
+                                toInsert.vftest[i].cod_test,
+                                toInsert.vftest[i].id_pregunta,
+                                toInsert.vftest[i].valor,
+                                toInsert.vftest[i].fecha
+                            ])
+                        }
+                        await sqlite3InsertBulk(
+                            'INSERT INTO test_inputn_respuestas VALUES (?,?,?,?,?)',
+                            arVtest
+                        );
+                    }
 
 
-                return {
-                    OK: true
+                    return {
+                        OK: true
+                    }
+
+                }else{
+                    return {
+                        error: "Ha ocurrido un error en la sincronización remota. Intenta nuevamente. NO_201"
+                    }
                 }
+
               }
       
 
