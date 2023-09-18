@@ -43,6 +43,11 @@ export default function Update() {
   const [isOpen, setIsOpen] = React.useState(false);
   const [dataUser, setDataUser] = React.useState(null);
   const handleChange = (e) => {
+      setDataUser({
+        ...dataUser,
+        fecha_nacimiento: e
+      })
+
     setIsOpen(false);
     setStartDate(e);
   };
@@ -58,8 +63,10 @@ export default function Update() {
       `SELECT * FROM usuario WHERE email = '${userId}' LIMIT 1`
     );
     if (userQuery.OK && userQuery.OK.length == 1) {
+      console.log(userQuery.OK[0])
       setOpen(false);
-      setStartDate(new Date(userQuery.OK[0].fecha_nacimiento))
+      const dateParts = userQuery.OK[0].fecha_nacimiento.split("-")
+      setStartDate(new Date(dateParts[0],dateParts[1], dateParts[2]))
       setDataUser(userQuery.OK[0]);
     } else {
       setOpen(false);
@@ -101,7 +108,7 @@ export default function Update() {
     } else {
 
         let updateRun = true;
-        let udateString = `UPDATE usuario SET nombre_completo = '${fullName}', documento = '${document}', fecha_nacimiento = '${birthday}',`;
+        let updateString = `UPDATE usuario SET nombre_completo = '${fullName}', documento = '${document}', fecha_nacimiento = '${birthday}' `;
         
         if (password_repeat != '' || password != ''){
           if (password != password_repeat) {
@@ -110,27 +117,21 @@ export default function Update() {
               'Revisa que tu contraseña sea la misma en ambos campos de texto'
             );
           }else{
-            udateString += `, password1 = '${sha256Encode(password)}', password2 = '${ base64Encode(password)}' `;
+            updateString += `, password1 = '${sha256Encode(password)}', password2 = '${ base64Encode(password)}' `;
           }
         }
 
-        udateString += ` WHERE email = '${dataUser.email}'`;
+        updateString += ` WHERE email = '${dataUser.email}'`;
 
         if (updateRun){
           setOpen(true);
           const result = await sqlite3Run(
-            'INSERT INTO usuario VALUES (?,?,?,?,?,?,?)',
+            updateString,
             [
-              fullName,
-              document,
-              email,
-              birthday,
-              sha256Encode(password),
-              base64Encode(password),
-              getMysqlDate().split(' ')[0],
             ]
           );
           if (result.OK) {
+            setOpen(false);
             showToast(
               'Usuario actualizado exitosamente',
               'success'
@@ -180,6 +181,12 @@ export default function Update() {
                   id="fullName"
                   label="Nombre completo"
                   value={dataUser.nombre_completo}
+                  onChange={(event) => {
+                    setDataUser({
+                      ...dataUser,
+                      nombre_completo: event.value
+                    })
+                  }}
                   autoFocus
                 />
               </Grid>
@@ -192,7 +199,7 @@ export default function Update() {
                   id="birthday"
                   label="Fecha de nacimiento"
                   onClick={handleClick}
-                  value={formatDate(startDate)}
+                  value={formatDate(new Date(dataUser.fecha_nacimiento))}
                   inputProps={{ readOnly: true }}
                 />
                 {isOpen ? (
@@ -272,6 +279,12 @@ export default function Update() {
                   name="document"
                   autoComplete="off"
                   value={dataUser.documento}
+                  onChange={(event) => {
+                    setDataUser({
+                      ...dataUser,
+                      documento: event.value
+                    })
+                  }}
                 />
               </Grid>
               <Grid item xs={12}>
@@ -283,6 +296,9 @@ export default function Update() {
                   name="email"
                   autoComplete="off"
                   value={dataUser.email}
+                  inputProps={
+                    { readOnly: true, }
+                  }
                 />
               </Grid>
               <Grid item xs={12}>
@@ -294,6 +310,9 @@ export default function Update() {
                   name="email_repeat"
                   autoComplete="off"
                   value={dataUser.email}
+                  inputProps={
+                    { readOnly: true, }
+                  }
                 />
               </Grid>
               <Grid item xs={12}>
