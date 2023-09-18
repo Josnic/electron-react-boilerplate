@@ -279,7 +279,7 @@ export default function MenuFooter({ isCourse, open, courseCode, legalPage, webs
                   if (result.error){
                     showToast(result?.error, 'error');
                   }else{
-                    showToast("Sincronización finalizada con éxito.")
+                    showToast("Sincronización finalizada con éxito.", "success")
                   }
                 }catch(e){
                   console.log(e)
