@@ -1,6 +1,7 @@
 {
   "name": "MenteMaestra",
   "description": "Aplicación de cursos",
+  "version": "1.0.0",
   "author": {
     "name": "Educational for the world",
     "email": "educationfortheworld1@gmail.com",
