@@ -1,36 +1,16 @@
 {
-  "name": "HabilidadesBlandas",
-  "description": "A foundation for scalable desktop apps",
-  "keywords": [
-    "electron",
-    "boilerplate",
-    "react",
-    "typescript",
-    "ts",
-    "sass",
-    "webpack",
-    "hot",
-    "reload"
-  ],
-  "homepage": "https://github.com/electron-react-boilerplate/electron-react-boilerplate#readme",
-  "bugs": {
-    "url": "https://github.com/electron-react-boilerplate/electron-react-boilerplate/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/electron-react-boilerplate/electron-react-boilerplate.git"
-  },
-  "license": "MIT",
+  "name": "MenteMaestra",
+  "description": "Aplicación de cursos",
   "author": {
-    "name": "Electron React Boilerplate Maintainers",
-    "email": "electronreactboilerplate@gmail.com",
-    "url": "https://electron-react-boilerplate.js.org"
+    "name": "Educational for the world",
+    "email": "educationfortheworld1@gmail.com",
+    "url": "https://educationfortheworld.com.py/"
   },
   "contributors": [
     {
-      "name": "Amila Welihinda",
-      "email": "amilajack@gmail.com",
-      "url": "https://github.com/amilajack"
+      "name": "Educational for the world",
+      "email": "educationfortheworld1@gmail.com",
+      "url": "https://educationfortheworld.com.py/"
     }
   ],
   "main": "./src/main/main.ts",
@@ -198,8 +178,8 @@
     "webpack-merge": "^5.8.0"
   },
   "build": {
-    "productName": "HabilidadesBlandas",
-    "appId": "app.educationalfortheworld.habilidadesblandas",
+    "productName": "MenteMaestra",
+    "appId": "aa.educationalforthrworld.mentemaestra",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
@@ -265,9 +245,6 @@
       "owner": "electron-react-boilerplate",
       "repo": "electron-react-boilerplate"
     }
-  },
-  "collective": {
-    "url": "https://opencollective.com/electron-react-boilerplate-594"
   },
   "devEngines": {
     "node": ">=14.x",
