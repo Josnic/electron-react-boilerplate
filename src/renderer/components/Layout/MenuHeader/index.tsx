@@ -11,6 +11,9 @@ import LinearProgress, { linearProgressClasses } from '@mui/material/LinearProgr
 import CardHeader from '@mui/material/CardHeader';
 import MenuIcon from '@mui/icons-material/Menu';
 import { getPathCourseResource } from '../../../utils/electronFunctions';
+import Menu from '@mui/material/Menu';
+import MenuItem from '@mui/material/MenuItem';
+import { useNavigate } from 'react-router-dom';
 
 const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
   height: 12,
@@ -46,6 +49,17 @@ export default function MenuHeader({ progress, isCourse, courseCode, handleDrawe
   const userName = authState.auth.user ? authState.auth.user.nombre_completo : "test";
   const [imgCourse, setImageCourse] = React.useState(null);
   const [imgApp, setImageApp] = React.useState(null);
+  const [anchorElUser, setAnchorElUser] = React.useState(null);
+  const navigate = useNavigate();
+
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
   const getImageCourse = async() => {
     const imgPath = await getPathCourseResource(courseCode + "/img.asar/logo_curso.png");
     setImageCourse(imgPath)
@@ -123,14 +137,37 @@ export default function MenuHeader({ progress, isCourse, courseCode, handleDrawe
           <Box sx={{ flexGrow: 0 }}>
               <CardHeader
                 avatar={
-                    <IconButton sx={{ p: 0, display: { md: 'flex' } }}>
+                    <IconButton onClick={handleOpenUserMenu} onMouseOver={handleOpenUserMenu} sx={{ p: 0, display: { md: 'flex' } }}>
                       <Avatar>{processNameForAvatar(userName)}</Avatar>
                     </IconButton>
                 }
                 title={userName}
                 subheader={<NumberLinearProgress value={progress ? progress : 0} />}
               />
-          </Box>
+              <Menu
+                sx={{ mt: '45px' }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: 'top',
+                  horizontal: 'right',
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                <MenuItem key={1} onClick={()=>{
+                  navigate('/update');
+                  handleCloseUserMenu();
+                }}>
+                  <Typography textAlign="center">{"Actualizar datos"}</Typography>
+                </MenuItem> 
+              </Menu>
+            </Box>
         </Toolbar>
       </AppBar>
   );
