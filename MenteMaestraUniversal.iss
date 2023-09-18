@@ -25,7 +25,7 @@ DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
 ;el archivo de salida se va a llamar Sistemas nada mas.
 OutputBaseFilename=Sistemas 
-SetupIconFile="D:\Productos\FS\WorldSystems\worldsystems.ico"
+SetupIconFile="C:\NodeApps\ElectronApps\electronApps\electron-react-boilerplate\icon.ico"
 Compression=lzma
 SolidCompression=yes
 ;ArchitecturesAllowed = x64
@@ -47,7 +47,8 @@ Name: "{app}"; Permissions: users-full
 Source: "C:\NodeApps\ElectronApps\electronApps\electron-react-boilerplate\release\build\win-unpacked\MenteMaestra.exe"; DestDir: "{app}"; Check: IsX64;  Flags: ignoreversion
 Source: "C:\NodeApps\ElectronApps\electronApps\electron-react-boilerplate\release\build\win-unpacked\*"; DestDir: "{app}"; Check: IsX64; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "{src}\COVI\*"; DestDir: "{app}\resources\COVI\"; Check: IsX64; Flags: external;
-Source: "{src}\INEM\*"; DestDir: "{app}\resources\INEM\"; Check: IsX64; Flags: external;Source: "{src}\LITR\*"; DestDir: "{app}\resources\LITR\"; Check: IsX64; Flags: external;
+Source: "{src}\INEM\*"; DestDir: "{app}\resources\INEM\"; Check: IsX64; Flags: external;
+Source: "{src}\LITR\*"; DestDir: "{app}\resources\LITR\"; Check: IsX64; Flags: external;
 
 ;archivos de 32 bits
 
@@ -57,7 +58,7 @@ Source: "{src}\COVI\*"; DestDir: "{app}\resources\COVI\"; Check: IsX86; Flags: e
 Source: "{src}\INEM\*"; DestDir: "{app}\resources\INEM\"; Check: IsX86; Flags: external;
 Source: "{src}\LITR\*"; DestDir: "{app}\resources\LITR\"; Check: IsX86; Flags: external;
 
-; como puede ver, los archivos  se agrupan en 2: los de 64 y 32 bits. Se agrega a cada linea Source  un atributo  Check: IsX86; para los de 32 bits y Check: IsX64; para los de 64. Esto quiere decir que según la arquitectura se copian o no ciertos archivos
+; como puede ver, los archivos  se agrupan en 2: los de 64 y 32 bits. Se agrega a cada linea Source  un atributo  Check: IsX86; para los de 32 bits y Check: IsX64; para los de 64. Esto quiere decir que segï¿½n la arquitectura se copian o no ciertos archivos
  ; esto lo que hace es llamar a la funcion Pascal agregada abajo 
 
 
