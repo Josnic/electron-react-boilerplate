@@ -19,9 +19,10 @@ const Init = () => {
     const statusLicense = base64Decode(data.estado);
     if (statusLicense == 'ACTIVE') {
       if (machineId == data.serial_maquina) {
-        navigate('/login');
+        navigate('/welcome');
       }else{
         showToast('Identificador de licencia inválido activo.', 'error');
+        navigate('/welcome');
       }
 
     }else if (statusLicense == "NO_VALID"){
@@ -72,7 +73,7 @@ const Init = () => {
               }
 
             }else{
-              navigate("/login")
+              navigate("/welcome")
             }
             
           } else {
@@ -91,7 +92,7 @@ const Init = () => {
           }
 
         }else{
-          navigate('/login');
+          navigate('/welcome');
         }
 
       } else {
@@ -108,7 +109,7 @@ const Init = () => {
     if (state == "NO_VALID"){
       showToast('Licencia no válida. Imposible continuar.');
     }else{
-      navigate('/login');
+      navigate('/welcome');
     }
     
    
