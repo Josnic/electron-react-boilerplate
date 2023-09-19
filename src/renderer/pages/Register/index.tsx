@@ -110,43 +110,58 @@ export default function SignUp() {
         showToast('Revisa que tu contraseña sea la misma en ambos campos de texto');
     } else {
       setOpen(true);
-      const existsData = await sqlite3All(
-        `SELECT * FROM usuario WHERE email = '${email}' OR documento = '${document}'`
+
+      const generalConfig = await sqlite3All(
+        `SELECT * FROM general LIMIT 1`
       );
 
-      if (existsData.OK && existsData.OK.length == 0){
-        const result = await sqlite3Run(
-          'INSERT INTO usuario VALUES (?,?,?,?,?,?,?)',
-          [
-            fullName,
-            document,
-            email,
-            birthday,
-            sha256Encode(password),
-            base64Encode(password),
-            getMysqlDate().split(' ')[0],
-          ]
-        );
-        if (result.OK) {
-          setReady(true);
-          showToast(
-            'Usuario creado exitosamente. De click en el botón o cierre el mensaje para ir a la pantalla de inico de sesión',
-            'success',
-            undefined,
-            () => {
-              setOpen(false);
-              navigate('/login');
-            }
-          );
-        } else {
-          setOpen(false);
-          console.log(result);
-          showToast('Ocurrió un error. Intenta nuevamente.', 'error');
-        }
-      }else{
+      const allUsers = await sqlite3All(
+        `SELECT * FROM usuario`
+      );
+
+      if (parseInt(generalConfig.OK[0].numu) == allUsers.OK.length){
         setOpen(false);
-        console.log(existsData);
-        showToast('Ocurrió un error. Intenta nuevamente.', 'error');
+        showToast('Máximo de usuarios permitidos.', 'error');
+      }else{
+        const existsData = await sqlite3All(
+          `SELECT * FROM usuario WHERE email = '${email}' OR documento = '${document}'`
+        );
+  
+        if (existsData.OK && existsData.OK.length == 0){
+          
+          const result = await sqlite3Run(
+            'INSERT INTO usuario VALUES (?,?,?,?,?,?,?)',
+            [
+              fullName,
+              document,
+              email,
+              birthday,
+              sha256Encode(password),
+              base64Encode(password),
+              getMysqlDate().split(' ')[0],
+            ]
+          );
+          if (result.OK) {
+            setReady(true);
+            showToast(
+              'Usuario creado exitosamente. De click en el botón o cierre el mensaje para ir a la pantalla de inico de sesión',
+              'success',
+              undefined,
+              () => {
+                setOpen(false);
+                navigate('/login');
+              }
+            );
+          } else {
+            setOpen(false);
+            console.log(result);
+            showToast('Ocurrió un error. Intenta nuevamente.', 'error');
+          }
+        }else{
+          setOpen(false);
+          console.log(existsData);
+          showToast('Revisa que el correo o documento de usuario no exista dentro de la app y que no has exedido el máximo de usuarios.', 'error');
+        }
       }
       
     }
