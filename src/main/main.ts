@@ -16,7 +16,7 @@ import MenuBuilder from './menu';
 import { resolveHtmlPath } from './util';
 
 import { ipcMainUtils } from './app/ipcMainUtils';
-import { sqlite3Module } from './app/sqlite3Module';
+import { sqlite3Module, closeDatabase } from './app/sqlite3Module';
 
 class AppUpdater {
   constructor() {
@@ -107,7 +107,7 @@ const createWindow = async () => {
 
   const menuBuilder = new MenuBuilder(mainWindow);
   menuBuilder.buildMenu();
-
+  
   // Open urls in the user's browser
   mainWindow.webContents.setWindowOpenHandler((edata) => {
     shell.openExternal(edata.url);
@@ -126,6 +126,7 @@ const createWindow = async () => {
 app.on('window-all-closed', () => {
   // Respect the OSX convention of having the application in memory even
   // after all windows have been closed
+  closeDatabase()
   if (process.platform !== 'darwin') {
     app.quit();
   }

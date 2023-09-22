@@ -5,21 +5,28 @@ import * as path from 'path';
 
 const localPath = app.isPackaged ? "../" : "release/app/";
 const pathDatabase = path.join(app.getAppPath(), `${localPath}data.db`)
-var db;
+var db = new sqlite3.Database(pathDatabase);
+
+export const closeDatabase = () => {
+    if (db) {
+        console.log("BD cerrada")
+        db.close();
+    }
+}
 
 export function sqlite3Module(ipcMain) {
     console.log("sqlite3  ok", pathDatabase)
 
     ipcMain.handle('SQLITE3_BULK_INSERT_PREPARED', async (event, arg) => {
         return new Promise((resolve) => {
-            db = new sqlite3.Database(pathDatabase);
+            //db = new sqlite3.Database(pathDatabase);
             const stmt = db.prepare(arg[0]);
             const values = arg[1];
             for (let i = 0; i < values.length; i++) {
                 stmt.run(values[i]);
             }
             stmt.finalize();
-            db.close();
+            // db.close();
             resolve({
                 OK: true
             })
@@ -28,11 +35,11 @@ export function sqlite3Module(ipcMain) {
 
     ipcMain.handle('SQLITE3_INSERT_LASTID', async (event, arg) => {
         return new Promise((resolve) => {
-            db = new sqlite3.Database(pathDatabase);
+            //db = new sqlite3.Database(pathDatabase);
             const stmt = db.prepare(arg[0]);
             stmt.run(arg[1], function(err){
                 stmt.finalize();
-                db.close();
+                // db.close();
                 if (err){
                     resolve({
                         ERROR: err
@@ -48,9 +55,9 @@ export function sqlite3Module(ipcMain) {
 
     ipcMain.handle('SQLITE3_RUN', async (event, arg) => {
         return new Promise((resolve) => {
-            db = new sqlite3.Database(pathDatabase);
+            //db = new sqlite3.Database(pathDatabase);
             db.run(arg[0], arg[1], function(err){
-                db.close();
+                // db.close();
                 if (err){
                     resolve({
                         ERROR: err
@@ -66,9 +73,9 @@ export function sqlite3Module(ipcMain) {
 
     ipcMain.handle('SQLITE3_SELECT', async (event, arg) => {
         return new Promise((resolve) => {
-            db = new sqlite3.Database(pathDatabase);
+            //db = new sqlite3.Database(pathDatabase);
             db.all(arg[0], function(err, rows) {
-                db.close();
+                // db.close();
                 if (err){
                     resolve({
                         ERROR: err
