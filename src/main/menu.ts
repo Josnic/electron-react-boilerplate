@@ -32,7 +32,14 @@ export default class MenuBuilder {
         : this.buildDefaultTemplate();
 
     const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+    if (
+      process.env.NODE_ENV === 'development' ||
+      process.env.DEBUG_PROD === 'true'
+    ) {
+      Menu.setApplicationMenu(menu);
+    }else{
+      Menu.setApplicationMenu(null);
+    }
 
     return menu;
   }
