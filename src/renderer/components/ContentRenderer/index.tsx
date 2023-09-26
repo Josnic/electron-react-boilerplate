@@ -18,7 +18,7 @@ import parse from 'html-react-parser';
 import * as download from 'downloadjs/download';
 import { useSelector } from 'react-redux';
 import { getMysqlDate } from '../../utils/generals';
-import { getPathCourseResource } from '../../utils/electronFunctions';
+import { getPathCourseResource, getBinaryContent } from '../../utils/electronFunctions';
 import { useStateWithCallback } from '../../hooks/useStateWithCallback';
 import { sqlite3Run, sqlite3All } from '../../helpers/Sqlite3Operations';
 import './styles.scss';
@@ -177,10 +177,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
     }
 
     if (data.archivo_descargable) {
-      const filePathPdf = await getPathCourseResource(
-        path + '/pdf.asar/' + data.archivo_descargable
-      );
-      setFilePathDownload(filePathPdf);
+      setFilePathDownload(path + '/pdf.asar/' + data.archivo_descargable);
     }
 
     const finalHtml = content ? content : content2;
@@ -307,6 +304,12 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
     }
   }
 
+  const downloadFile = async() => {
+    const fileBytes = await getBinaryContent(filePathDownload);
+    const filePathAr = filePathDownload.split("/");
+    download(fileBytes, filePathAr[filePathAr.length - 1], "application/pdf");
+  }
+
   useEffect(() => {
     setOpen(true);
     prepareHtml();
@@ -331,8 +334,8 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
       {
         data && filePathDownload  ? (
           <Grid item xs={12} className="download-button-container">
-            <Button onClick={()=>{
-              download(filePathDownload);
+            <Button onClick={async()=>{
+              await downloadFile();
             }} variant="outlined" download>{data.texto_boton}</Button>
           </Grid>
         ):(
