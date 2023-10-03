@@ -1,6 +1,6 @@
 import { sqlite3All, sqlite3Run, sqlite3InsertBulk } from './Sqlite3Operations';
 import httpClient from './httpClient';
-import { isInternetAvailable } from '../utils/electronFunctions';
+import { isInternetAvailable, axiosNativePost } from '../utils/electronFunctions';
 import { base64Decode } from '../utils/generals';
 
 export const syncData = async(userId) => {
@@ -41,7 +41,7 @@ export const syncData = async(userId) => {
                 }
             }
 
-            const response = await httpClient().post('https://educationfortheworld.com.py/apiv1-dskapp/', {
+            const response = await axiosNativePost('https://educationfortheworld.com.py/apiv1-dskapp/', {
                 SYNCHRONIZE: obj
             });
             console.log(response)

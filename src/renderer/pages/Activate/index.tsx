@@ -28,6 +28,7 @@ import {
   readSerialFiles,
   deleteSerialFiles,
   isInternetAvailable,
+  axiosNativePost
 } from '../../utils/electronFunctions';
 import { userApi, tokenApi, BAD_REQUEST_ERRORS } from '../../constants';
 
@@ -45,7 +46,7 @@ export default function Activate() {
       const isReachable = await isInternetAvailable('https://google.com');
       const machineId = await getMachineId();
       if (isReachable) {
-        const response = await httpClient().post('http://educationfortheworld.com.py:7000/v1', {
+        const response = await axiosNativePost('http://educationfortheworld.com.py:7000/v1', {
           serialLicense: pin,
           serialMachine: machineId,
           user: userApi,

@@ -25,3 +25,7 @@ export const readSerialFiles = async(pin) => {
 export const isInternetAvailable = async(domain) => {
     return await window.electron.ipcRenderer.invoke('isInternetAvailable', domain);
 }
+
+export const axiosNativePost = async(path, payload) => {
+    return await window.electron.ipcRenderer.invoke('axiosNativePost', {path: path, payload:payload});
+}

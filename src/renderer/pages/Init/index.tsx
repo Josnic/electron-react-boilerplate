@@ -8,7 +8,7 @@ import { sqlite3All, sqlite3Run } from '../../helpers/Sqlite3Operations';
 import AuthTypes from './../../redux/constants';
 import { sha256Encode, base64Decode, base64Encode } from '../../utils/generals';
 import httpClient from '../../helpers/httpClient';
-import { getMachineId, isInternetAvailable } from '../../utils/electronFunctions';
+import { getMachineId, isInternetAvailable, axiosNativePost } from '../../utils/electronFunctions';
 import { userApi, tokenApi, BAD_REQUEST_ERRORS } from '../../constants';
 
 const Init = () => {
@@ -32,7 +32,7 @@ const Init = () => {
       if (machineId == data.serial_maquina) {
         const isReachable = await isInternetAvailable('https://google.com');
         if (isReachable){
-          const response = await httpClient().post('http://educationfortheworld.com.py:7000/v1', {
+          const response = await axiosNativePost('http://educationfortheworld.com.py:7000/v1', {
             user: userApi,
             token: tokenApi,
             serialLicense: base64Decode(data.serial_licencia),

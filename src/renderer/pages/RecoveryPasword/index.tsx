@@ -19,7 +19,7 @@ import { sqlite3All } from '../../helpers/Sqlite3Operations';
 import { showToast } from '../../utils/toast';
 import { base64Decode } from '../../utils/generals';
 import httpClient from '../../helpers/httpClient';
-import { isInternetAvailable } from '../../utils/electronFunctions';
+import { isInternetAvailable, axiosNativePost } from '../../utils/electronFunctions';
 
 export default function Activate() {
   const [open, setOpen] = React.useState(false);
@@ -43,7 +43,7 @@ export default function Activate() {
     const isReachable = await isInternetAvailable('https://google.com');
 
     if (isReachable) {
-      const response = await httpClient().post('https://educationfortheworld.com.py/apiv1-dskapp/', {
+      const response = await axiosNativePost('https://educationfortheworld.com.py/apiv1-dskapp/', {
         CONFIRM_CODE: {
           email: email,
           fullName: fullName

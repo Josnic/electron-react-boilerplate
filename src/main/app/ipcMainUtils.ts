@@ -1,14 +1,67 @@
 import { join } from 'path';
 import { app, shell } from 'electron';
 import * as fs from 'fs';
+import axios from 'axios';
 import { machineIdSync } from 'node-machine-id';
 import { isInternetAvailable } from 'is-internet-available';
 
 const localPath = app.isPackaged ? "../" : "release/app";
 
+const API = axios.create({
+  timeout: 4000,
+  headers: {
+      'accept': 'application/json', 
+      'Content-Type': 'application/json',
+      'user': 'userSerial',
+      'token': '0febaed7a8fe0951fefd618b176e34d483082e12'
+  },
+  adapter: 'http' 
+})
+
+const errorHandler = (error) => {
+  if (error.response){
+      return {
+          type: "response",
+          error: {
+            status: error.response.status,
+            data: error.response.data
+          }
+      }
+  }else if (error.request){
+      return {
+          type: "request",
+          error: {
+            status: error.request.status ? error.request.status : 0,
+            data: error.request.data ? error.request.data : "REQUEST_ERROR"
+          }
+      }
+  }else{
+      return {
+          type: "unknown",
+          error: error.message
+      }
+  }
+}
+
 export function ipcMainUtils(ipcMain) {
   ipcMain.on('openBrowser', async (event, arg) => {
     shell.openExternal(arg[0]);
+  });
+
+  ipcMain.handle('axiosNativePost', async (event, ...args) => {
+        try{
+          const result = await API.post(args[0].path, args[0].payload);
+          return {
+            status: result.status,
+            data: result.data
+          }
+      }catch(e){
+        console.log(e.response)
+          return {
+              data: errorHandler(e),
+              error: true
+          }
+      }  
   });
 
   ipcMain.handle('getPathCourseResource', async (event, ...args) => {
