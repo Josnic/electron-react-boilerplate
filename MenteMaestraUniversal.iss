@@ -23,8 +23,8 @@ DefaultDirName={sd}\{#MyAppName}
 DisableDirPage=yes
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
-;el archivo de salida se va a llamar Sistemas nada mas.
-OutputBaseFilename=Sistemas 
+;el archivo de salida se va a llamar
+OutputBaseFilename=MenteMaestra 
 SetupIconFile="C:\NodeApps\ElectronApps\electronApps\electron-react-boilerplate\icon.ico"
 Compression=lzma
 SolidCompression=yes
