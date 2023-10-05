@@ -23,6 +23,7 @@ release/app/*
 !release/app/commonassets
 release/build
 .erb/dll
+.github/*
 
 .idea
 npm-debug.log.*
