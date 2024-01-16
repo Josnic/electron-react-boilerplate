@@ -7,7 +7,7 @@ interface IProps {
 }
 
 const VideoIframe: React.FC<IProps> = (props) => {
-  const { sourceUrl, title, id} = props;
+  const { sourceUrl, title, id, callbackSave } = props;
 
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const defaultHeight = 495;
@@ -68,11 +68,21 @@ const VideoIframe: React.FC<IProps> = (props) => {
     };
   }, [videoHeight, handleChangeVideoWidth]);
 
+  const execCallbackSave = (event) => {
+    console.log("Evaluación evento", event)
+    callbackSave();
+    window.removeEventListener("message",execCallbackSave)
+  }
+
   useEffect(()=>{
     const bb = document.getElementById(id)
+    window.addEventListener("message", execCallbackSave)
     onresize(bb, function () {
         handleChangeVideoWidth2()
       })
+    return () => {
+      window.removeEventListener("message",execCallbackSave)
+    }
   }, [])
 
   return (

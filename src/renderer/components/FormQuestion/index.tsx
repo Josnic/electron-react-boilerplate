@@ -163,6 +163,7 @@ const FormQuestion = ({ data, courseCode, onFinalize, onContinue }) => {
     if (data) {
       setOpen(true);
       loadFormDetails();
+      document.getElementsByClassName("main")[0].scrollTo({ top: 0, left: 0 });
       setOpen(false);
     }
   }, [data.id]);

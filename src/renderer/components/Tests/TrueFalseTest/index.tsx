@@ -274,6 +274,7 @@ const TrueFalseTest = ({ data, courseCode, onFinalize, onContinue }) => {
     if (data) {
       setOpen(true);
       loadTestData();
+      document.getElementsByClassName("main")[0].scrollTo({ top: 0, left: 0 });
       setOpen(false);
     }
   }, [data]);

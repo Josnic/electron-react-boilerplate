@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import Grid from '@mui/material/Grid';
 import Button from '@mui/material/Button';
@@ -21,9 +21,11 @@ import { getMysqlDate } from '../../utils/generals';
 import { getPathCourseResource, getBinaryContent } from '../../utils/electronFunctions';
 import { useStateWithCallback } from '../../hooks/useStateWithCallback';
 import { sqlite3Run, sqlite3All } from '../../helpers/Sqlite3Operations';
+import { getMimeType } from '../../utils/generals';
+import { useInterval } from '../../hooks/useInterval'
 import './styles.scss';
 
-const Audio = ({ playList }) => {
+const Audio = ({ playList, getInstance }) => {
   const [progressType, setProgressType] = useState<ProgressUI>('waveform');
   const [playerPlacement, setPlayerPlacement] =
     useState<PlayerPlacement>('bottom-left');
@@ -37,6 +39,14 @@ const Audio = ({ playList }) => {
   const [width, setWidth] = useState('100%');
   const [activeUI, setActiveUI] = useState<ActiveUI>({ all: true });
 
+  const audioRef = useRef();
+
+  useEffect(()=>{
+    if (audioRef.current) {
+      getInstance(audioRef.current)
+    }
+  }, [audioRef.current])
+
   return (
     <>
       <AudioPlayer
@@ -45,6 +55,7 @@ const Audio = ({ playList }) => {
           ...activeUI,
           progress: progressType,
         }}
+        audioRef={audioRef}
         placement={{
           interface: {
             templateArea: interfacePlacement,
@@ -66,13 +77,13 @@ const Video = ({ source, getInstance }) => {
     <div>
       <Artplayer
         option={{
+          id: source,
           url: source,
           setting: true,
           autoSize: true,
           autoMini: true,
           screenshot: true,
-          setting: true,
-          loop: true,
+          loop: false,
           flip: true,
           playbackRate: true,
           aspectRatio: true,
@@ -98,25 +109,53 @@ const Video = ({ source, getInstance }) => {
         }}
         getInstance={(art) => {
           getInstance(art)
-          console.info(art)
         }}
       />
     </div>
   );
 };
 
-const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
+const ContentRenderer = ({ data, type, courseCode, onFinalize, onContinue }) => {
   const [html, setHtml] = useState(null);
   const [open, setOpen] = useState(false);
   const [filePathDownload, setFilePathDownload] = useState(null);
   const [rootMultimedia, setRootMultimedia] = useStateWithCallback([]);
   const [artPlayerInstances, setArtPlayerInstances] = useState([]);
+  const [audiosInstances, setAudiosInstances] = useState([]);
   const authState = useSelector((state) => state);
+  const videosDuration = useRef(0);
+  const audiosDuration = useRef(0);
+  const DEFAULT_DURATION_SUBLESSONS_SECONDS = 30;
+  const sublessonDuration = useRef(DEFAULT_DURATION_SUBLESSONS_SECONDS);
+  const MAX_DURATION_VIDEOS_PERCENTAGE = 50;
+  const MAX_DURATION_AUDIOS_PERCENTAGE = 50;
+
+  const [count, setCount] = useState(0) 
+  const [delay, setDelay] = useState(1000) 
+  const [isPlaying, setPlaying] = useState(false)
+  const durationFromDB = useRef(false)
+  const isQuizFinalized = useRef(true);
+  const [isSaved, setIsSaved] = useState(false)
+
+
+  useInterval( 
+    () => { 
+      setCount(count + 1) 
+    },  
+    isPlaying && !isSaved ? delay : null, 
+  ) 
+
   const prepareHtml = async () => {
     setFilePathDownload(null);
     let path = courseCode;
     let content = data.contenido;
     let content2 = "";
+    sublessonDuration.current = DEFAULT_DURATION_SUBLESSONS_SECONDS;
+    if (data.duracion_minima_segundos != null && Number(data.duracion_minima_segundos)){
+      sublessonDuration.current = Number(data.duracion_minima_segundos);
+      durationFromDB.current = true;
+    }
+     
     //imagenes
     const images = data.imagenes ? data.imagenes.split(',') : null;
     if (Array.isArray(images)) {
@@ -177,7 +216,21 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
     }
 
     if (data.archivo_descargable) {
-      setFilePathDownload(path + '/pdf.asar/' + data.archivo_descargable);
+
+      const arrayDownloadableFilesNames = data.archivo_descargable.split(",");
+      const arrayDownloadableFilesButtonTexts = data.texto_boton.split(",");
+
+      let newArrayFilesData = [];
+
+      for (let k = 0; k < arrayDownloadableFilesNames.length; k++) {
+        const extensionFile = arrayDownloadableFilesNames[k].split(".").pop();
+        newArrayFilesData.push({
+          file: path + '/descargables.asar/' + arrayDownloadableFilesNames[k],
+          buttonText: arrayDownloadableFilesButtonTexts[k] ? arrayDownloadableFilesButtonTexts[k] : "Descarga fichero " + extensionFile.toUpperCase() 
+        })
+      }
+
+      setFilePathDownload(newArrayFilesData);
     }
 
     const finalHtml = content ? content : content2;
@@ -188,6 +241,13 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
             artPlayerInstances[k].destroy();
           }
         }
+
+        if(audiosInstances.length > 0) {
+          for (let k = 0; k < audiosInstances.length; k++){
+            audiosInstances[k] = null;
+          }
+        }
+
         for (let i = 0; i < rootMultimedia.length; i++){
           try{
             rootMultimedia[i].unmount();
@@ -228,6 +288,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
         const finalPath = await getPathCourseResource(
           path + '/audios.asar/' + audios[i]
         );
+        console.log(finalPath)
         await renderMultimedia(audios[i], 'AUDIO', finalPath, data.nombre);
       }
     }
@@ -241,6 +302,14 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
       }
     }
   };
+
+  const updateIsPlayingValue = (value) => {
+    setPlaying(value)
+  }
+
+  const updateVideosDuration = (value) => {
+   videosDuration.current = videosDuration.current + value;
+  }
 
   const renderMultimedia = (identifier, type, source, name) => {
     const container = document.getElementById(identifier);
@@ -260,20 +329,91 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
             //writer: 'writer',
             //img: '',
             src: source,
-            id: 1,
+            id: 1
           },
         ];
-        component = <Audio playList={playList} />;
+        component = <Audio playList={playList} getInstance={(audioInstance)=>{
+          
+          audioInstance.id = identifier + "_audio";
+          const audioElement = document.getElementById(audioInstance.id)
+          audioElement.onplay = function() {
+            const isSaved1 = document.getElementById("input-hidden-saved").value == "true";
+            if (!isSaved1) {
+              updateIsPlayingValue(true);
+            }
+          };
+          audioElement.onpause = function() {
+            updateIsPlayingValue(false);
+          };
+
+          audioElement.onloadeddata = function () {
+            console.log(audioElement.duration)
+            audiosDuration.current = audiosDuration.current + audioElement.duration
+          }
+
+          setAudiosInstances(audiosInstances => [...audiosInstances, audioInstance])
+
+         }} />;
       break;
 
       case 'VIDEO':
         component = <Video source={source} getInstance={(artInstance)=>{
+
+          artInstance.on('video:canplay', (...args) => {
+            if (data.duracion_minima_segundos == null) {
+              const el = document.querySelector('[data-art-id="'+artInstance.id+'"]');
+              const video = el.querySelector("video");
+              updateVideosDuration(video.duration);
+              
+              /*video.onplay = () => {
+                const isSaved1 = document.getElementById("input-hidden-saved").value == "true";
+                if (!isSaved1){
+                  updateIsPlayingValue(true);
+                }
+              }
+              video.onpause = () => {
+                updateIsPlayingValue(false);
+              }*/
+            
+            }
+          });
+
+          artInstance.on('video:play', (...args) => {
+
+            const isSaved1 = document.getElementById("input-hidden-saved").value == "true";
+            if (!isSaved1){
+              updateIsPlayingValue(true);
+            }
+          });
+          artInstance.on('video:pause', (...args) => {
+
+              updateIsPlayingValue(false);
+            
+          });
+          
+
+          artInstance.on("video:timeupdate", (...args) => {
+            console.log(artInstance.currentTime)
+            const isSaved2 = document.getElementById("input-hidden-saved").value == "true";
+            const isPlaying2 = document.getElementById("input-hidden-is-playing").value == "true";
+            if (!isPlaying2 && !isSaved2) {
+              updateIsPlayingValue(true);
+            }
+          });
+
           setArtPlayerInstances(artPlayerInstances => [...artPlayerInstances, artInstance])
         }} />;
       break;
 
       case 'IFRAME':
-        component = <ResponsiveIframe id={identifier} sourceUrl={source} title={""} />
+        component = <ResponsiveIframe id={identifier} sourceUrl={source} title={""} callbackSave={()=>{
+          if (isQuizFinalized.current == false){
+            isQuizFinalized.current = true;
+            setPlaying(false);
+            setCount(0);
+            insertView()
+          }
+        }} />
       break;
     }
 
@@ -282,6 +422,7 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
 
   const insertView = async() => {
     if(type == "SUBLESSON"){
+      console.log("guardando...")
       const userId = authState && authState.auth.user ? authState.auth.user.email : "test";
 
       const validate = await sqlite3All(`SELECT * FROM sublecciones_vistas WHERE user_id = '${userId}' AND subleccion_id = '${data.id}'`)
@@ -300,30 +441,94 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
           );
           console.log(result)
         }
+        setIsSaved(true);
+        onFinalize();
       }
     }
   }
 
-  const downloadFile = async() => {
-    const fileBytes = await getBinaryContent(filePathDownload);
-    const filePathAr = filePathDownload.split("/");
-    download(fileBytes, filePathAr[filePathAr.length - 1], "application/pdf");
+  const downloadFile = async(filePath) => {
+    const fileBytes = await getBinaryContent(filePath);
+    const filePathAr = filePath.split("/");
+    const fileName =  filePathAr[filePathAr.length - 1];
+    const extension = filePathAr[filePathAr.length - 1].split(".").pop();
+    download(fileBytes, fileName, getMimeType(extension));
   }
 
   useEffect(() => {
     setOpen(true);
+    if (data && data.tipo && data.tipo == "EV") {
+      isQuizFinalized.current = false;
+    }else{
+      isQuizFinalized.current = true;
+    }
+    durationFromDB.current = false;
     prepareHtml();
-    insertView();
     setOpen(false);
   }, [data]);
 
   useEffect(() => {
+    setIsSaved(false);
+    setPlaying(false);
+    setCount(0);
     if (html) {
-        renderMultimediaComponents();
-        document.getElementsByClassName("main")[0].scrollTo({ top: 0, left: 0 });
+      videosDuration.current = 0;
+      audiosDuration.current = 0;
+      renderMultimediaComponents();
+      document.getElementsByClassName("main")[0].scrollTo({ top: 0, left: 0 });
+      const videos = data.videos ? data.videos.split(',') : null;
+      const audios = data.audios ? data.audios.split(',') : null;
+      if (!videos && !audios) {
+        if (type == "SUBLESSON"){
+          setPlaying(true);
+        }
+      }
     }
   }, [html]);
 
+
+  useEffect(()=>{
+    if (count > 0) {
+      console.log(count)
+      let readyTimeVideos = true;
+      let readyTimeAudios = true;
+      let readyTimeOther = true;
+      if (durationFromDB.current == false){
+        if (artPlayerInstances.length > 0 && videosDuration.current > 0) {
+          const currentPercentVideos = ((count * 100) / videosDuration.current)
+          if (currentPercentVideos < MAX_DURATION_VIDEOS_PERCENTAGE ||  count > videosDuration.current) {
+            readyTimeVideos = false;
+          }
+        }
+  
+        if (audiosDuration.current > 0) {
+          const currentPercentAudios = ((count * 100) / audiosDuration.current)
+          if (currentPercentAudios < MAX_DURATION_AUDIOS_PERCENTAGE ||  count > audiosDuration.current) {
+            readyTimeAudios = false;
+          }
+        }
+  
+        if (artPlayerInstances.length == 0 && audiosDuration.current == 0) {
+          if ((count < sublessonDuration.current || !isQuizFinalized.current) ||  count > sublessonDuration.current) {
+            readyTimeOther = false;
+          } 
+        }
+      }else{
+        if ((count < sublessonDuration.current || !isQuizFinalized.current) ||  count > sublessonDuration.current) {
+          readyTimeOther = false;
+        } 
+      }
+      
+
+      if (readyTimeVideos == true &&
+        readyTimeAudios == true &&
+        readyTimeOther == true) {
+          setPlaying(false);
+          setCount(0);
+          insertView();
+        }
+    }
+  }, [count])
 
   return (
     <Grid container columns={{ xs: 4, md: 12 }} spacing={2}>
@@ -331,17 +536,15 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
       <Grid item xs={12}>
         {html ? <div className="mt-content">{parse(html)}</div> : null}
       </Grid>
-      {
-        data && filePathDownload  ? (
+      { data && filePathDownload && filePathDownload.map(function(file) {
+        return (
           <Grid item xs={12} className="download-button-container">
             <Button onClick={async()=>{
-              await downloadFile();
-            }} variant="outlined" download>{data.texto_boton}</Button>
+              await downloadFile(file.file);
+            }} variant="outlined" download>{file.buttonText}</Button>
           </Grid>
-        ):(
-          null
         )
-      }
+      })}
     
       <Grid item xs={12} className="lessons-button-container-center">
         <ButtomCustom onClick={()=>{
@@ -350,7 +553,8 @@ const ContentRenderer = ({ data, type, courseCode, onContinue }) => {
           Continuar
         </ButtomCustom>
       </Grid>
-      
+      <input type={"hidden"} value={isSaved} id={"input-hidden-saved"} />
+      <input type={"hidden"} value={isPlaying} id={"input-hidden-is-playing"} />
     </Grid>
   );
 };

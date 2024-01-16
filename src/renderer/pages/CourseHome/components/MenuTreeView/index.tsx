@@ -93,7 +93,7 @@ function StyledTreeItem(props: StyledTreeItemProps) {
 }
 
 const MenuTreeView = React.forwardRef(
-  ({ data, onClickItem, isFormFinalize, isTestFinalize, onChangeMenu }, ref) => {
+  ({ data, onClickItem, isFormFinalize, isTestFinalize, isSublessonFinalize, onChangeMenu }, ref) => {
     const [dataMenu, setDataMenu] = React.useState([]);
     const [selectedNode, setSelectedNode] = React.useState(null);
     const [expanded, setExpanded] = React.useState<string[]>([]);
@@ -196,7 +196,8 @@ const MenuTreeView = React.forwardRef(
             ].sublessons[parseInt(selectedNodeParts[3])].cod_formulario &&
             !dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
               parseInt(selectedNodeParts[2])
-            ].sublessons[parseInt(selectedNodeParts[3])].test_id
+            ].sublessons[parseInt(selectedNodeParts[3])].test_id && 
+            isSublessonFinalize
           ) {
             dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
               parseInt(selectedNodeParts[2])
@@ -271,7 +272,8 @@ const MenuTreeView = React.forwardRef(
               ].sublessons[parseInt(selectedNodeParts[3])].cod_formulario &&
               !dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
                 parseInt(selectedNodeParts[2])
-              ].sublessons[parseInt(selectedNodeParts[3])].test_id
+              ].sublessons[parseInt(selectedNodeParts[3])].test_id &&
+              isSublessonFinalize
             ) {
               dataMenuCopy[parseInt(selectedNodeParts[1])].lessons[
                 parseInt(selectedNodeParts[2])

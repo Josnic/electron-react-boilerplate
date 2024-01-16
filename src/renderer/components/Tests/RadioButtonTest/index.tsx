@@ -199,7 +199,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
             )[0];
             answersTemp.push({
               category: questions.OK[i].category,
-              value: r.valor,
+              value: r ? r.valor : 0,
             });
           }
           setAnswers(answersTemp);
@@ -241,6 +241,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     if (data) {
       setOpen(true);
       loadTestData();
+      document.getElementsByClassName("main")[0].scrollTo({ top: 0, left: 0 });
       setOpen(false);
     }
   }, [data]);
@@ -810,37 +811,42 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
     } else {
       setOpen(true);
       await insertDataTest();
-      switch (currentTest.cod_test) {
-        case 'COVI_Autoevaluacion':
+      const codTest = currentTest.cod_test.split("_");
+      if (currentTest.cod_test != "Test_DISC") {
+        codTest.shift();
+      }
+      const finalCodTest = codTest.join("_");
+      switch (finalCodTest) {
+        case 'Autoevaluacion':
           resultByCategory();
           COVI_AutoevaluacionResponse();
           break;
 
-        case 'COVI_Raiz_amargura':
+        case 'Raiz_amargura':
           resultByCategory();
           COVI_Raiz_amarguraResponse();
           break;
-        case 'INEM_nivel_IE':
+        case 'nivel_IE':
           resultByCategory();
           INEM_nivel_IEResponse();
           break;
 
-          case "INEM_asertividad":
+          case "asertividad":
             resultByCategory();
             INEM_asertividad_Response();
           break;
 
-          case "INEM_hab_socioemoc":
+          case "hab_socioemoc":
             resultByCategory();
             INEM_hab_socioemoc_Response();
           break;
 
-          case "INEM_necesidades":
+          case "necesidades":
             resultByCategory();
             INEM_necesidades_Response();
           break;
 
-          case "INEM_autogestion":
+          case "autogestion":
             INEM_autogestion_Response();
           break;
 
@@ -848,7 +854,7 @@ const RadioButtonTest = ({ data, courseCode, onFinalize, onContinue }) => {
             Test_DISC_Response();
           break;
 
-          case "LITR_Blake_Mouton":
+          case "Blake_Mouton":
             resultByCategory();
             LITR_Blake_Mouton_Response();
           break;

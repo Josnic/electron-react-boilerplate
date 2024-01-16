@@ -85,6 +85,7 @@ export default function MenuFooter({ isCourse, open, courseCode, legalPage, webs
     const constancia_porc_formularios = [];
     const constancia_porc_tests = [];
     const userId = authState && authState.auth.user ? authState.auth.user.email : "test";
+    let sublessonsEV = [];
     const units = await sqlite3All(`SELECT *, 0 AS viewed, imagen_unid AS imagen, video AS videos FROM unidades WHERE cod_curso = '${courseCode}' ORDER BY orden ASC`);
     if (units.OK){
       const dataMenu = units.OK;
@@ -98,6 +99,7 @@ export default function MenuFooter({ isCourse, open, courseCode, legalPage, webs
             FROM sublecciones 
             WHERE cod_leccion = '${lessons.OK[j].cod_leccion}' ORDER BY orden ASC`);
             if (sublessons.OK){
+              sublessonsEV = sublessons.OK.filter(ele => ele.tipo == "EV");
               lessons.OK[j]["sublessons"] = sublessons.OK;
               lessons.OK[j]["viewed"] = checkLesson(lessons.OK[j]) ? 1 : 0;
             }else{
@@ -117,7 +119,6 @@ export default function MenuFooter({ isCourse, open, courseCode, legalPage, webs
       console.log(configuration)
       if (configuration.OK && configuration.OK.length > 0){
         const courseconfiguration = configuration.OK[0];
-
         for (let i = 0; i < dataMenu.length; i++) {
           if (dataMenu[i].lessons.length > 0){
             for (let j = 0; j < dataMenu[i].lessons.length; j++) {
@@ -142,7 +143,8 @@ export default function MenuFooter({ isCourse, open, courseCode, legalPage, webs
 
         if (courseconfiguration.constancia_porc_lecciones <= parseInt(constancia_porc_lecciones.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0))  &&
           courseconfiguration.constancia_porc_formularios <= parseInt(constancia_porc_formularios.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0)) &&
-          courseconfiguration.constancia_porc_tests <= parseInt(constancia_porc_tests.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0))
+          courseconfiguration.constancia_porc_tests <= parseInt(constancia_porc_tests.reduce((accumulator, currentValue) => { return accumulator + currentValue;}, 0)) &&
+          sublessonsEV.filter(ele => ele.viewed == 0) == 0
         ){
           const filePath = `/constancias.asar/${courseCode}.pdf`
 
@@ -189,7 +191,7 @@ export default function MenuFooter({ isCourse, open, courseCode, legalPage, webs
 
           exportDiscPdf(objText, [], filePath, customFonts);
         }else{
-          showToast('No es posible generar la constancia ya que te falta realizar actividades.');
+          showToast('No es posible generar la constancia ya que te falta realizar actividades y/o Evaluaciones.');
         }
 
       }else{

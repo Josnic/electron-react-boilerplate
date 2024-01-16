@@ -109,6 +109,7 @@ export default function CourseHome() {
   const { courseCode } = useParams();
   const [isFormFinalize, setIsFormFinalize] = React.useState(false);
   const [isTestFinalize, setIsTestFinalize] = React.useState(false);
+  const [isSublessonFinalize, setIsSublessonFinalize] = React.useState(false);
   const [percentage, setPercentage] = React.useState(0);
   const [legalPage, setLegalPage] = React.useState('<div></div>');
   const [website, setWebsite] = React.useState('');
@@ -199,6 +200,7 @@ export default function CourseHome() {
     setShowUnits(false);
     setIsTestFinalize(false);
     setIsFormFinalize(false);
+    setIsSublessonFinalize(false);
     if (data.cod_formulario && data.cod_formulario != ""){
       setHtmlContent(null);
       setTestData(null);
@@ -278,6 +280,7 @@ export default function CourseHome() {
           onChangeMenu={getPercentage}
           isFormFinalize={isFormFinalize}
           isTestFinalize={isTestFinalize}
+          isSublessonFinalize={isSublessonFinalize}
           ref={menuTreeViewRef} 
         />
       </Drawer>
@@ -305,9 +308,12 @@ export default function CourseHome() {
                     data={htmlContent.data} 
                     type={htmlContent.type} 
                     courseCode={courseCode}
+                    onFinalize={()=>{
+                      setIsSublessonFinalize(true);
+                    }}
                     onContinue={()=> {
                       if (nextNodeId){
-                        menuTreeViewRef.current.setSelectedNode(nextNodeId);
+                        menuTreeViewRef.current.setSelectedNode(nextNodeId, isSublessonFinalize);
                       }
                     }} 
                   />
